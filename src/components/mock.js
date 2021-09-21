@@ -4,13 +4,12 @@ export const makePickRessource = (onPicked) =>
 
         var ressourcesPicker = document.getElementById("ressourcesPicker");
         ressourcesPicker.style.display = "";
-        console.log("AAAAAAAA", ressourcesPicker.getAttribute("data-type"));
         var typeId = ressourcesPicker.getAttribute("data-type");
         var typeNode = document.getElementById("pickRessource" + typeId);
         var ressourceId = nodeRessourcePicker.getAttribute("data-ressourceId");
 
         typeNode.className += " ressourceSelected";
-        typeNode.setAttribute("data-name", nodeRessourcePicker.lastChild.nodeValue);
+        typeNode.setAttribute("data-name", nodeRessourcePicker.lastChild?.nodeValue);
         typeNode.setAttribute("data-ressourceId", ressourceId);
         typeNode.innerHTML = "";
         this.contentWindow.updateVerbalRessources();
@@ -22,7 +21,6 @@ export const makePickRessource = (onPicked) =>
             { typeId: typeId }
         );
 
-        console.log("picked", ressourceId, typeId);
         onPicked(Number(ressourceId), typeId);
     };
 
@@ -46,7 +44,6 @@ export const makeClickOnTypePicker = (onUnpick) =>
             //remove corresponding the ressources markers
             this.contentWindow.removeRessourceMarkers(type);
 
-            console.log("unpicked");
             onUnpick(type);
         }
     };
