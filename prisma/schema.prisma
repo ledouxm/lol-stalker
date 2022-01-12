@@ -1,0 +1,35 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../lol-stalking.db"
+}
+
+model Friend {
+  puuid       String       @id
+  id          String 
+  gameName    String
+  gameTag     String
+  name        String
+  summonerId  Int
+  icon        Int
+  ranks       Ranking[]
+  createdAt   DateTime     @default(now())
+}
+
+model Ranking {
+    id            Int       @id @default(autoincrement())
+    division      String    
+    tier          String
+    leaguePoints  Int
+    wins          Int
+    losses        Int
+    puuid         String
+    friend        Friend    @relation(fields: [puuid], references: [puuid])
+    createdAt     DateTime  @default(now())
+}

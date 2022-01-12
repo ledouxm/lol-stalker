@@ -1,13 +1,10 @@
-export interface FriendDto {
+import { Prisma } from "@prisma/client";
+export interface FriendDto extends Prisma.FriendCreateInput {
     availability: string;
     displayGroupId: number;
     displayGroupName: string;
-    gameName: string;
-    gameTag: string;
     groupId: number;
     groupName: string;
-    icon: number;
-    id: string;
     isP2PConversationMuted: boolean;
     lastSeenOnlineTimestamp?: any;
     name: string;
@@ -17,10 +14,8 @@ export interface FriendDto {
     platformId: string;
     product: string;
     productName: string;
-    puuid: string;
     statusMessage: string;
     summary: string;
-    summonerId: number;
     time: number;
 }
 
@@ -274,12 +269,12 @@ export interface RankedStats {
     splitsProgress: SplitsProgress;
 }
 
-export interface Friend {
-    puuid: string;
-    id: string;
-    gameName: string;
-    gameTag: string;
-    name: string;
-    summonerId: number;
-    icon: number;
-}
+// export interface Friend {
+//     puuid: string;
+//     id: string;
+//     gameName: string;
+//     gameTag: string;
+//     name: string;
+//     summonerId: number;
+//     icon: number;
+// }

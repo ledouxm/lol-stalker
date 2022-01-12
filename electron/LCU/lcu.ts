@@ -1,8 +1,18 @@
 import axios, { AxiosInstance } from "axios";
 import https from "https";
 import LCUConnector from "lcu-connector";
-import { CurrentSummoner, Friend, FriendDto, Queue, RankedStats } from "./types";
+import { CurrentSummoner, FriendDto, Queue, RankedStats } from "./types";
 import { pick } from "@pastable/core";
+import { Prisma } from "@prisma/client";
+import {
+    addOrUpdateFriends,
+    addRanking,
+    getFriendsAndRankingFromDb,
+    getFriendsFromDb,
+} from "../routes/friends";
+import { formatRank, makeDebug } from "../utils";
+
+const debug = makeDebug("LCU");
 
 const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 const connector = new LCUConnector();
@@ -38,17 +48,27 @@ export interface AuthData {
 // const theoPuuid = "4ab5d4e7-0e24-54ac-b8e7-2a72c8483712";
 // const getTheoSoloQRank = () => getSoloQRankedStats(theoPuuid);
 export const startCheckFriendList = async () => {
-    const friendListStats = await checkFriendList();
-    console.log(friendListStats);
-    friendsRef.current = friendListStats;
+    friendsRef.current = await getFriendsAndRankingFromDb();
 
-    setInterval(async () => {
+    if (!friendsRef.current?.length) {
+        const friendListStats = await checkFriendList();
+        friendsRef.current = friendListStats;
+    }
+
+    while (true) {
         const friendListStats = await checkFriendList();
         const changes = compareFriends(friendsRef.current, friendListStats);
+        if (changes.length) {
+            debug("changes", changes);
+            for (const change of changes) {
+                await addRanking(change, change.puuid);
+            }
+        } else debug("no soloQ played by friends");
 
-        console.log(changes);
         friendsRef.current = friendListStats;
-    }, 60000);
+
+        await new Promise((resolve) => setTimeout(resolve, 10000));
+    }
 };
 
 interface FriendChange extends FriendStats {
@@ -71,7 +91,7 @@ const compareFriends = (oldFriends: FriendStats[], newFriends: FriendStats[]) =>
     return changes;
 };
 
-type FriendStats = Pick<Friend, "name" | "puuid"> &
+type FriendStats = Pick<Prisma.FriendCreateInput, "name" | "puuid"> &
     Pick<Queue, "division" | "tier" | "leaguePoints" | "wins" | "losses">;
 
 const friendsRef = {
@@ -80,8 +100,10 @@ const friendsRef = {
 
 export const checkFriendList = async () => {
     const friends = await getFriends();
+    debug(`fetched ${friends.length} friends`);
+    await addOrUpdateFriends(friends);
     const stats = await getMultipleSummonerSoloQStats(friends);
-
+    debug(`fetched stats ${stats.length}`);
     return stats;
 };
 
@@ -102,13 +124,18 @@ export const getSoloQRankedStats = async (puuid: string) =>
         (queue) => queue.queueType === "RANKED_SOLO_5x5"
     );
 export const getMultipleSummonerSoloQStats = async (
-    summoners: Pick<Friend, "puuid" | "name">[]
+    summoners: Pick<Prisma.FriendCreateInput, "puuid" | "name">[]
 ) => {
     const summonersRanks = [];
     for (const summoner of summoners) {
+        // debug(`checking rank for friend ${summoner.name}`);
         try {
             const rank = await getSoloQRankedStats(summoner.puuid);
-            if (!rank) throw "no rank";
+            if (!rank) {
+                debug("no rank found");
+                throw "no rank";
+            }
+            // debug(formatRank(rank));
             summonersRanks.push({
                 ...pick(rank, ["division", "tier", "leaguePoints", "wins", "losses"]),
                 ...pick(summoner, ["name", "puuid"]),

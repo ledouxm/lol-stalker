@@ -1,7 +1,11 @@
+import "./envVars";
 import { join } from "path";
 import { BrowserWindow, app, ipcMain, ipcRenderer, Notification } from "electron";
 import isDev from "electron-is-dev";
-import { connectorStatus } from "./LCU/lcu";
+import { connectorStatus, startCheckFriendList } from "./LCU/lcu";
+import { makeDebug } from "./utils";
+import { getFriendsFromDb } from "./routes/friends";
+const debug = makeDebug("index");
 
 const height = 600;
 const width = 800;
@@ -26,7 +30,6 @@ function createWindow() {
     // window.setAlwaysOnTop(true, "status");
 
     const port = process.env.PORT || 3000;
-    console.log(isDev);
     const url = isDev ? `https://localhost:${port}` : join(__dirname, "../src/out/index.html");
 
     // and load the index.html of the app.
@@ -47,9 +50,9 @@ function createWindow() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.commandLine.appendSwitch("ignore-certificate-errors");
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+    debug("starting electron app");
     createWindow();
-
     app.on("activate", function () {
         // On macOS it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.
@@ -59,6 +62,8 @@ app.whenReady().then(() => {
 
 ipcMain.on("lcu/connection", () => {
     console.log("salut");
+    // getFriendsFromDb().then((data) => console.log(data));
+    startCheckFriendList();
     window.webContents.send("lcu/connection", connectorStatus.current);
 });
 
