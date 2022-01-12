@@ -1,12 +1,11 @@
 import { Box, ChakraProvider } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { AppCanvas, Socket } from "./components/Socket";
+import { LCUConnector } from "./components/LCUConnector";
 
 function App() {
     return (
         <ChakraProvider>
-            <Socket />
-            <AppCanvas />
+            <LCUConnector />
         </ChakraProvider>
     );
 }
