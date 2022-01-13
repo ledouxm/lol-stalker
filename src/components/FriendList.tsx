@@ -53,8 +53,9 @@ export const FriendGroup = ({ group }: { group: GroupClient }) => {
                     defaultChecked={isChecked}
                     checked={isChecked}
                     isIndeterminate={isIndeterminate}
-                    outline="none"
-                    boxShadow="none"
+                    _focusVisible={{
+                        boxShadow: "none",
+                    }}
                     onChange={onChange}
                 />
                 {isOpen ? <ChevronDownIcon /> : <ChevronRightIcon />}
