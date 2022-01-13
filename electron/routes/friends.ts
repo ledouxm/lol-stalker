@@ -7,7 +7,7 @@ import { pick } from "@pastable/core";
 const friendDebug = makeDebug("prisma/friend");
 const rankingDebug = makeDebug("prisma/ranking");
 
-const friendFields: (keyof Prisma.FriendCreateInput)[] = [
+const friendFields: (keyof Omit<Prisma.FriendCreateInput, "oldNames">)[] = [
     "gameName",
     "gameTag",
     "icon",
@@ -67,6 +67,15 @@ export const addOrUpdateFriends = async (friends: Prisma.FriendCreateInput[]) =>
                 friendDto.groupName !== existingFriend.groupName ||
                 friendDto.selected !== existingFriend.selected
             ) {
+                if (friendDto.gameName !== existingFriend.gameName) {
+                    await prisma.friendName.create({
+                        data: {
+                            puuid: friendDto.puuid,
+                            name: existingFriend.name,
+                        },
+                    });
+                }
+
                 friendDebug(`update friend ${existingFriend.name}`);
                 await prisma.friend.update({
                     where: { puuid: friend.puuid },
@@ -84,7 +93,7 @@ export const addOrUpdateFriends = async (friends: Prisma.FriendCreateInput[]) =>
     debug("add or update ended");
 };
 export const addRanking = async (
-    ranking: Omit<Prisma.RankingCreateInput, "friend">,
+    ranking: Omit<Prisma.RankingCreateInput, "friend" | "oldNames">,
     puuid: Prisma.FriendCreateInput["puuid"],
     name?: Prisma.FriendCreateInput["name"]
 ) => {

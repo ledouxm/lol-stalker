@@ -21,6 +21,7 @@ model Friend {
   summonerId            Int
   icon                  Int
   ranks                 Ranking[]
+  oldNames              FriendName[]
   createdAt             DateTime     @default(now())
   selected              Boolean      @default(true)
 }
@@ -36,4 +37,12 @@ model Ranking {
   puuid                 String
   friend                Friend       @relation(fields: [puuid], references: [puuid])
   createdAt             DateTime     @default(now())
+}
+
+model FriendName {
+  id                    Int         @id @default(autoincrement())
+  name                  String       @default("")
+  createdAt             DateTime     @default(now())
+  puuid                 String
+  friend                Friend       @relation(fields: [puuid], references: [puuid])
 }
