@@ -1,5 +1,12 @@
 import { Prisma } from "@prisma/client";
 import debug from "debug";
+import { BrowserWindow } from "electron";
+
+export const sendToClient = (channel: string, ...args: any[]) =>
+    console.log(channel)! || BrowserWindow.getAllWindows()?.[0]?.webContents.send(channel, ...args);
+
+export const makeDataDragonUrl = (buildVersion: string) =>
+    `https://ddragon.leagueoflegends.com/cdn/dragontail-${buildVersion}.tgz`;
 
 export const makeDebug = (suffix: string) => debug("lol-stalking").extend(suffix);
 export const formatRank = (

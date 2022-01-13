@@ -7,36 +7,66 @@ import { pick } from "@pastable/core";
 const friendDebug = makeDebug("prisma/friend");
 const rankingDebug = makeDebug("prisma/ranking");
 
+const friendFields: (keyof Prisma.FriendCreateInput)[] = [
+    "gameName",
+    "gameTag",
+    "icon",
+    "id",
+    "name",
+    "puuid",
+    "summonerId",
+    "groupId",
+    "groupName",
+    "selected",
+];
+const rankingFields: (keyof Omit<Prisma.RankingCreateInput, "friend">)[] = [
+    "division",
+    "tier",
+    "leaguePoints",
+    "wins",
+    "losses",
+    "miniSeriesProgress",
+];
+
 export const getFriendsFromDb = () => prisma.friend.findMany();
-export const getFriendsAndRankingFromDb = async () => {
-    const friends = await prisma.friend.findMany({ include: { ranks: true } });
+
+export const getFriendsAndRankingsFromDb = () =>
+    prisma.friend.findMany({ include: { ranks: true } });
+
+export const getFriendAndRankingsFromDb = (puuid: Prisma.FriendCreateInput["puuid"]) =>
+    prisma.friend.findUnique({ where: { puuid }, include: { ranks: true } });
+
+export const getFriendsAndLastRankingFromDb = async () => {
+    const friends = await getFriendsAndRankingsFromDb();
     return friends.map((friend) => {
         const lastRank = friend.ranks.sort(
             (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
         )[0];
         return {
-            ...pick(friend, ["name", "puuid"]),
-            ...pick(lastRank, ["division", "tier", "leaguePoints", "wins", "losses"]),
+            ...pick(friend, friendFields),
+            ...pick(lastRank, rankingFields),
         };
     });
 };
+
+export const toggleSelectFriends = async (
+    puuids: Prisma.FriendCreateInput["puuid"][],
+    newState: boolean
+) => prisma.friend.updateMany({ where: { puuid: { in: puuids } }, data: { selected: newState } });
 
 export const addOrUpdateFriends = async (friends: Prisma.FriendCreateInput[]) => {
     const existingFriends = await getFriendsFromDb();
 
     for (const friend of friends) {
-        const friendDto = pick(friend, [
-            "gameName",
-            "gameTag",
-            "icon",
-            "id",
-            "name",
-            "puuid",
-            "summonerId",
-        ]);
+        const friendDto = pick(friend, friendFields);
         const existingFriend = existingFriends.find((ef) => ef.puuid === friend.puuid);
         if (existingFriend) {
-            if (friendDto.gameName !== existingFriend.gameName) {
+            if (
+                friendDto.gameName !== existingFriend.gameName ||
+                friendDto.groupId !== existingFriend.groupId ||
+                friendDto.groupName !== existingFriend.groupName ||
+                friendDto.selected !== existingFriend.selected
+            ) {
                 friendDebug(`update friend ${existingFriend.name}`);
                 await prisma.friend.update({
                     where: { puuid: friend.puuid },
@@ -60,6 +90,9 @@ export const addRanking = async (
 ) => {
     rankingDebug(`create ranking for friend ${name || puuid}: ${formatRank(ranking)}`);
     return prisma.ranking.create({
-        data: { ...pick(ranking, ["division", "leaguePoints", "losses", "tier", "wins"]), puuid },
+        data: {
+            ...pick(ranking, rankingFields),
+            puuid,
+        },
     });
 };

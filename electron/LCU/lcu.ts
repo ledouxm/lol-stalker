@@ -7,7 +7,9 @@ import { Prisma } from "@prisma/client";
 import {
     addOrUpdateFriends,
     addRanking,
-    getFriendsAndRankingFromDb,
+    getFriendAndRankingsFromDb,
+    getFriendsAndLastRankingFromDb,
+    getFriendsAndRankingsFromDb,
     getFriendsFromDb,
 } from "../routes/friends";
 import { formatRank, makeDebug } from "../utils";
@@ -30,6 +32,10 @@ connector.on("connect", async (data) => {
         headers: { Authorization: `Basic ${data.password}` },
     });
     // startCheckFriendList();
+
+    // console.log(await getTheoSoloQRank());
+    const friendsRanks = await getFriendAndRankingsFromDb(theoPuuid);
+    console.log(friendsRanks);
 });
 connector.on("disconnect", () => {
     connectorStatus.current = null;
@@ -45,10 +51,10 @@ export interface AuthData {
     protocol: string;
 }
 
-// const theoPuuid = "4ab5d4e7-0e24-54ac-b8e7-2a72c8483712";
-// const getTheoSoloQRank = () => getSoloQRankedStats(theoPuuid);
+const theoPuuid = "4ab5d4e7-0e24-54ac-b8e7-2a72c8483712";
+const getTheoSoloQRank = () => getSoloQRankedStats(theoPuuid);
 export const startCheckFriendList = async () => {
-    friendsRef.current = await getFriendsAndRankingFromDb();
+    friendsRef.current = await getFriendsAndLastRankingFromDb();
 
     if (!friendsRef.current?.length) {
         const friendListStats = await checkFriendList();

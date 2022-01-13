@@ -11,25 +11,29 @@ datasource db {
 }
 
 model Friend {
-  puuid       String       @id
-  id          String 
-  gameName    String
-  gameTag     String
-  name        String
-  summonerId  Int
-  icon        Int
-  ranks       Ranking[]
-  createdAt   DateTime     @default(now())
+  puuid                 String       @id
+  id                    String 
+  gameName              String
+  gameTag               String
+  groupId               Int          @default(0)
+  groupName             String       @default("NONE")
+  name                  String
+  summonerId            Int
+  icon                  Int
+  ranks                 Ranking[]
+  createdAt             DateTime     @default(now())
+  selected              Boolean      @default(true)
 }
 
 model Ranking {
-    id            Int       @id @default(autoincrement())
-    division      String    
-    tier          String
-    leaguePoints  Int
-    wins          Int
-    losses        Int
-    puuid         String
-    friend        Friend    @relation(fields: [puuid], references: [puuid])
-    createdAt     DateTime  @default(now())
+  id                    Int          @id @default(autoincrement())
+  division              String    
+  tier                  String
+  leaguePoints          Int
+  wins                  Int
+  losses                Int
+  miniSeriesProgress    String       @default("")
+  puuid                 String
+  friend                Friend       @relation(fields: [puuid], references: [puuid])
+  createdAt             DateTime     @default(now())
 }

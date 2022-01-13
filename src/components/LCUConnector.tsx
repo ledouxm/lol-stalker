@@ -1,32 +1,29 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import React from "react";
+import { useQuery } from "react-query";
+import { atom } from "jotai";
+import { useUpdateAtom } from "jotai/utils";
 // console.log(https.Agent);
 export const LCUConnector = () => {
-    const [authData, setAuthData] = useState(null as any);
     useEffect(() => {
-        window.Main.on("lcu/connection", (data: any) => {
-            if (!data) {
-                console.log("disconnected");
-                return setAuthData(null);
-            }
-            setAuthData(data);
-            console.log("connected", data);
-
-            const resp = axios
-                .get(
-                    `${data.protocol}://${data.username}:${data.password}@${data.address}:${data.port}/lol-summoner/v1/current-summoner`,
-                    {
-                        headers: { Authorization: `Basic ${data.password}` },
-                        // httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-                    }
-                )
-                .then(console.log)
-                .catch(console.error);
-        });
+        window.Main.on("lcu/connection", (data: any) => {});
 
         window.ipcRenderer.send("lcu/connection");
     }, []);
 
-    return <div>salut à tous</div>;
+    usePatchVersion();
+    return null;
 };
+
+export const patchVersionAtom = atom<string>(null as unknown as string);
+export const usePatchVersion = () => {
+    const setPatchVersion = useUpdateAtom(patchVersionAtom);
+    useQuery("version", getDataDragonVersion, {
+        refetchOnWindowFocus: false,
+        staleTime: 1000 * 60 * 60,
+        onSuccess: (data) => setPatchVersion(data),
+    });
+};
+
+export const getDataDragonVersion = async () =>
+    (await axios.get("https://ddragon.leagueoflegends.com/api/versions.json")).data[0];
