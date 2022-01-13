@@ -21,3 +21,4 @@ yarn-error.log*
 .env.production.local
 
 *.db
+lol-stalking.db
