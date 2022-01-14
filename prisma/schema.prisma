@@ -3,6 +3,8 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../electron/prismaClient"
+  binaryTargets = ["native"]
 }
 
 datasource db {

@@ -6,6 +6,7 @@ import { atomWithStorage, useUpdateAtom } from "jotai/utils";
 import { getRankDifference, sendMessage } from "../utils";
 import { friendsAtom, selectedFriendsAtom } from "../features/FriendList/useFriendList";
 import { FriendDto } from "../types";
+import { useInterval } from "@chakra-ui/react";
 
 export enum LocalStorageKeys {
     OpenGroups = "lol-stalking/openGroups",
@@ -19,6 +20,8 @@ export const LCUConnector = () => {
 
     const queryClient = useQueryClient();
     usePatchVersion();
+
+    useInterval(() => console.log(window.location.pathname), 1000);
 
     useEffect(() => {
         window.ipcRenderer.send("lcu/connection");

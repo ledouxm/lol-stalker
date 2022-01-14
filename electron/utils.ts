@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "./prismaClient";
 import debug from "debug";
 import { BrowserWindow } from "electron";
 
@@ -104,6 +104,6 @@ export const getRankDifference = (oldRank: Rank, newRank: Rank) => {
         type: hasLost ? "LOSS" : "WIN",
         from: formatRank(oldRank),
         to: formatRank(newRank),
-        content: `${hasLost ? "LOST" : "GAINED"} ${Math.abs(lpDifference)} LPs`,
+        content: `${hasLost ? "LOST" : "GAINED"} ${Math.abs(lpDifference)} LP`,
     };
 };

@@ -3,7 +3,7 @@ import https from "https";
 import LCUConnector from "lcu-connector";
 import { CurrentSummoner, FriendDto, Queue, RankedStats } from "./types";
 import { pick } from "@pastable/core";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "../prismaClient";
 import {
     addNotification,
     addOrUpdateFriends,

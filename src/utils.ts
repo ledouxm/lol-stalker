@@ -45,5 +45,5 @@ export const getRankDifference = (oldRank: MinimalRank, newRank: MinimalRank) =>
     }
 
     const lpDifference = oldRank.leaguePoints - newRank.leaguePoints;
-    return `${lpDifference > 0 ? "LOST" : "GAINED"} ${Math.abs(lpDifference)} LPs`;
+    return `${lpDifference > 0 ? "LOST" : "GAINED"} ${Math.abs(lpDifference)} LP`;
 };

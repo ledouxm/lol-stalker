@@ -74,8 +74,18 @@
             "main",
             "src/out",
             {
-                "from": "node_modules/.prisma/client/",
-                "to": "node_modules/.prisma/client/"
+                "from": "./",
+                "to": "main/",
+                "filter": [
+                    "*.db"
+                ]
+            },
+            {
+                "from": "electron/prismaClient",
+                "to": "main/prismaClient",
+                "filter": [
+                    "*.prisma"
+                ]
             }
         ],
         "directories": {

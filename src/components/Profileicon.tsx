@@ -5,7 +5,7 @@ import { patchVersionAtom } from "./LCUConnector";
 
 export const ProfileIcon = ({ icon, ...props }: { icon: FriendDto["icon"] } & BoxProps) => {
     const patchVersion = useAtomValue(patchVersionAtom);
-
+    console.log(patchVersion);
     if (!patchVersion)
         return (
             <Box boxSize="50px" {...props}>

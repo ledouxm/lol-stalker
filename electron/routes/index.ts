@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "../prismaClient";
 import { makeDebug, sendToClient } from "../utils";
 import {
     getFriendAndRankingsFromDb,

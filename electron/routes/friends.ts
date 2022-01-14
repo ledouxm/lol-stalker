@@ -1,5 +1,5 @@
 import { prisma } from "../db";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "../prismaClient";
 import { formatRank, makeDebug } from "../utils";
 import debug from "debug";
 import { pick } from "@pastable/core";
