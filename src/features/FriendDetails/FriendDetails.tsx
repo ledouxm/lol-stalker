@@ -3,14 +3,14 @@ import { Box, Flex, Spinner, Stack } from "@chakra-ui/react";
 import { useQuery } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { ProfileIcon } from "../../components/Profileicon";
+import { FriendAllRanksDto, FriendDto, RankDto } from "../../types";
 import { electronRequest } from "../../utils";
-import { FriendClient } from "../FriendList/FriendList";
 
-export const formatRank = (ranking: Pick<Rank, "division" | "tier" | "leaguePoints">) =>
+export const formatRank = (ranking: Pick<RankDto, "division" | "tier" | "leaguePoints">) =>
     `${ranking.tier} ${ranking.division} - ${ranking.leaguePoints}`;
 
-const getFriendRanks = (puuid: FriendClient["puuid"]) =>
-    electronRequest<FriendObject>("friendList/friend", puuid);
+const getFriendRanks = (puuid: FriendDto["puuid"]) =>
+    electronRequest<FriendAllRanksDto>("friendList/friend", puuid);
 export const FriendDetails = () => {
     const { puuid } = useParams<{ puuid: string }>();
     const navigate = useNavigate();
@@ -40,7 +40,7 @@ export const FriendDetails = () => {
     );
 };
 
-export const RankDetails = ({ rank }: { rank: Rank }) => {
+export const RankDetails = ({ rank }: { rank: RankDto }) => {
     return (
         <Flex>
             <Box>
@@ -50,30 +50,3 @@ export const RankDetails = ({ rank }: { rank: Rank }) => {
         </Flex>
     );
 };
-
-export interface Rank {
-    id: number;
-    division: string;
-    tier: string;
-    leaguePoints: number;
-    wins: number;
-    losses: number;
-    miniSeriesProgress: string;
-    puuid: string;
-    createdAt: Date;
-}
-
-export interface FriendObject {
-    puuid: string;
-    id: string;
-    gameName: string;
-    gameTag: string;
-    groupId: number;
-    groupName: string;
-    name: string;
-    summonerId: number;
-    icon: number;
-    createdAt: Date;
-    selected: boolean;
-    ranks: Rank[];
-}

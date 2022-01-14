@@ -1,9 +1,9 @@
 import { Box, BoxProps, chakra, Spinner } from "@chakra-ui/react";
 import { useAtomValue } from "jotai/utils";
+import { FriendDto } from "../types";
 import { patchVersionAtom } from "./LCUConnector";
-import { FriendClient } from "../features/FriendList/FriendList";
 
-export const ProfileIcon = ({ icon, ...props }: { icon: FriendClient["icon"] } & BoxProps) => {
+export const ProfileIcon = ({ icon, ...props }: { icon: FriendDto["icon"] } & BoxProps) => {
     const patchVersion = useAtomValue(patchVersionAtom);
 
     if (!patchVersion)
@@ -18,5 +18,5 @@ export const ProfileIcon = ({ icon, ...props }: { icon: FriendClient["icon"] } &
     return <chakra.img boxSize="50px" borderRadius="50%" src={src} {...props} />;
 };
 
-export const getProfileIconUrl = (patchVersion: string, icon: FriendClient["icon"]) =>
+export const getProfileIconUrl = (patchVersion: string, icon: FriendDto["icon"]) =>
     `https://ddragon.leagueoflegends.com/cdn/${patchVersion}/img/profileicon/${icon}.png`;

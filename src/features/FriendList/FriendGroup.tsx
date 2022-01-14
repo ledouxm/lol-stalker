@@ -3,12 +3,12 @@ import { chakra, Checkbox, Flex, Stack, useDisclosure } from "@chakra-ui/react";
 import { ChangeEvent, useMemo } from "react";
 import { sendMessage } from "../../utils";
 import { ProfileIcon } from "../../components/Profileicon";
-import { FriendClient } from "./FriendList";
 import { useNavigate } from "react-router-dom";
 import { useAtom } from "jotai";
 import { openGroupsAtom } from "../../components/LCUConnector";
+import { FriendDto, FriendGroup } from "../../types";
 
-export const FriendGroup = ({ group }: { group: GroupClient }) => {
+export const FriendGroupRow = ({ group }: { group: FriendGroup }) => {
     const [openGroups, setOpenGroups] = useAtom(openGroupsAtom);
 
     const defaultIsOpen = useMemo(() => openGroups.includes(group.groupId), []);
@@ -72,7 +72,7 @@ export const FriendGroup = ({ group }: { group: GroupClient }) => {
     );
 };
 
-export const FriendRow = ({ friend }: { friend: FriendClient }) => {
+export const FriendRow = ({ friend }: { friend: FriendDto }) => {
     const navigate = useNavigate();
 
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -97,9 +97,3 @@ export const FriendRow = ({ friend }: { friend: FriendClient }) => {
         </Flex>
     );
 };
-
-export interface GroupClient {
-    groupId: number;
-    groupName: string;
-    friends: FriendClient[];
-}

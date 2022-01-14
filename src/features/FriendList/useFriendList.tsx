@@ -1,25 +1,29 @@
 import { pick } from "@pastable/core";
-import { atom } from "jotai";
-import { useUpdateAtom } from "jotai/utils";
+import { atom, useAtom } from "jotai";
+import { useAtomValue } from "jotai/utils";
 import { useEffect } from "react";
-import { QueryOptions, useQuery, useQueryClient } from "react-query";
-import { electronRequest } from "../../utils";
-import { GroupClient } from "./FriendGroup";
-import { FriendClient } from "./FriendList";
-export const friendsAtom = atom<FriendClient[]>([]);
+import { useQueryClient } from "react-query";
+import { FriendGroup, FriendLastRankDto } from "../../types";
+import { sendMessage } from "../../utils";
+
+export const friendsAtom = atom<FriendLastRankDto[]>([]);
+export const groupsAtom = atom((get) => getFriendListFilteredByGroups(get(friendsAtom)));
 
 export const useFriendList = () => {
-    const setFriends = useUpdateAtom(friendsAtom);
+    const [friends, setFriends] = useAtom(friendsAtom);
+    const friendGroups = useAtomValue(groupsAtom);
     const queryClient = useQueryClient();
+
     useEffect(() => {
         window.Main.on("friendList/invalidate", () => queryClient.invalidateQueries("friendList"));
+        window.Main.on("friendList/lastRank", setFriends);
+        sendMessage("friendList/lastRank");
     }, []);
-    return useQuery("friendList", () => getFriendListFilteredByGroups((data) => setFriends(data)));
+
+    return { friends, friendGroups };
 };
 
-export const getFriendListFilteredByGroups = async (onSuccess?: (data: FriendClient[]) => void) => {
-    const friends = await electronRequest<FriendClient[]>("friendList/lastRank");
-    onSuccess?.(friends);
+export const getFriendListFilteredByGroups = (friends: FriendLastRankDto[]) => {
     return friends
         .reduce((groups, friend) => {
             const groupIndex = groups.findIndex((group) => group.groupId === friend.groupId);
@@ -27,6 +31,6 @@ export const getFriendListFilteredByGroups = async (onSuccess?: (data: FriendCli
                 groups.push({ ...pick(friend, ["groupId", "groupName"]), friends: [friend] });
             } else groups[groupIndex].friends.push(friend);
             return groups;
-        }, [] as GroupClient[])
+        }, [] as FriendGroup[])
         .sort((_, groupB) => (groupB.groupName === "**Default" ? -1 : 1));
 };

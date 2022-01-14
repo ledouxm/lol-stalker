@@ -2,9 +2,9 @@ import { Box, Flex, Spinner, Stack } from "@chakra-ui/react";
 import { useMemo } from "react";
 import { useQuery } from "react-query";
 import { electronRequest } from "../../utils";
-import { FriendObject } from "../FriendDetails/FriendDetails";
 import { useAtomValue } from "jotai/utils";
 import { friendsAtom } from "../FriendList/useFriendList";
+import { FriendDto } from "../../types";
 
 const getNotifications = () => electronRequest<NotificationObject[]>("notifications");
 export const Notifications = () => {
@@ -49,6 +49,6 @@ export interface NotificationObject {
     id: number;
     content: string;
     puuid: string;
-    friend: Partial<FriendObject>;
+    friend: Partial<FriendDto>;
     createdAt?: Date;
 }
