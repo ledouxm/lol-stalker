@@ -1,7 +1,7 @@
 export interface FriendDto {
     gameName: string;
     gameTag: string;
-    id: string;
+    id: number;
     summonerId: number;
     groupId: number;
     groupName: string;
@@ -11,7 +11,7 @@ export interface FriendDto {
     selected: boolean;
 }
 
-export type FriendLastRankDto = FriendDto & RankDto;
+export type FriendLastRankDto = FriendDto & Omit<RankDto, "id">;
 export type FriendAllRanksDto = FriendDto & { ranks: RankDto[] };
 export interface RankDto {
     id: number;

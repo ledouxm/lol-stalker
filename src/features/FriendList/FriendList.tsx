@@ -1,6 +1,7 @@
 import { Center, Spinner, Stack } from "@chakra-ui/react";
-import { useFriendList } from "./useFriendList";
+import { selectedFriendsAtom, useFriendList } from "./useFriendList";
 import { FriendGroupRow } from "./FriendGroup";
+import { useAtomValue } from "jotai/utils";
 
 export const FriendList = () => {
     const { friendGroups } = useFriendList();

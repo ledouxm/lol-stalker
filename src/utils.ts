@@ -1,4 +1,4 @@
-import { Rank } from "./features/FriendDetails/FriendDetails";
+import { RankDto } from "./types";
 
 export const sendMessage = window.ipcRenderer.send;
 
@@ -25,7 +25,7 @@ const tiers = [
     "CHALLENGER",
 ];
 const divisions = ["IV", "III", "II", "I"];
-export type MinimalRank = Pick<Rank, "division" | "tier" | "leaguePoints">;
+export type MinimalRank = Pick<RankDto, "division" | "tier" | "leaguePoints">;
 export const getRankDifference = (oldRank: MinimalRank, newRank: MinimalRank) => {
     const sameTier = oldRank.tier === newRank.tier;
     const sameDivision = oldRank.division === newRank.division;

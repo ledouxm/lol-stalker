@@ -5,6 +5,7 @@ import {
     getFriendsAndLastRankingFromDb,
     getFriendsAndRankingsFromDb,
     getNotifications,
+    getSelectedFriends,
     toggleSelectFriends,
 } from "./friends";
 const debug = makeDebug("routes");
@@ -14,7 +15,7 @@ export const sendFriendList = async () => {
     sendToClient("friendList/lastRank", groups);
 };
 
-export const sendInvalidateFriendList = async () => sendToClient("friendList/invalidate");
+export const sendInvalidate = async (queryName: string) => sendToClient("invalidate", queryName);
 
 export const sendFriendRank = async (_: any, puuid: Prisma.FriendCreateInput["puuid"]) => {
     const groups = await getFriendAndRankingsFromDb(puuid);
@@ -31,6 +32,11 @@ export const sendNotifications = async () => {
     sendToClient("notifications", notifications);
 };
 
+export const sendSelected = async () => {
+    const selected = await getSelectedFriends();
+    sendToClient("friendList/selected", selected);
+};
+
 export type SelectEventType = "add" | "remove" | "";
 export const receiveToggleSelectFriends = async (
     _: any,
@@ -40,9 +46,8 @@ export const receiveToggleSelectFriends = async (
     }
 ) => {
     const { type, puuids } = data;
-
     const payload = Array.isArray(puuids) ? puuids : [puuids];
-    console.log("toggle select", puuids, type);
+
     await toggleSelectFriends(payload, type === "add");
-    sendInvalidateFriendList();
+    sendSelected();
 };

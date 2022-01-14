@@ -1,26 +1,25 @@
 import { pick } from "@pastable/core";
-import { atom, useAtom } from "jotai";
+import { atom } from "jotai";
 import { useAtomValue } from "jotai/utils";
-import { useEffect } from "react";
-import { useQueryClient } from "react-query";
-import { FriendGroup, FriendLastRankDto } from "../../types";
-import { sendMessage } from "../../utils";
+import { FriendDto, FriendGroup, FriendLastRankDto } from "../../types";
 
 export const friendsAtom = atom<FriendLastRankDto[]>([]);
 export const groupsAtom = atom((get) => getFriendListFilteredByGroups(get(friendsAtom)));
-
+export const selectedFriendsAtom = atom<FriendDto["puuid"][]>([]);
+export interface FriendUpdate extends Partial<FriendDto> {
+    puuid: FriendDto["puuid"];
+}
 export const useFriendList = () => {
-    const [friends, setFriends] = useAtom(friendsAtom);
+    const friends = useAtomValue(friendsAtom);
     const friendGroups = useAtomValue(groupsAtom);
-    const queryClient = useQueryClient();
-
-    useEffect(() => {
-        window.Main.on("friendList/invalidate", () => queryClient.invalidateQueries("friendList"));
-        window.Main.on("friendList/lastRank", setFriends);
-        sendMessage("friendList/lastRank");
-    }, []);
 
     return { friends, friendGroups };
+};
+
+export const useSelectedFriends = (puuid: FriendDto["puuid"]) => {
+    const selectedFriends = useAtomValue(selectedFriendsAtom);
+
+    return selectedFriends.includes(puuid);
 };
 
 export const getFriendListFilteredByGroups = (friends: FriendLastRankDto[]) => {

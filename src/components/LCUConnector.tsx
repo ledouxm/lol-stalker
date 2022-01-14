@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useQuery, useQueryClient } from "react-query";
-import { atom } from "jotai";
+import { atom, useAtom } from "jotai";
 import { atomWithStorage, useUpdateAtom } from "jotai/utils";
-import { getRankDifference } from "../utils";
+import { getRankDifference, sendMessage } from "../utils";
+import { friendsAtom, selectedFriendsAtom } from "../features/FriendList/useFriendList";
+import { FriendDto } from "../types";
 
 export enum LocalStorageKeys {
     OpenGroups = "lol-stalking/openGroups",
@@ -12,18 +14,32 @@ export enum LocalStorageKeys {
 export const openGroupsAtom = atomWithStorage<number[]>(LocalStorageKeys.OpenGroups, []);
 
 export const LCUConnector = () => {
+    const setFriends = useUpdateAtom(friendsAtom);
+    const setSelectedFriends = useUpdateAtom(selectedFriendsAtom);
+
     const queryClient = useQueryClient();
     usePatchVersion();
+
     useEffect(() => {
         window.ipcRenderer.send("lcu/connection");
-        window.Main.on("friendList/changes", (changes: FriendChange[]) => {
-            // console.log(changes);
-            const messages = changes.map(
-                (change) => change.name + ": " + getRankDifference(change.oldFriend, change)
-            );
-            queryClient.invalidateQueries("notifications");
-            console.log(messages);
-        });
+        window.Main.on("invalidate", (queryName: string) =>
+            queryClient.invalidateQueries(queryName)
+        );
+        window.Main.on("friendList/lastRank", setFriends);
+        window.Main.on("friendList/selected", (selected: Pick<FriendDto, "puuid" | "selected">[]) =>
+            setSelectedFriends(
+                selected.filter((friend) => !!friend.selected).map((friend) => friend.puuid)
+            )
+        );
+        // TODO: remove since this is for debug purpose
+        // window.Main.on("friendList/changes", (changes: FriendChange[]) => {
+        //     const messages = changes.map(
+        //         (change) => change.name + ": " + getRankDifference(change.oldFriend, change)
+        //         );
+        //         console.log(messages);
+        //     });
+        sendMessage("friendList/lastRank");
+        sendMessage("friendList/selected");
     }, []);
 
     return null;

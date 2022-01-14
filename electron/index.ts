@@ -7,6 +7,7 @@ import {
     sendFriendListWithRankings,
     sendFriendRank,
     sendNotifications,
+    sendSelected,
 } from "./routes";
 import { makeDebug } from "./utils";
 import isDev from "electron-is-dev";
@@ -35,6 +36,7 @@ export function makeWindow() {
     });
     const port = process.env.PORT || 3001;
     const url = isDev ? `https://localhost:${port}` : join(__dirname, "../src/out/index.html");
+    window.webContents.openDevTools();
 
     isDev ? window?.loadURL(url) : window?.loadFile(url);
 
@@ -60,6 +62,7 @@ ipcMain.on("friendList/lastRank", sendFriendList);
 ipcMain.on("friendList/friend", sendFriendRank);
 ipcMain.on("friendList/ranks", sendFriendListWithRankings);
 ipcMain.on("friendList/select", receiveToggleSelectFriends);
+ipcMain.on("friendList/selected", () => sendSelected());
 ipcMain.on("notifications", sendNotifications);
 
 ipcMain.on("close", () => {

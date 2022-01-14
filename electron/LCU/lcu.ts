@@ -72,6 +72,7 @@ export const startCheckFriendList = async () => {
                     toNotify.push(change);
             }
             sendToClient("friendList/changes", toNotify);
+            sendToClient("invalidate", "notification");
         } else console.log("no soloQ played by friends");
 
         friendsRef.current = friendListStats;

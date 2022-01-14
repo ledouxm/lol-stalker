@@ -7,11 +7,13 @@ import { useNavigate } from "react-router-dom";
 import { useAtom } from "jotai";
 import { openGroupsAtom } from "../../components/LCUConnector";
 import { FriendDto, FriendGroup } from "../../types";
+import { selectedFriendsAtom, useSelectedFriends } from "./useFriendList";
+import { useAtomValue } from "jotai/utils";
 
 export const FriendGroupRow = ({ group }: { group: FriendGroup }) => {
     const [openGroups, setOpenGroups] = useAtom(openGroupsAtom);
-
     const defaultIsOpen = useMemo(() => openGroups.includes(group.groupId), []);
+    const selectedFriends = useAtomValue(selectedFriendsAtom);
 
     const { isOpen, onToggle } = useDisclosure({
         onOpen: () => {
@@ -29,9 +31,14 @@ export const FriendGroupRow = ({ group }: { group: FriendGroup }) => {
         defaultIsOpen,
     });
 
-    const isChecked = useMemo(() => group.friends.every((friend) => friend.selected), [group]);
-    const isIndeterminate =
-        useMemo(() => group.friends.some((friend) => friend.selected), [group]) && !isChecked;
+    const isChecked = useMemo(
+        () => group.friends.every((friend) => selectedFriends.includes(friend.puuid)),
+        [group, selectedFriends]
+    );
+    const isIndeterminate = useMemo(
+        () => !isChecked && group.friends.some((friend) => selectedFriends.includes(friend.puuid)),
+        [group, selectedFriends]
+    );
 
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
         const newState = e.target.checked;
@@ -47,7 +54,12 @@ export const FriendGroupRow = ({ group }: { group: FriendGroup }) => {
                     checked={isChecked}
                     isIndeterminate={isIndeterminate}
                     _focusVisible={{
-                        boxShadow: "none",
+                        outline: "none !important",
+                        boxShadow: "none !important",
+                    }}
+                    boxShadox="none !important"
+                    _focus={{
+                        boxShadow: "none !important",
                     }}
                     onChange={onChange}
                 />
@@ -73,6 +85,8 @@ export const FriendGroupRow = ({ group }: { group: FriendGroup }) => {
 };
 
 export const FriendRow = ({ friend }: { friend: FriendDto }) => {
+    const isChecked = useSelectedFriends(friend.puuid);
+
     const navigate = useNavigate();
 
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -84,14 +98,14 @@ export const FriendRow = ({ friend }: { friend: FriendDto }) => {
     };
 
     return (
-        <Flex pl="15px" alignItems="center" opacity={friend.selected ? "1" : ".3"}>
-            <Checkbox isChecked={friend.selected} onChange={onChange} />
+        <Flex pl="15px" alignItems="center" opacity={isChecked ? "1" : ".3"}>
+            <Checkbox isChecked={isChecked} onChange={onChange} mr="10px" />
             <Flex
                 alignItems="center"
                 onClick={() => navigate(`/friend/${friend.puuid}`)}
                 cursor="pointer"
             >
-                <ProfileIcon icon={friend.icon} ml="10px" />
+                <ProfileIcon icon={friend.icon} />
                 <chakra.span pl="15px">{friend.name}</chakra.span>
             </Flex>
         </Flex>
