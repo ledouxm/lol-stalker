@@ -53,14 +53,6 @@ export const FriendGroupRow = ({ group }: { group: FriendGroup }) => {
                     defaultChecked={isChecked}
                     checked={isChecked}
                     isIndeterminate={isIndeterminate}
-                    _focusVisible={{
-                        outline: "none !important",
-                        boxShadow: "none !important",
-                    }}
-                    boxShadox="none !important"
-                    _focus={{
-                        boxShadow: "none !important",
-                    }}
                     onChange={onChange}
                 />
                 {isOpen ? <ChevronDownIcon /> : <ChevronRightIcon />}

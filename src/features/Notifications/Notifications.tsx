@@ -3,22 +3,20 @@ import { useMemo } from "react";
 import { useQuery } from "react-query";
 import { electronRequest } from "../../utils";
 import { useAtomValue } from "jotai/utils";
-import { friendsAtom } from "../FriendList/useFriendList";
+import { selectedFriendsAtom } from "../FriendList/useFriendList";
 import { FriendDto } from "../../types";
 
 const getNotifications = () => electronRequest<NotificationObject[]>("notifications");
 export const Notifications = () => {
     const notificationsQuery = useQuery("notifications", getNotifications);
-    const friends = useAtomValue(friendsAtom);
+    const selectedFriends = useAtomValue(selectedFriendsAtom);
 
     if (notificationsQuery.isLoading) return <Spinner />;
     if (notificationsQuery.error) return <Box>An error has occured</Box>;
     const baseNotifications = notificationsQuery.data!;
 
-    const notifications = friends
-        ? baseNotifications.filter(
-              (notif) => friends.find((friend) => friend.puuid === notif.puuid)?.selected
-          )
+    const notifications = selectedFriends
+        ? baseNotifications.filter((notif) => selectedFriends.includes(notif.puuid))
         : baseNotifications;
 
     return (
