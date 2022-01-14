@@ -11,7 +11,10 @@ export const makeDataDragonUrl = (buildVersion: string) =>
 export const makeDebug = (suffix: string) => debug("lol-stalking").extend(suffix);
 export const formatRank = (
     ranking: Pick<Prisma.RankingCreateInput, "division" | "tier" | "leaguePoints">
-) => `${ranking.tier} ${ranking.division} - ${ranking.leaguePoints} LPs`;
+) =>
+    `${ranking.tier}${ranking.division !== "NA" ? ` ${ranking.division}` : ""} - ${
+        ranking.leaguePoints
+    } LPs`;
 
 export const ranks: Rank[] = [
     {

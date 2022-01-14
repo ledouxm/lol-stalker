@@ -1,3 +1,19 @@
+html {
+    overflow-x: hidden;
+}
+
+*::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+*::-webkit-scrollbar-track {
+    border-radius: 7px;
+}
+*::-webkit-scrollbar-thumb {
+    border-radius: 7px;
+    background-color: #c1c1c1;
+}
+
 .chakra-checkbox__control {
     box-shadow: none !important;
 }

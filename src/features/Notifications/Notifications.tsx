@@ -1,4 +1,4 @@
-import { Box, Flex, Spinner, Stack, Tooltip } from "@chakra-ui/react";
+import { Box, Flex, Spinner, Stack } from "@chakra-ui/react";
 import { useAtomValue } from "jotai/utils";
 import { useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
@@ -38,27 +38,28 @@ export const NotificationItem = ({
 }) => {
     const navigate = useNavigate();
     return (
-        <Tooltip label={formatTooltipLabel(notification)}>
-            <Flex flexDir="column" alignItems="flex-end" pr="10px">
-                <Flex justifyContent="flex-end">
-                    <Box
-                        fontWeight="bold"
-                        _hover={{
-                            textDecoration: isClickable ? "underline" : "initial",
-                        }}
-                        cursor={isClickable ? "pointer" : "initial"}
-                        onClick={() => isClickable && navigate(`/friend/${notification.puuid}`)}
-                    >
-                        {notification.friend.name}
-                    </Box>
-                    <Box ml="10px">{notification.content}</Box>
-                </Flex>
-                <Box fontSize="small" color="gray">
-                    {notification.createdAt?.toLocaleDateString()}{" "}
-                    {notification.createdAt?.toLocaleTimeString()}
+        <Flex flexDir="column" alignItems="flex-end" pr="10px">
+            <Flex justifyContent="flex-end">
+                <Box
+                    fontWeight="bold"
+                    _hover={{
+                        textDecoration: isClickable ? "underline" : "initial",
+                    }}
+                    cursor={isClickable ? "pointer" : "initial"}
+                    onClick={() => isClickable && navigate(`/friend/${notification.puuid}`)}
+                >
+                    {notification.friend.name}
                 </Box>
+                <Box ml="10px">{notification.content}</Box>
             </Flex>
-        </Tooltip>
+            <Box fontSize="small" color="gray.400">
+                {formatTooltipLabel(notification)}
+            </Box>
+            <Box fontSize="small" color="gray">
+                {notification.createdAt?.toLocaleDateString()}{" "}
+                {notification.createdAt?.toLocaleTimeString()}
+            </Box>
+        </Flex>
     );
 };
 

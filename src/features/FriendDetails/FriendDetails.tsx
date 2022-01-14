@@ -8,7 +8,9 @@ import { electronRequest } from "../../utils";
 import { FriendNotifications } from "./FriendNotifications";
 
 export const formatRank = (ranking: Pick<RankDto, "division" | "tier" | "leaguePoints">) =>
-    `${ranking.tier} ${ranking.division} - ${ranking.leaguePoints} LPs`;
+    `${ranking.tier}${ranking.division !== "NA" ? ` ${ranking.division}` : ""} - ${
+        ranking.leaguePoints
+    } LPs`;
 
 const getFriendRanks = (puuid: FriendDto["puuid"]) =>
     electronRequest<FriendAllRanksDto>("friendList/friend", puuid);
