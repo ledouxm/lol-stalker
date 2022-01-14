@@ -30,3 +30,14 @@ export interface FriendGroup {
     groupName: string;
     friends: FriendLastRankDto[];
 }
+
+export interface NotificationDto {
+    id: number;
+    type: string;
+    from: string;
+    to: string;
+    content: string;
+    puuid: string;
+    createdAt: Date;
+    friend: Pick<FriendDto, "icon" | "name">;
+}

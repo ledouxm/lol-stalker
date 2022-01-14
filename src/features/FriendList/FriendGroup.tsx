@@ -1,5 +1,5 @@
 import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import { chakra, Checkbox, Flex, Stack, useDisclosure } from "@chakra-ui/react";
+import { chakra, Checkbox, Flex, FlexProps, Stack, useDisclosure } from "@chakra-ui/react";
 import { ChangeEvent, useMemo } from "react";
 import { sendMessage } from "../../utils";
 import { ProfileIcon } from "../../components/Profileicon";
@@ -65,18 +65,16 @@ export const FriendGroupRow = ({ group }: { group: FriendGroup }) => {
                     {group.groupName} ({group.friends.length})
                 </chakra.span>
             </Flex>
-            {isOpen && (
-                <Stack mt="10px">
-                    {group.friends.map((friend) => (
-                        <FriendRow key={friend.puuid} friend={friend} />
-                    ))}
-                </Stack>
-            )}
+            <Stack mt="10px" display={isOpen ? "flex" : "none"}>
+                {group.friends.map((friend) => (
+                    <FriendRow key={friend.puuid} friend={friend} />
+                ))}
+            </Stack>
         </Flex>
     );
 };
 
-export const FriendRow = ({ friend }: { friend: FriendDto }) => {
+export const FriendRow = ({ friend, ...props }: { friend: FriendDto } & FlexProps) => {
     const isChecked = useSelectedFriends(friend.puuid);
 
     const navigate = useNavigate();
@@ -90,7 +88,7 @@ export const FriendRow = ({ friend }: { friend: FriendDto }) => {
     };
 
     return (
-        <Flex pl="15px" alignItems="center" opacity={isChecked ? "1" : ".3"}>
+        <Flex pl="15px" alignItems="center" opacity={isChecked ? "1" : ".3"} {...props}>
             <Checkbox isChecked={isChecked} onChange={onChange} mr="10px" />
             <Flex
                 alignItems="center"

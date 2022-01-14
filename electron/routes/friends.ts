@@ -123,3 +123,9 @@ export const getNotifications = () =>
         include: { friend: { select: { name: true, icon: true } } },
         take: 20,
     });
+export const getFriendNotifications = (puuid: Prisma.FriendCreateInput["puuid"]) =>
+    prisma.notification.findMany({
+        where: { puuid },
+        orderBy: { createdAt: "desc" },
+        include: { friend: { select: { name: true, icon: true } } },
+    });

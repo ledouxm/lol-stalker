@@ -11,7 +11,7 @@ export const makeDataDragonUrl = (buildVersion: string) =>
 export const makeDebug = (suffix: string) => debug("lol-stalking").extend(suffix);
 export const formatRank = (
     ranking: Pick<Prisma.RankingCreateInput, "division" | "tier" | "leaguePoints">
-) => `${ranking.tier} ${ranking.division} - ${ranking.leaguePoints}`;
+) => `${ranking.tier} ${ranking.division} - ${ranking.leaguePoints} LPs`;
 
 export const ranks: Rank[] = [
     {
@@ -84,11 +84,23 @@ export const getRankDifference = (oldRank: Rank, newRank: Rank) => {
             tiers.findIndex((tier) => tier === oldRank.tier) <
             tiers.findIndex((tier) => tier === newRank.tier);
         const hasPromoted = hasTierPromoted || (hasDivisionPromoted && sameTier);
-        return `${hasPromoted ? "PROMOTED" : "DEMOTED"} FROM ${oldRank.tier} ${
-            oldRank.division
-        } TO ${newRank.tier} ${newRank.division}`;
+
+        return {
+            type: hasPromoted ? "PROMOTION" : "DEMOTION",
+            from: formatRank(oldRank),
+            to: formatRank(newRank),
+            content: `${hasPromoted ? "PROMOTED" : "DEMOTED"} FROM ${oldRank.tier} ${
+                oldRank.division
+            } TO ${newRank.tier} ${newRank.division}`,
+        };
     }
 
     const lpDifference = oldRank.leaguePoints - newRank.leaguePoints;
-    return `${lpDifference > 0 ? "LOST" : "GAINED"} ${Math.abs(lpDifference)} LPs`;
+    const hasLost = lpDifference > 0;
+    return {
+        type: hasLost ? "LOSS" : "WIN",
+        from: formatRank(oldRank),
+        to: formatRank(newRank),
+        content: `${hasLost ? "LOST" : "GAINED"} ${Math.abs(lpDifference)} LPs`,
+    };
 };

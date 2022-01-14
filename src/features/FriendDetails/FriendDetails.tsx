@@ -5,9 +5,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ProfileIcon } from "../../components/Profileicon";
 import { FriendAllRanksDto, FriendDto, RankDto } from "../../types";
 import { electronRequest } from "../../utils";
+import { FriendNotifications } from "./FriendNotifications";
 
 export const formatRank = (ranking: Pick<RankDto, "division" | "tier" | "leaguePoints">) =>
-    `${ranking.tier} ${ranking.division} - ${ranking.leaguePoints}`;
+    `${ranking.tier} ${ranking.division} - ${ranking.leaguePoints} LPs`;
 
 const getFriendRanks = (puuid: FriendDto["puuid"]) =>
     electronRequest<FriendAllRanksDto>("friendList/friend", puuid);
@@ -21,7 +22,6 @@ export const FriendDetails = () => {
     if (friendQuery.error) return <Box>An error has occured</Box>;
 
     const friend = friendQuery.data!;
-    console.log(friend);
     return (
         <Stack p="10px">
             <Flex>
@@ -31,11 +31,14 @@ export const FriendDetails = () => {
                 <ProfileIcon icon={friend.icon} />
                 <Box ml="10px">{friend.name}</Box>
             </Flex>
-            <Stack>
-                {friend.ranks.map((rank) => (
-                    <RankDetails key={rank.id} rank={rank} />
-                ))}
-            </Stack>
+            <Flex justifyContent="space-between">
+                <Stack>
+                    {friend.ranks.map((rank) => (
+                        <RankDetails key={rank.id} rank={rank} />
+                    ))}
+                </Stack>
+                <FriendNotifications puuid={puuid!} />
+            </Flex>
         </Stack>
     );
 };

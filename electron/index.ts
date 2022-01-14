@@ -5,6 +5,7 @@ import {
     receiveToggleSelectFriends,
     sendFriendList,
     sendFriendListWithRankings,
+    sendFriendNotifications,
     sendFriendRank,
     sendNotifications,
     sendSelected,
@@ -12,6 +13,7 @@ import {
 import { makeDebug } from "./utils";
 import isDev from "electron-is-dev";
 import { connector } from "./LCU/lcu";
+import { getFriendNotifications } from "./routes/friends";
 
 const debug = makeDebug("index");
 const height = 600;
@@ -64,7 +66,7 @@ ipcMain.on("friendList/ranks", sendFriendListWithRankings);
 ipcMain.on("friendList/select", receiveToggleSelectFriends);
 ipcMain.on("friendList/selected", () => sendSelected());
 ipcMain.on("notifications", sendNotifications);
-
+ipcMain.on("notifications/friend", sendFriendNotifications);
 ipcMain.on("close", () => {
     window.close();
     app.exit(0);

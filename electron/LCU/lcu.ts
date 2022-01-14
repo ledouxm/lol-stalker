@@ -66,8 +66,8 @@ export const startCheckFriendList = async () => {
             console.log("changes", changes);
             for (const change of changes) {
                 await addRanking(change, change.puuid);
-                const content = getRankDifference(change.oldFriend as any, change as any);
-                await addNotification({ content, puuid: change.puuid });
+                const notification = getRankDifference(change.oldFriend as any, change as any);
+                await addNotification({ ...notification, puuid: change.puuid });
                 if (selectedFriends.find((friend) => friend.puuid === change.puuid))
                     toNotify.push(change);
             }
