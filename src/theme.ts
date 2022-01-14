@@ -1,12 +1,26 @@
 import { extendTheme } from "@chakra-ui/react";
 
-// 2. Add your color mode config
+export const scrollbarStyle = {
+    css: {
+        "&::-webkit-scrollbar": {
+            width: "7px",
+            height: "7px",
+        },
+        "&::-webkit-scrollbar-track": {
+            borderRadius: "7px",
+        },
+        "&::-webkit-scrollbar-thumb": {
+            borderRadius: "7px",
+            backgroundColor: "#C1C1C1",
+        },
+    },
+};
+
 const config = {
     initialColorMode: "dark",
     useSystemColorMode: false,
 };
 
-// 3. extend the theme
 const theme = extendTheme({ config });
 
 export default theme;

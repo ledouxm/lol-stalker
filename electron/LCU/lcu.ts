@@ -5,19 +5,18 @@ import { CurrentSummoner, FriendDto, Queue, RankedStats } from "./types";
 import { pick } from "@pastable/core";
 import { Prisma } from "@prisma/client";
 import {
+    addNotification,
     addOrUpdateFriends,
     addRanking,
-    getFriendAndRankingsFromDb,
     getFriendsAndLastRankingFromDb,
-    getFriendsAndRankingsFromDb,
-    getFriendsFromDb,
+    getSelectedFriends,
 } from "../routes/friends";
-import { formatRank, makeDebug } from "../utils";
+import { getRankDifference, makeDebug, sendToClient } from "../utils";
 
 const debug = makeDebug("LCU");
 
 const httpsAgent = new https.Agent({ rejectUnauthorized: false });
-const connector = new LCUConnector();
+export const connector = new LCUConnector();
 export const connectorStatus = {
     current: null as any,
     api: null as unknown as AxiosInstance,
@@ -31,17 +30,12 @@ connector.on("connect", async (data) => {
         httpsAgent,
         headers: { Authorization: `Basic ${data.password}` },
     });
-    // startCheckFriendList();
-
-    // console.log(await getTheoSoloQRank());
-    const friendsRanks = await getFriendAndRankingsFromDb(theoPuuid);
-    console.log(friendsRanks);
+    console.log("connected to riot client");
+    startCheckFriendList();
 });
 connector.on("disconnect", () => {
     connectorStatus.current = null;
 });
-
-connector.start();
 
 export interface AuthData {
     address: string;
@@ -54,6 +48,7 @@ export interface AuthData {
 const theoPuuid = "4ab5d4e7-0e24-54ac-b8e7-2a72c8483712";
 const getTheoSoloQRank = () => getSoloQRankedStats(theoPuuid);
 export const startCheckFriendList = async () => {
+    console.log("start checking friendlist");
     friendsRef.current = await getFriendsAndLastRankingFromDb();
 
     if (!friendsRef.current?.length) {
@@ -65,11 +60,19 @@ export const startCheckFriendList = async () => {
         const friendListStats = await checkFriendList();
         const changes = compareFriends(friendsRef.current, friendListStats);
         if (changes.length) {
-            debug("changes", changes);
+            const selectedFriends = await getSelectedFriends();
+
+            const toNotify: FriendChange[] = [];
+            console.log("changes", changes);
             for (const change of changes) {
                 await addRanking(change, change.puuid);
+                const content = getRankDifference(change.oldFriend as any, change as any);
+                await addNotification({ content, puuid: change.puuid });
+                if (selectedFriends.find((friend) => friend.puuid === change.puuid))
+                    toNotify.push(change);
             }
-        } else debug("no soloQ played by friends");
+            sendToClient("friendList/changes", toNotify);
+        } else console.log("no soloQ played by friends");
 
         friendsRef.current = friendListStats;
 

@@ -6,9 +6,11 @@ import {
     sendFriendList,
     sendFriendListWithRankings,
     sendFriendRank,
+    sendNotifications,
 } from "./routes";
 import { makeDebug } from "./utils";
 import isDev from "electron-is-dev";
+import { connector } from "./LCU/lcu";
 
 const debug = makeDebug("index");
 const height = 600;
@@ -40,6 +42,7 @@ export function makeWindow() {
 }
 app.whenReady().then(async () => {
     debug("starting electron app");
+    connector.start();
     makeWindow();
     app.on("activate", function () {
         // On macOS it's common to re-create a window in the app when the
@@ -57,6 +60,7 @@ ipcMain.on("friendList/lastRank", sendFriendList);
 ipcMain.on("friendList/friend", sendFriendRank);
 ipcMain.on("friendList/ranks", sendFriendListWithRankings);
 ipcMain.on("friendList/select", receiveToggleSelectFriends);
+ipcMain.on("notifications", sendNotifications);
 
 ipcMain.on("close", () => {
     window.close();

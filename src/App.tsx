@@ -1,8 +1,9 @@
-import { Box, ChakraProvider } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { ChakraProvider } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "react-query";
-import { FriendList } from "./components/FriendList";
+import { Route, Routes } from "react-router-dom";
 import { LCUConnector } from "./components/LCUConnector";
+import { FriendDetails } from "./features/FriendDetails/FriendDetails";
+import { Home } from "./Home";
 import theme from "./theme";
 
 const queryClient = new QueryClient();
@@ -12,7 +13,10 @@ function App() {
         <QueryClientProvider client={queryClient}>
             <ChakraProvider theme={theme}>
                 <LCUConnector />
-                <FriendList />
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/friend/:puuid" element={<FriendDetails />} />
+                </Routes>
             </ChakraProvider>
         </QueryClientProvider>
     );

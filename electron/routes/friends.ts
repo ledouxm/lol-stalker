@@ -7,7 +7,7 @@ import { pick } from "@pastable/core";
 const friendDebug = makeDebug("prisma/friend");
 const rankingDebug = makeDebug("prisma/ranking");
 
-const friendFields: (keyof Omit<Prisma.FriendCreateInput, "oldNames">)[] = [
+const friendFields: (keyof Omit<Prisma.FriendCreateInput, "oldNames" | "notifications">)[] = [
     "gameName",
     "gameTag",
     "icon",
@@ -34,7 +34,10 @@ export const getFriendsAndRankingsFromDb = () =>
     prisma.friend.findMany({ include: { ranks: true } });
 
 export const getFriendAndRankingsFromDb = (puuid: Prisma.FriendCreateInput["puuid"]) =>
-    prisma.friend.findUnique({ where: { puuid }, include: { ranks: true } });
+    prisma.friend.findUnique({
+        where: { puuid },
+        include: { ranks: { orderBy: { createdAt: "desc" } } },
+    });
 
 export const getFriendsAndLastRankingFromDb = async () => {
     const friends = await getFriendsAndRankingsFromDb();
@@ -44,11 +47,12 @@ export const getFriendsAndLastRankingFromDb = async () => {
         )[0];
         return {
             ...pick(friend, friendFields),
-            ...pick(lastRank, rankingFields),
+            ...(lastRank ? pick(lastRank, rankingFields) : {}),
         };
     });
 };
 
+export const getSelectedFriends = () => prisma.friend.findMany({ where: { selected: true } });
 export const toggleSelectFriends = async (
     puuids: Prisma.FriendCreateInput["puuid"][],
     newState: boolean
@@ -105,3 +109,12 @@ export const addRanking = async (
         },
     });
 };
+
+export const addNotification = (data: Prisma.NotificationUncheckedCreateInput) =>
+    prisma.notification.create({ data });
+export const getNotifications = () =>
+    prisma.notification.findMany({
+        orderBy: { createdAt: "desc" },
+        include: { friend: { select: { name: true, icon: true } } },
+        take: 20,
+    });

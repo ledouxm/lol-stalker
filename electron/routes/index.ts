@@ -4,6 +4,7 @@ import {
     getFriendAndRankingsFromDb,
     getFriendsAndLastRankingFromDb,
     getFriendsAndRankingsFromDb,
+    getNotifications,
     toggleSelectFriends,
 } from "./friends";
 const debug = makeDebug("routes");
@@ -23,6 +24,11 @@ export const sendFriendRank = async (_: any, puuid: Prisma.FriendCreateInput["pu
 export const sendFriendListWithRankings = async () => {
     const groups = await getFriendsAndRankingsFromDb();
     sendToClient("friendList/lastRank", groups);
+};
+
+export const sendNotifications = async () => {
+    const notifications = await getNotifications();
+    sendToClient("notifications", notifications);
 };
 
 export type SelectEventType = "add" | "remove" | "";
