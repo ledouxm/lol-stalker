@@ -1,6 +1,8 @@
-import reactRefresh from "@vitejs/plugin-react-refresh";
 import { UserConfig, ConfigEnv, defineConfig } from "vite";
 import { join } from "path";
+import jotaiDebugLabel from "jotai/babel/plugin-debug-label";
+import jotaiReactRefresh from "jotai/babel/plugin-react-refresh";
+import react from "@vitejs/plugin-react";
 
 const srcRoot = join(__dirname, "src");
 
@@ -31,7 +33,7 @@ export default ({ command }: ConfigEnv): UserConfig => {
         return {
             base: "/",
             publicDir: `${__dirname}/public`,
-            plugins: [reactRefresh()],
+            plugins: [react({ babel: { plugins: [jotaiDebugLabel, jotaiReactRefresh] } })],
             alias: {
                 "/@": srcRoot,
             },
@@ -39,10 +41,6 @@ export default ({ command }: ConfigEnv): UserConfig => {
                 outDir: join(srcRoot, "/out"),
                 emptyOutDir: true,
                 rollupOptions: {},
-            },
-
-            esbuild: {
-                jsxInject: `import React from 'react'`,
             },
             server: {
                 port: process.env.PORT === undefined ? 3000 : +process.env.PORT,
@@ -57,7 +55,7 @@ export default ({ command }: ConfigEnv): UserConfig => {
         return {
             base: `${__dirname}/src/out/`,
             publicDir: `${__dirname}/public`,
-            plugins: [reactRefresh()],
+            plugins: [],
             alias: {
                 "/@": srcRoot,
             },
@@ -65,10 +63,6 @@ export default ({ command }: ConfigEnv): UserConfig => {
                 outDir: join(srcRoot, "/out"),
                 emptyOutDir: true,
                 rollupOptions: {},
-            },
-
-            esbuild: {
-                jsxInject: `import React from 'react'`,
             },
             server: {
                 port: process.env.PORT === undefined ? 3000 : +process.env.PORT,

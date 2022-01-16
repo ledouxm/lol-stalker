@@ -7,12 +7,13 @@ import {
     sendFriendListWithRankings,
     sendFriendNotifications,
     sendFriendRank,
+    sendMatches,
     sendNotifications,
     sendSelected,
 } from "./routes";
-import { makeDebug } from "./utils";
+import { makeDebug, sendToClient } from "./utils";
 import isDev from "electron-is-dev";
-import { connector } from "./LCU/lcu";
+import { connector, connectorStatus, sendConnectorStatus, startCheckFriendList } from "./LCU/lcu";
 import { getFriendNotifications } from "./routes/friends";
 
 const debug = makeDebug("index");
@@ -48,6 +49,8 @@ app.whenReady().then(async () => {
     debug("starting electron app");
     connector.start();
     makeWindow();
+    startCheckFriendList();
+
     app.on("activate", function () {
         // On macOS it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.
@@ -56,10 +59,8 @@ app.whenReady().then(async () => {
 });
 
 ipcMain.on("lcu/connection", () => {
-    console.log("salut");
-    // startCheckFriendList();
+    sendConnectorStatus();
 });
-
 ipcMain.on("friendList/lastRank", sendFriendList);
 ipcMain.on("friendList/friend", sendFriendRank);
 ipcMain.on("friendList/ranks", sendFriendListWithRankings);
@@ -67,6 +68,7 @@ ipcMain.on("friendList/select", receiveToggleSelectFriends);
 ipcMain.on("friendList/selected", () => sendSelected());
 ipcMain.on("notifications", sendNotifications);
 ipcMain.on("notifications/friend", sendFriendNotifications);
+ipcMain.on("friend/matches", sendMatches);
 ipcMain.on("close", () => {
     window.close();
     app.exit(0);

@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 import https from "https";
 import LCUConnector from "lcu-connector";
-import { CurrentSummoner, FriendDto, Queue, RankedStats } from "./types";
+import { CurrentSummoner, FriendDto, MatchDto, Queue, RankedStats } from "./types";
 import { pick } from "@pastable/core";
 import { Prisma } from "../prismaClient";
 import {
@@ -12,6 +12,7 @@ import {
     getSelectedFriends,
 } from "../routes/friends";
 import { getRankDifference, makeDebug, sendToClient } from "../utils";
+import { sendInvalidate } from "../routes";
 
 const debug = makeDebug("LCU");
 
@@ -21,6 +22,9 @@ export const connectorStatus = {
     current: null as any,
     api: null as unknown as AxiosInstance,
 };
+
+export const sendConnectorStatus = () => sendToClient("lcu/connection", connectorStatus.current);
+
 connector.on("connect", async (data) => {
     connectorStatus.current = data;
     const { protocol, username, password, address, port } = data;
@@ -31,10 +35,10 @@ connector.on("connect", async (data) => {
         headers: { Authorization: `Basic ${data.password}` },
     });
     console.log("connected to riot client");
-    startCheckFriendList();
 });
 connector.on("disconnect", () => {
     connectorStatus.current = null;
+    sendInvalidate("lcuStatus");
 });
 
 export interface AuthData {
@@ -48,36 +52,43 @@ export interface AuthData {
 const theoPuuid = "4ab5d4e7-0e24-54ac-b8e7-2a72c8483712";
 const getTheoSoloQRank = () => getSoloQRankedStats(theoPuuid);
 export const startCheckFriendList = async () => {
-    console.log("start checking friendlist");
-    friendsRef.current = await getFriendsAndLastRankingFromDb();
+    try {
+        if (!connectorStatus.current) throw "not connected to LCU";
+        console.log("start checking friendlist");
+        friendsRef.current = await getFriendsAndLastRankingFromDb();
 
-    if (!friendsRef.current?.length) {
-        const friendListStats = await checkFriendList();
-        friendsRef.current = friendListStats;
-    }
+        if (!friendsRef.current?.length) {
+            const friendListStats = await checkFriendList();
+            friendsRef.current = friendListStats;
+        }
 
-    while (true) {
-        const friendListStats = await checkFriendList();
-        const changes = compareFriends(friendsRef.current, friendListStats);
-        if (changes.length) {
-            const selectedFriends = await getSelectedFriends();
+        while (true) {
+            const friendListStats = await checkFriendList();
+            const changes = compareFriends(friendsRef.current, friendListStats);
+            if (changes.length) {
+                const selectedFriends = await getSelectedFriends();
 
-            const toNotify: FriendChange[] = [];
-            console.log("changes", changes);
-            for (const change of changes) {
-                await addRanking(change, change.puuid);
-                const notification = getRankDifference(change.oldFriend as any, change as any);
-                await addNotification({ ...notification, puuid: change.puuid });
-                if (selectedFriends.find((friend) => friend.puuid === change.puuid))
-                    toNotify.push(change);
-            }
-            sendToClient("friendList/changes", toNotify);
-            sendToClient("invalidate", "notification");
-        } else console.log("no soloQ played by friends");
+                const toNotify: FriendChange[] = [];
+                console.log("changes", changes);
+                for (const change of changes) {
+                    await addRanking(change, change.puuid);
+                    const notification = getRankDifference(change.oldFriend as any, change as any);
+                    await addNotification({ ...notification, puuid: change.puuid });
+                    if (selectedFriends.find((friend) => friend.puuid === change.puuid))
+                        toNotify.push(change);
+                }
+                sendToClient("friendList/changes", toNotify);
+                sendToClient("invalidate", "notifications");
+            } else console.log("no soloQ played by friends");
 
-        friendsRef.current = friendListStats;
+            friendsRef.current = friendListStats;
 
-        await new Promise((resolve) => setTimeout(resolve, 10000));
+            await new Promise((resolve) => setTimeout(resolve, 10000));
+        }
+    } catch (e) {
+        console.log(e);
+        console.log("Retrying in 5s...");
+        setTimeout(() => startCheckFriendList(), 5000);
     }
 };
 
@@ -133,6 +144,8 @@ export const getSoloQRankedStats = async (puuid: string) =>
     (await getRankedStatsBySummonerPuuid(puuid)).queues.find(
         (queue) => queue.queueType === "RANKED_SOLO_5x5"
     );
+export const getMatchHistoryBySummonerPuuid = (puuid: string) =>
+    request<MatchDto>(`/lol-match-history/v1/products/lol/${puuid}/matches`);
 export const getMultipleSummonerSoloQStats = async (
     summoners: Pick<Prisma.FriendCreateInput, "puuid" | "name">[]
 ) => {

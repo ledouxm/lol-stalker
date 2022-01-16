@@ -2,9 +2,10 @@ import { ArrowBackIcon } from "@chakra-ui/icons";
 import { Box, Flex, Spinner, Stack } from "@chakra-ui/react";
 import { useQuery } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import { ProfileIcon } from "../../components/Profileicon";
+import { ProfileIcon } from "../DataDragon/Profileicon";
 import { FriendAllRanksDto, FriendDto, RankDto } from "../../types";
 import { electronRequest } from "../../utils";
+import { FriendMatches } from "./FriendMatches";
 import { FriendNotifications } from "./FriendNotifications";
 
 export const formatRank = (ranking: Pick<RankDto, "division" | "tier" | "leaguePoints">) =>
@@ -35,9 +36,12 @@ export const FriendDetails = () => {
             </Flex>
             <Flex justifyContent="space-between">
                 <Stack>
-                    {friend.ranks.map((rank) => (
-                        <RankDetails key={rank.id} rank={rank} />
-                    ))}
+                    {/* <Stack>
+                        {friend.ranks.map((rank) => (
+                            <RankDetails key={rank.id} rank={rank} />
+                        ))}
+                    </Stack> */}
+                    <FriendMatches puuid={puuid!} />
                 </Stack>
                 <FriendNotifications puuid={puuid!} />
             </Flex>

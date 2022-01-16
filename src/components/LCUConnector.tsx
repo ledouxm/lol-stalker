@@ -2,11 +2,15 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useQuery, useQueryClient } from "react-query";
 import { atom, useAtom } from "jotai";
-import { atomWithStorage, useUpdateAtom } from "jotai/utils";
-import { getRankDifference, sendMessage } from "../utils";
+import { atomWithStorage, useAtomValue, useUpdateAtom } from "jotai/utils";
+import { electronRequest, getRankDifference, sendMessage } from "../utils";
 import { friendsAtom, selectedFriendsAtom } from "../features/FriendList/useFriendList";
-import { FriendDto } from "../types";
-import { useInterval } from "@chakra-ui/react";
+import { AuthData, Champion, FriendDto } from "../types";
+import { useChampionsList } from "../features/DataDragon/useChampionsList";
+import { useSummonerSpellsList } from "../features/DataDragon/useSummonerSpellsList";
+import { useItemsList } from "../features/DataDragon/useItemsList";
+
+export const lcuStatusAtom = atom<AuthData>(null as unknown as AuthData);
 
 export enum LocalStorageKeys {
     OpenGroups = "lol-stalking/openGroups",
@@ -14,14 +18,19 @@ export enum LocalStorageKeys {
 
 export const openGroupsAtom = atomWithStorage<number[]>(LocalStorageKeys.OpenGroups, []);
 
+const getLCUStatus = () => electronRequest<AuthData>("lcu/connection");
+
 export const LCUConnector = () => {
     const setFriends = useUpdateAtom(friendsAtom);
     const setSelectedFriends = useUpdateAtom(selectedFriendsAtom);
-
+    const setLcuStatus = useUpdateAtom(lcuStatusAtom);
     const queryClient = useQueryClient();
-    usePatchVersion();
 
-    useInterval(() => console.log(window.location.pathname), 1000);
+    useQuery("lcuStatus", getLCUStatus, { onSuccess: setLcuStatus });
+    usePatchVersion();
+    useChampionsList();
+    useItemsList();
+    useSummonerSpellsList();
 
     useEffect(() => {
         window.ipcRenderer.send("lcu/connection");
@@ -57,7 +66,6 @@ export const usePatchVersion = () => {
         onSuccess: (data) => setPatchVersion(data),
     });
 };
-
 export const getDataDragonVersion = async () =>
     (await axios.get("https://ddragon.leagueoflegends.com/api/versions.json")).data[0];
 

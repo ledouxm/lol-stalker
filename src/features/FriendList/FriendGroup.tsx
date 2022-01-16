@@ -2,7 +2,7 @@ import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { chakra, Checkbox, Flex, FlexProps, Stack, useDisclosure } from "@chakra-ui/react";
 import { ChangeEvent, useMemo } from "react";
 import { sendMessage } from "../../utils";
-import { ProfileIcon } from "../../components/Profileicon";
+import { ProfileIcon } from "../DataDragon/Profileicon";
 import { useNavigate } from "react-router-dom";
 import { useAtom } from "jotai";
 import { openGroupsAtom } from "../../components/LCUConnector";

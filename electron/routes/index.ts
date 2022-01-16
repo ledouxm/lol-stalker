@@ -1,3 +1,4 @@
+import { getMatchHistoryBySummonerPuuid } from "../LCU/lcu";
 import { Prisma } from "../prismaClient";
 import { makeDebug, sendToClient } from "../utils";
 import {
@@ -41,6 +42,11 @@ export const sendFriendNotifications = async (_: any, puuid: Prisma.FriendCreate
 export const sendSelected = async () => {
     const selected = await getSelectedFriends();
     sendToClient("friendList/selected", selected);
+};
+
+export const sendMatches = async (_: any, puuid: Prisma.FriendCreateInput["puuid"]) => {
+    const matches = await getMatchHistoryBySummonerPuuid(puuid);
+    sendToClient("friend/matches", matches);
 };
 
 export type SelectEventType = "add" | "remove" | "";
