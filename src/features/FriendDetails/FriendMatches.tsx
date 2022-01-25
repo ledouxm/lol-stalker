@@ -23,13 +23,13 @@ export const FriendMatches = ({ puuid }: Pick<FriendDto, "puuid">) => {
     const games = matchObj.games.games;
 
     return (
-        <Stack w="100%">
-            <Stack spacing="20px" whiteSpace="nowrap" w="100%">
+        <Center w="100%">
+            <Stack spacing="5px" whiteSpace="nowrap">
                 {games.map((game) => (
                     <GameRow game={game} key={game.gameId} />
                 ))}
             </Stack>
-        </Stack>
+        </Center>
     );
 };
 
@@ -45,7 +45,7 @@ export const GameRow = ({ game }: { game: Game }) => {
     const items = useItemsDataByIds(makeArrayOf(7).map((_, index) => stats["item" + index]));
 
     return (
-        <Flex alignItems="center" w="700px">
+        <Flex alignItems="center" w="700px" bgColor="blackAlpha.500" p="5px">
             <Box pos="relative" mr="20px">
                 {champion ? <ChampionIcon image={champion.image.full} /> : <Spinner />}
                 <Center

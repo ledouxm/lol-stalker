@@ -50,7 +50,7 @@ export const Notifications = () => {
     const notificationsQuery = useQuery(
         ["notifications", showRecent, page],
         () => getNotifications(showRecent, { page }),
-        { refetchInterval: false, refetchOnWindowFocus: false }
+        { refetchInterval: false, refetchOnWindowFocus: false, retry: false }
     );
     const selectedFriends = useAtomValue(selectedFriendsAtom);
 
@@ -127,11 +127,12 @@ export const NotificationItem = ({
     const navigate = useNavigate();
 
     return (
-        <Flex pos="relative" mt="10px">
+        <Flex mt="10px">
             {withIcon && <ProfileIcon icon={notification.friend.icon} mr="10px" />}
             <Flex whiteSpace="nowrap" flexDir="column" pr="10px">
                 <Flex>
-                    <Box
+                    <Flex
+                        alignItems="center"
                         fontWeight="bold"
                         _hover={{
                             textDecoration: isClickable ? "underline" : "initial",
@@ -139,8 +140,11 @@ export const NotificationItem = ({
                         cursor={isClickable ? "pointer" : "initial"}
                         onClick={() => isClickable && navigate(`/friend/${notification.puuid}`)}
                     >
+                        {notification.isNew && withIcon && (
+                            <Box boxSize="10px" bg="orange" borderRadius="50%" mr="5px" />
+                        )}
                         {notification.friend.name}
-                    </Box>
+                    </Flex>
                     <Box ml="10px">{notification.content}</Box>
                 </Flex>
                 <Box fontSize="small" color="gray.400">
@@ -151,9 +155,6 @@ export const NotificationItem = ({
                     {notification.createdAt?.toLocaleTimeString()}
                 </Box>
             </Flex>
-            {notification.isNew && withIcon && (
-                <Box pos="absolute" boxSize="10px" bg="orange" borderRadius="50%" />
-            )}
         </Flex>
     );
 };

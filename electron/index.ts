@@ -17,6 +17,7 @@ import isDev from "electron-is-dev";
 import { connector, connectorStatus, sendConnectorStatus } from "./LCU/lcu";
 import { startCheckFriendListJob } from "./jobs/friendListJob";
 import { setNotificationIsNew } from "./routes/notifications";
+import { startCheckCurrentSummonerRank } from "./jobs/currentSummonerRank";
 
 const debug = makeDebug("index");
 const height = 600;
@@ -55,6 +56,7 @@ app.whenReady().then(async () => {
     makeWindow();
     // startCheckFriendList();
     startCheckFriendListJob();
+    startCheckCurrentSummonerRank();
     app.on("activate", function () {
         // On macOS it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.

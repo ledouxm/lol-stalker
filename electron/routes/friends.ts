@@ -18,7 +18,7 @@ const friendFields: (keyof Omit<Prisma.FriendCreateInput, "oldNames" | "notifica
     "groupId",
     "groupName",
 ];
-const rankingFields: (keyof Omit<Prisma.RankingCreateInput, "friend">)[] = [
+export const rankingFields: (keyof Omit<Prisma.RankingCreateInput, "friend">)[] = [
     "division",
     "tier",
     "leaguePoints",
@@ -27,10 +27,14 @@ const rankingFields: (keyof Omit<Prisma.RankingCreateInput, "friend">)[] = [
     "miniSeriesProgress",
 ];
 
-export const getFriendsFromDb = () => prisma.friend.findMany();
+export const getFriendsFromDb = () =>
+    prisma.friend.findMany({ where: { isCurrentSummoner: { equals: false } } });
 
 export const getFriendsAndRankingsFromDb = () =>
-    prisma.friend.findMany({ include: { ranks: true } });
+    prisma.friend.findMany({
+        where: { isCurrentSummoner: { equals: false } },
+        include: { ranks: true },
+    });
 
 export const getFriendAndRankingsFromDb = (puuid: Prisma.FriendCreateInput["puuid"]) =>
     prisma.friend.findUnique({
@@ -52,7 +56,10 @@ export const getFriendsAndLastRankingFromDb = async () => {
 };
 
 export const getSelectedFriends = async () =>
-    prisma.friend.findMany({ where: { selected: true }, select: { selected: true, puuid: true } });
+    prisma.friend.findMany({
+        where: { selected: true, isCurrentSummoner: { equals: false } },
+        select: { selected: true, puuid: true },
+    });
 export const toggleSelectFriends = async (
     puuids: Prisma.FriendCreateInput["puuid"][],
     newState: boolean

@@ -21,32 +21,32 @@ const getFriendRanks = (puuid: FriendDto["puuid"]) =>
 type FriendDetailsState = "notifications" | "match-history";
 export const FriendDetails = () => {
     const { puuid } = useParams<{ puuid: string }>();
-    const [state, setState] = useState<FriendDetailsState>("notifications");
+    const [state, setState] = useState<FriendDetailsState>("match-history");
     const navigate = useNavigate();
 
     const friendQuery = useQuery(["friend", puuid], () => getFriendRanks(puuid!));
 
     if (friendQuery.isLoading) return <Spinner />;
     if (friendQuery.error) return <Box>An error has occured</Box>;
-
     const friend = friendQuery.data!;
+    console.log(friend);
     return (
-        <Stack p="10px" w="100%">
-            <Flex>
-                <ArrowBackIcon boxSize="20px" cursor="pointer" onClick={() => navigate("/")} />
+        <Center flexDir="column" p="10px" w="100%" pos="relative" minW="700px">
+            <Flex pos="absolute" top="10px" left="10px">
+                <ArrowBackIcon boxSize="30px" cursor="pointer" onClick={() => navigate("/")} />
             </Flex>
             <Flex alignItems="center">
                 <ProfileIcon icon={friend.icon} />
-                <Box ml="10px">{friend.name}</Box>
+                <Flex direction="column" ml="10px">
+                    <Box fontSize="20px" fontWeight="bold">
+                        {friend.name}
+                    </Box>
+                    <Box color="gray.400" mt="-5px">
+                        #{friend.gameTag}
+                    </Box>
+                </Flex>
             </Flex>
             <Flex direction="row" spacing="30px">
-                <SwitchStateButton
-                    onClick={() => setState("notifications")}
-                    state={state}
-                    stateName="notifications"
-                >
-                    Notification history
-                </SwitchStateButton>
                 <SwitchStateButton
                     onClick={() => setState("match-history")}
                     state={state}
@@ -54,15 +54,22 @@ export const FriendDetails = () => {
                 >
                     Match history
                 </SwitchStateButton>
+                <SwitchStateButton
+                    onClick={() => setState("notifications")}
+                    state={state}
+                    stateName="notifications"
+                >
+                    Notification history
+                </SwitchStateButton>
             </Flex>
-            <Flex justifyContent="space-between" whiteSpace="nowrap" w="100%">
+            <Flex whiteSpace="nowrap" w="100%">
                 {state === "notifications" ? (
                     <FriendNotifications puuid={puuid!} />
                 ) : (
                     <FriendMatches puuid={puuid!} />
                 )}
             </Flex>
-        </Stack>
+        </Center>
     );
 };
 
@@ -74,10 +81,12 @@ const SwitchStateButton = ({
     <Box
         fontWeight={state === stateName ? "bold" : "initial"}
         textDecoration={state === stateName ? "underline" : "initial"}
-        p="20px"
-        _hover={{ bgColor: "gray.500" }}
+        p="10px"
+        m="10px"
+        _hover={{ bgColor: "gray.700" }}
         cursor="pointer"
-        fontSize="20px"
+        textAlign="center"
+        fontSize="16px"
         {...props}
     />
 );

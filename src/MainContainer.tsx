@@ -6,12 +6,12 @@ import { Navbar, navbarHeight } from "./components/Navbar";
 import { FriendDetails } from "./features/FriendDetails/FriendDetails";
 import { FriendList } from "./features/FriendList/FriendList";
 import { Notifications } from "./features/Notifications/Notifications";
-import { Home } from "./Home";
+import { OptionsPage } from "./features/Options/OptionsPage";
 
 export const MainContainer = () => {
     const lcuStatus = useAtomValue(lcuStatusAtom);
     const location = useLocation();
-    console.log(location.pathname);
+
     if (!lcuStatus)
         return (
             <Center w="100vw" h="100vh" flexDir="column">
@@ -37,6 +37,7 @@ const AppRoutes = () => {
             <Route path="/" element={<Notifications />} />
             <Route path="/friendlist" element={<FriendList />} />
             <Route path="/friend/:puuid" element={<FriendDetails />} />
+            <Route path="/options" element={<OptionsPage />} />
         </Routes>
     );
 };
