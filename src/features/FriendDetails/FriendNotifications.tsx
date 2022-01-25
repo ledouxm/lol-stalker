@@ -19,7 +19,12 @@ export const FriendNotifications = ({ puuid }: Pick<FriendDto, "puuid">) => {
     return (
         <Stack>
             {notifications.map((notif) => (
-                <NotificationItem notification={notif} key={notif.id} isClickable={false} />
+                <NotificationItem
+                    notification={notif}
+                    key={notif.id}
+                    isClickable={false}
+                    withIcon={false}
+                />
             ))}
         </Stack>
     );

@@ -8,7 +8,12 @@ import {
     getSelectedFriends,
     toggleSelectFriends,
 } from "./friends";
-import { getNotifications, getFriendNotifications } from "./notifications";
+import {
+    getNotifications,
+    getFriendNotifications,
+    PaginationOptions,
+    getNewNotifications,
+} from "./notifications";
 const debug = makeDebug("routes");
 
 export const sendFriendList = async () => {
@@ -28,13 +33,13 @@ export const sendFriendListWithRankings = async () => {
     sendToClient("friendList/lastRank", groups);
 };
 
-export const sendNotifications = async () => {
-    const notifications = await getNotifications();
+export const sendNotifications = async (_: any, options: PaginationOptions = {}) => {
+    const notifications = await getNotifications(options);
     sendToClient("notifications", notifications);
 };
 
-export const sendNewNotifications = async () => {
-    const notifications = await getNotifications({ where: { isNew: { equals: true } } });
+export const sendNewNotifications = async (_: any, options: PaginationOptions = {}) => {
+    const notifications = await getNewNotifications(options);
     sendToClient("notifications/new", notifications);
 };
 

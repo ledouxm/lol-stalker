@@ -47,11 +47,10 @@ export const FriendGroupRow = ({ group }: { group: FriendGroup }) => {
     };
 
     return (
-        <Flex flexDir="column" pl="10px">
+        <Flex flexDir="column" pl="10px" mt="10px">
             <Flex alignItems="center" onClick={onToggle}>
                 <Checkbox
-                    defaultChecked={isChecked}
-                    checked={isChecked}
+                    isChecked={isChecked}
                     isIndeterminate={isIndeterminate}
                     onChange={onChange}
                 />
@@ -66,9 +65,11 @@ export const FriendGroupRow = ({ group }: { group: FriendGroup }) => {
                 </chakra.span>
             </Flex>
             <Stack mt="10px" display={isOpen ? "flex" : "none"}>
-                {group.friends.map((friend) => (
-                    <FriendRow key={friend.puuid} friend={friend} />
-                ))}
+                {group.friends
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((friend) => (
+                        <FriendRow key={friend.puuid} friend={friend} />
+                    ))}
             </Stack>
         </Flex>
     );

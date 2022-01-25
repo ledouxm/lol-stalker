@@ -7,7 +7,7 @@ export const FriendList = () => {
     const { friendGroups } = useFriendList();
     if (!friendGroups?.length) return <Spinner />;
     return (
-        <Stack w="400px" ml="20px">
+        <Stack whiteSpace="nowrap" overflowY="auto" h="100%" ml="20px">
             {friendGroups?.map((group) => (
                 <FriendGroupRow key={group.groupId} group={group} />
             ))}
