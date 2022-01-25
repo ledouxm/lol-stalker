@@ -115,17 +115,13 @@ export const addRanking = async (
     });
 };
 
-export const addNotification = (data: Prisma.NotificationUncheckedCreateInput) =>
-    prisma.notification.create({ data });
-export const getNotifications = () =>
-    prisma.notification.findMany({
-        orderBy: { createdAt: "desc" },
-        include: { friend: { select: { name: true, icon: true } } },
-        take: 20,
-    });
-export const getFriendNotifications = (puuid: Prisma.FriendCreateInput["puuid"]) =>
-    prisma.notification.findMany({
-        where: { puuid },
-        orderBy: { createdAt: "desc" },
-        include: { friend: { select: { name: true, icon: true } } },
-    });
+export const friendsApi = {
+    getFriendsFromDb,
+    getFriendsAndRankingsFromDb,
+    getFriendAndRankingsFromDb,
+    getFriendsAndLastRankingFromDb,
+    getSelectedFriends,
+    toggleSelectFriends,
+    addOrUpdateFriends,
+    addRanking,
+};

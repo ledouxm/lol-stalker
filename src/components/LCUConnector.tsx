@@ -43,15 +43,15 @@ export const LCUConnector = () => {
                 selected.filter((friend) => !!friend.selected).map((friend) => friend.puuid)
             )
         );
-        // TODO: remove since this is for debug purpose
-        // window.Main.on("friendList/changes", (changes: FriendChange[]) => {
-        //     const messages = changes.map(
-        //         (change) => change.name + ": " + getRankDifference(change.oldFriend, change)
-        //         );
-        //         console.log(messages);
-        //     });
         sendMessage("friendList/lastRank");
         sendMessage("friendList/selected");
+
+        // window.prisma.notification.findMany().then(console.log);
+
+        return () =>
+            window.Main.getEventNames().forEach((eventName) =>
+                window.Main.off(eventName as string)
+            );
     }, []);
 
     return null;

@@ -4,14 +4,8 @@ import LCUConnector from "lcu-connector";
 import { CurrentSummoner, FriendDto, MatchDto, Queue, RankedStats } from "./types";
 import { pick } from "@pastable/core";
 import { Prisma } from "../prismaClient";
-import {
-    addNotification,
-    addOrUpdateFriends,
-    addRanking,
-    getFriendsAndLastRankingFromDb,
-    getSelectedFriends,
-} from "../routes/friends";
-import { getRankDifference, makeDebug, sendToClient } from "../utils";
+import { addOrUpdateFriends } from "../routes/friends";
+import { makeDebug, sendToClient } from "../utils";
 import { sendInvalidate } from "../routes";
 
 const debug = makeDebug("LCU");
@@ -51,51 +45,10 @@ export interface AuthData {
 
 const theoPuuid = "4ab5d4e7-0e24-54ac-b8e7-2a72c8483712";
 const getTheoSoloQRank = () => getSoloQRankedStats(theoPuuid);
-export const startCheckFriendList = async () => {
-    try {
-        if (!connectorStatus.current) throw "not connected to LCU";
-        console.log("start checking friendlist");
-        friendsRef.current = await getFriendsAndLastRankingFromDb();
-
-        if (!friendsRef.current?.length) {
-            const friendListStats = await checkFriendList();
-            friendsRef.current = friendListStats;
-        }
-
-        while (true) {
-            const friendListStats = await checkFriendList();
-            const changes = compareFriends(friendsRef.current, friendListStats);
-            if (changes.length) {
-                const selectedFriends = await getSelectedFriends();
-
-                const toNotify: FriendChange[] = [];
-                console.log("changes", changes);
-                for (const change of changes) {
-                    await addRanking(change, change.puuid);
-                    const notification = getRankDifference(change.oldFriend as any, change as any);
-                    await addNotification({ ...notification, puuid: change.puuid });
-                    if (selectedFriends.find((friend) => friend.puuid === change.puuid))
-                        toNotify.push(change);
-                }
-                sendToClient("friendList/changes", toNotify);
-                sendToClient("invalidate", "notifications");
-            } else console.log("no soloQ played by friends");
-
-            friendsRef.current = friendListStats;
-
-            await new Promise((resolve) => setTimeout(resolve, 10000));
-        }
-    } catch (e) {
-        console.log(e);
-        console.log("Retrying in 5s...");
-        setTimeout(() => startCheckFriendList(), 5000);
-    }
-};
-
-interface FriendChange extends FriendStats {
+export interface FriendChange extends FriendStats {
     oldFriend: FriendStats;
 }
-const compareFriends = (oldFriends: FriendStats[], newFriends: FriendStats[]) => {
+export const compareFriends = (oldFriends: FriendStats[], newFriends: FriendStats[]) => {
     const changes: FriendChange[] = [];
     oldFriends.forEach((oldFriend) => {
         const newFriend = newFriends.find((newFriend) => newFriend.puuid === oldFriend.puuid);
@@ -114,10 +67,6 @@ const compareFriends = (oldFriends: FriendStats[], newFriends: FriendStats[]) =>
 
 type FriendStats = Pick<Prisma.FriendCreateInput, "name" | "puuid"> &
     Pick<Queue, "division" | "tier" | "leaguePoints" | "wins" | "losses">;
-
-const friendsRef = {
-    current: null as any,
-};
 
 export const checkFriendList = async () => {
     const friends = await getFriends();
@@ -170,6 +119,9 @@ export const getMultipleSummonerSoloQStats = async (
 
     return summonersRanks;
 };
+export const getLobbySummoners = () => {};
+export const getSummonerRankedStats = () => {};
+// export const get
 
 export const getSwagger = () => request("/swagger/v2/swagger.json");
 

@@ -2,8 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../electron/prismaClient"
+  provider      = "prisma-client-js"
+  output        = "../electron/prismaClient"
   binaryTargets = ["native"]
 }
 
@@ -13,50 +13,51 @@ datasource db {
 }
 
 model Friend {
-  puuid                 String       @id
-  id                    String 
-  gameName              String
-  gameTag               String
-  groupId               Int          @default(0)
-  groupName             String       @default("NONE")
-  name                  String
-  summonerId            Int
-  icon                  Int
-  ranks                 Ranking[]
-  oldNames              FriendName[]
-  notifications         Notification[]
-  createdAt             DateTime     @default(now())
-  selected              Boolean      @default(true)
+  puuid         String         @id
+  id            String
+  gameName      String
+  gameTag       String
+  groupId       Int            @default(0)
+  groupName     String         @default("NONE")
+  name          String
+  summonerId    Int
+  icon          Int
+  ranks         Ranking[]
+  oldNames      FriendName[]
+  notifications Notification[]
+  createdAt     DateTime       @default(now())
+  selected      Boolean        @default(true)
 }
 
 model Ranking {
-  id                    Int          @id @default(autoincrement())
-  division              String    
-  tier                  String
-  leaguePoints          Int
-  wins                  Int
-  losses                Int
-  miniSeriesProgress    String       @default("")
-  puuid                 String
-  friend                Friend       @relation(fields: [puuid], references: [puuid])
-  createdAt             DateTime     @default(now())
+  id                 Int      @id @default(autoincrement())
+  division           String
+  tier               String
+  leaguePoints       Int
+  wins               Int
+  losses             Int
+  miniSeriesProgress String   @default("")
+  puuid              String
+  friend             Friend   @relation(fields: [puuid], references: [puuid])
+  createdAt          DateTime @default(now())
 }
 
 model FriendName {
-  id                    Int          @id @default(autoincrement())
-  name                  String       @default("")
-  createdAt             DateTime     @default(now())
-  puuid                 String
-  friend                Friend       @relation(fields: [puuid], references: [puuid])
+  id        Int      @id @default(autoincrement())
+  name      String   @default("")
+  createdAt DateTime @default(now())
+  puuid     String
+  friend    Friend   @relation(fields: [puuid], references: [puuid])
 }
 
 model Notification {
-  id                    Int          @id @default(autoincrement())
-  type                  String       @default("")
-  from                  String
-  to                    String
-  content               String
-  puuid                 String
-  friend                Friend       @relation(fields: [puuid], references: [puuid])
-  createdAt             DateTime     @default(now())
+  id        Int      @id @default(autoincrement())
+  type      String   @default("")
+  from      String
+  to        String
+  content   String
+  puuid     String
+  friend    Friend   @relation(fields: [puuid], references: [puuid])
+  createdAt DateTime @default(now())
+  isNew     Boolean  @default(true)
 }

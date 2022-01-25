@@ -8,13 +8,15 @@ import {
     sendFriendNotifications,
     sendFriendRank,
     sendMatches,
+    sendNewNotifications,
     sendNotifications,
     sendSelected,
 } from "./routes";
 import { makeDebug, sendToClient } from "./utils";
 import isDev from "electron-is-dev";
-import { connector, connectorStatus, sendConnectorStatus, startCheckFriendList } from "./LCU/lcu";
-import { getFriendNotifications } from "./routes/friends";
+import { connector, connectorStatus, sendConnectorStatus } from "./LCU/lcu";
+import { startCheckFriendListJob } from "./jobs/friendListJob";
+import { setNotificationIsNew } from "./routes/notifications";
 
 const debug = makeDebug("index");
 const height = 600;
@@ -29,9 +31,11 @@ export function makeWindow() {
         frame: true,
         show: true,
         resizable: true,
+        autoHideMenuBar: true,
         fullscreenable: true,
         webPreferences: {
             preload: join(__dirname, "preload.js"),
+            // contextIsolation: true,
             webSecurity: false,
             allowRunningInsecureContent: true,
             nodeIntegration: true,
@@ -49,8 +53,8 @@ app.whenReady().then(async () => {
     debug("starting electron app");
     connector.start();
     makeWindow();
-    startCheckFriendList();
-
+    // startCheckFriendList();
+    startCheckFriendListJob();
     app.on("activate", function () {
         // On macOS it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.
@@ -67,7 +71,14 @@ ipcMain.on("friendList/ranks", sendFriendListWithRankings);
 ipcMain.on("friendList/select", receiveToggleSelectFriends);
 ipcMain.on("friendList/selected", () => sendSelected());
 ipcMain.on("notifications", sendNotifications);
+ipcMain.on("notifications/new", sendNewNotifications);
 ipcMain.on("notifications/friend", sendFriendNotifications);
+ipcMain.on("notifications/setNew", async () => {
+    const results = await setNotificationIsNew();
+    sendToClient("invalidate", "notifications");
+    console.log(results);
+});
+
 ipcMain.on("friend/matches", sendMatches);
 ipcMain.on("close", () => {
     window.close();

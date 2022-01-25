@@ -18,7 +18,7 @@
     },
     "productName": "vite-reactts-electron-starter",
     "scripts": {
-        "dev": "concurrently \"yarn dev:vite\" \" yarn dev:electron\"",
+        "dev": "concurrently \"yarn dev:vite --port 3002\" \" yarn dev:electron\"",
         "dev:vite": "vite --https",
         "dev:electron": "npm run build:electron && electron .",
         "build": "yarn migrate && npm run build:vite && npm run build:electron",
@@ -41,6 +41,7 @@
         "@pastable/core": "^0.1.14",
         "@prisma/client": "^3.8.0",
         "axios": "^0.24.0",
+        "bull": "^4.2.1",
         "debug": "^4.3.3",
         "electron-is-dev": "^2.0.0",
         "framer-motion": "^4",
@@ -55,6 +56,7 @@
         "yenv": "^3.0.1"
     },
     "devDependencies": {
+        "@types/bull": "^3.15.7",
         "@types/node": "^16.3.3",
         "@types/react": "^17.0.3",
         "@types/react-dom": "^17.0.3",

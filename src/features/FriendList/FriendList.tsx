@@ -1,13 +1,13 @@
-import { Center, Spinner, Stack } from "@chakra-ui/react";
-import { selectedFriendsAtom, useFriendList } from "./useFriendList";
+import { Spinner, Stack } from "@chakra-ui/react";
+import { Suspense } from "react";
 import { FriendGroupRow } from "./FriendGroup";
-import { useAtomValue } from "jotai/utils";
+import { useFriendList } from "./useFriendList";
 
 export const FriendList = () => {
     const { friendGroups } = useFriendList();
-    if (!friendGroups?.length) return null;
+    if (!friendGroups?.length) return <Spinner />;
     return (
-        <Stack w="250px">
+        <Stack w="400px" ml="20px">
             {friendGroups?.map((group) => (
                 <FriendGroupRow key={group.groupId} group={group} />
             ))}

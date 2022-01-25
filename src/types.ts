@@ -40,6 +40,7 @@ export interface NotificationDto {
     puuid: string;
     createdAt: Date;
     friend: Pick<FriendDto, "icon" | "name">;
+    isNew: boolean;
 }
 
 export interface AuthData {

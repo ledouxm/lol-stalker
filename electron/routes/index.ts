@@ -5,11 +5,10 @@ import {
     getFriendAndRankingsFromDb,
     getFriendsAndLastRankingFromDb,
     getFriendsAndRankingsFromDb,
-    getNotifications,
-    getFriendNotifications,
     getSelectedFriends,
     toggleSelectFriends,
 } from "./friends";
+import { getNotifications, getFriendNotifications } from "./notifications";
 const debug = makeDebug("routes");
 
 export const sendFriendList = async () => {
@@ -32,6 +31,11 @@ export const sendFriendListWithRankings = async () => {
 export const sendNotifications = async () => {
     const notifications = await getNotifications();
     sendToClient("notifications", notifications);
+};
+
+export const sendNewNotifications = async () => {
+    const notifications = await getNotifications({ where: { isNew: { equals: true } } });
+    sendToClient("notifications/new", notifications);
 };
 
 export const sendFriendNotifications = async (_: any, puuid: Prisma.FriendCreateInput["puuid"]) => {
