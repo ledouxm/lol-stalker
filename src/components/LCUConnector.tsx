@@ -46,6 +46,8 @@ export const LCUConnector = () => {
         sendMessage("friendList/lastRank");
         sendMessage("friendList/selected");
 
+        // electronRequest("notifications/all-new", { cursor: 900 }).then(console.log);
+        // electronRequest("notifications/all", { cursor: 900 }).then(console.log);
         // window.prisma.notification.findMany().then(console.log);
 
         return () =>

@@ -17,7 +17,7 @@ export const FriendNotifications = ({ puuid }: Pick<FriendDto, "puuid">) => {
     const notifications = query.data!;
 
     return (
-        <Stack>
+        <Stack h="100%" overflowY="auto" w="100%">
             {notifications.map((notif) => (
                 <NotificationItem
                     notification={notif}

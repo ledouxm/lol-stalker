@@ -21,6 +21,6 @@ const config = {
     useSystemColorMode: false,
 };
 
-const theme = extendTheme({ config });
+const theme = extendTheme({ config, colors: { "red-loss": "#ff2344", "blue-win": "#0acce6" } });
 
 export default theme;

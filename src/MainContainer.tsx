@@ -24,7 +24,7 @@ export const MainContainer = () => {
         <Box w="100vw" h="100vh" pos="relative">
             <Navbar pos="fixed" top="0" left="0" right="0" />
             <Box h={`calc(100% - ${navbarHeight}px)`}>
-                <Box pt={`${navbarHeight}px`} />
+                <Box mb={`${navbarHeight}px`} />
                 <AppRoutes />
             </Box>
         </Box>

@@ -35,8 +35,8 @@ export const startCheckFriendListJob = async () => {
                     if (selectedFriends.find((friend) => friend.puuid === change.puuid))
                         toNotify.push(change);
                 }
-                sendToClient("friendList/changes", toNotify);
-                sendToClient("invalidate", "notifications");
+                // sendToClient("friendList/changes", toNotify);
+                sendToClient("invalidate", "notifications/nb-new");
             } else {
                 console.log("no soloQ played by friends");
             }

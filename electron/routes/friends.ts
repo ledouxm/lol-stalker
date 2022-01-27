@@ -39,7 +39,10 @@ export const getFriendsAndRankingsFromDb = () =>
 export const getFriendAndRankingsFromDb = (puuid: Prisma.FriendCreateInput["puuid"]) =>
     prisma.friend.findUnique({
         where: { puuid },
-        include: { ranks: { orderBy: { createdAt: "desc" } } },
+        include: {
+            ranks: { orderBy: { createdAt: "desc" } },
+            oldNames: { orderBy: { createdAt: "desc" } },
+        },
     });
 
 export const getFriendsAndLastRankingFromDb = async () => {
