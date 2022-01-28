@@ -1,12 +1,12 @@
+import { pick } from "@pastable/core";
 import axios, { AxiosInstance } from "axios";
 import https from "https";
 import LCUConnector from "lcu-connector";
-import { CurrentSummoner, FriendDto, MatchDto, Queue, RankedStats } from "./types";
-import { pick } from "@pastable/core";
 import { Prisma } from "../prismaClient";
+import { sendInvalidate } from "../routes";
 import { addOrUpdateFriends } from "../routes/friends";
 import { makeDebug, sendToClient } from "../utils";
-import { sendInvalidate } from "../routes";
+import { CurrentSummoner, FriendDto, MatchDto, Queue, RankedStats } from "./types";
 
 const debug = makeDebug("LCU");
 
@@ -100,14 +100,12 @@ export const getMultipleSummonerSoloQStats = async (
 ) => {
     const summonersRanks = [];
     for (const summoner of summoners) {
-        // debug(`checking rank for friend ${summoner.name}`);
         try {
             const rank = await getSoloQRankedStats(summoner.puuid);
             if (!rank) {
                 debug("no rank found");
                 throw "no rank";
             }
-            // debug(formatRank(rank));
             summonersRanks.push({
                 ...pick(rank, ["division", "tier", "leaguePoints", "wins", "losses"]),
                 ...pick(summoner, ["name", "puuid"]),
@@ -121,7 +119,6 @@ export const getMultipleSummonerSoloQStats = async (
 };
 export const getLobbySummoners = () => {};
 export const getSummonerRankedStats = () => {};
-// export const get
 
 export const getSwagger = () => request("/swagger/v2/swagger.json");
 

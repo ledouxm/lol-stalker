@@ -1,5 +1,4 @@
 import { Spinner, Stack } from "@chakra-ui/react";
-import { Suspense } from "react";
 import { FriendGroupRow } from "./FriendGroup";
 import { useFriendList } from "./useFriendList";
 

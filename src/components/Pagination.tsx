@@ -1,7 +1,5 @@
-import { ButtonHTMLAttributes } from "react";
-import cx from "classnames";
-import { WithChildren, WithClassName } from "@pastable/core";
 import { Box, Button, ButtonProps, Flex } from "@chakra-ui/react";
+import { WithChildren, WithClassName } from "@pastable/core";
 
 /**
  * Pagination with siblingsNbToShow = 2 looks like that

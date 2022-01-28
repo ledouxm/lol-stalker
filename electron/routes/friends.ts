@@ -1,8 +1,8 @@
+import { pick } from "@pastable/core";
+import debug from "debug";
 import { prisma } from "../db";
 import { Prisma } from "../prismaClient";
 import { formatRank, makeDebug } from "../utils";
-import debug from "debug";
-import { pick } from "@pastable/core";
 
 const friendDebug = makeDebug("prisma/friend");
 const rankingDebug = makeDebug("prisma/ranking");
@@ -39,7 +39,10 @@ export const getFriendsAndRankingsFromDb = () =>
 export const getFriendAndRankingsFromDb = (puuid: Prisma.FriendCreateInput["puuid"]) =>
     prisma.friend.findUnique({
         where: { puuid },
-        include: { ranks: { orderBy: { createdAt: "desc" } } },
+        include: {
+            ranks: { orderBy: { createdAt: "desc" } },
+            oldNames: { orderBy: { createdAt: "desc" } },
+        },
     });
 
 export const getFriendsAndLastRankingFromDb = async () => {

@@ -3,7 +3,7 @@ import { atom } from "jotai";
 import { useAtomValue, useUpdateAtom } from "jotai/utils";
 import { useQuery } from "react-query";
 import { patchVersionAtom } from "../../components/LCUConnector";
-import { Champion, Participant, Stats, SummonerSpell } from "../../types";
+import { Participant, SummonerSpell } from "../../types";
 
 export const summonerSpellsListAtom = atom<any>(null as unknown as any);
 export const useSummonerSpellsList = () => {

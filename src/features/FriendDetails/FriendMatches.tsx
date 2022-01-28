@@ -1,6 +1,5 @@
-import { Box, Center, chakra, Flex, Heading, Spinner, Stack } from "@chakra-ui/react";
+import { Box, Center, Flex, Spinner, Stack } from "@chakra-ui/react";
 import { makeArrayOf } from "@pastable/core";
-import { useAtomValue } from "jotai/utils";
 import { useQuery } from "react-query";
 import { FriendDto, Game, MatchDto } from "../../types";
 import { electronRequest } from "../../utils";
@@ -23,8 +22,8 @@ export const FriendMatches = ({ puuid }: Pick<FriendDto, "puuid">) => {
     const games = matchObj.games.games;
 
     return (
-        <Center w="100%">
-            <Stack spacing="5px" whiteSpace="nowrap">
+        <Center w="100%" h="100%" overflowY="auto">
+            <Stack spacing="5px" whiteSpace="nowrap" h="100%">
                 {games.map((game) => (
                     <GameRow game={game} key={game.gameId} />
                 ))}
@@ -62,7 +61,7 @@ export const GameRow = ({ game }: { game: Game }) => {
                 </Center>
             </Box>
             <Flex flexDirection="column" mr="50px">
-                <Box>{stats.win ? "Win" : "Loss"}</Box>
+                <Box color={stats.win ? "blue-win" : "red-loss"}>{stats.win ? "Win" : "Loss"}</Box>
                 <Box>
                     {game.gameMode === "CLASSIC" && game.gameType === "MATCHED_GAME"
                         ? "SoloQ ranked"

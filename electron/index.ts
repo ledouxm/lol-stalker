@@ -1,27 +1,27 @@
 import { app, BrowserWindow, ipcMain } from "electron";
+import isDev from "electron-is-dev";
 import { join } from "path";
 import "./envVars";
+import { startCheckCurrentSummonerRank } from "./jobs/currentSummonerRank";
+import { startCheckFriendListJob } from "./jobs/friendListJob";
+import { connector, sendConnectorStatus } from "./LCU/lcu";
 import {
     receiveToggleSelectFriends,
+    sendCursoredNotifications,
     sendFriendList,
     sendFriendListWithRankings,
     sendFriendNotifications,
     sendFriendRank,
     sendMatches,
-    sendNewNotifications,
-    sendNotifications,
+    sendNbNewNotifications,
     sendSelected,
 } from "./routes";
-import { makeDebug, sendToClient } from "./utils";
-import isDev from "electron-is-dev";
-import { connector, connectorStatus, sendConnectorStatus } from "./LCU/lcu";
-import { startCheckFriendListJob } from "./jobs/friendListJob";
 import { setNotificationIsNew } from "./routes/notifications";
-import { startCheckCurrentSummonerRank } from "./jobs/currentSummonerRank";
+import { makeDebug, sendToClient } from "./utils";
 
 const debug = makeDebug("index");
 const height = 600;
-const width = 800;
+const width = 1200;
 
 const baseBounds = { height, width };
 let window: BrowserWindow;
@@ -36,7 +36,6 @@ export function makeWindow() {
         fullscreenable: true,
         webPreferences: {
             preload: join(__dirname, "preload.js"),
-            // contextIsolation: true,
             webSecurity: false,
             allowRunningInsecureContent: true,
             nodeIntegration: true,
@@ -54,7 +53,6 @@ app.whenReady().then(async () => {
     debug("starting electron app");
     connector.start();
     makeWindow();
-    // startCheckFriendList();
     startCheckFriendListJob();
     startCheckCurrentSummonerRank();
     app.on("activate", function () {
@@ -72,9 +70,9 @@ ipcMain.on("friendList/friend", sendFriendRank);
 ipcMain.on("friendList/ranks", sendFriendListWithRankings);
 ipcMain.on("friendList/select", receiveToggleSelectFriends);
 ipcMain.on("friendList/selected", () => sendSelected());
-ipcMain.on("notifications", sendNotifications);
-ipcMain.on("notifications/new", sendNewNotifications);
 ipcMain.on("notifications/friend", sendFriendNotifications);
+ipcMain.on("notifications/all", sendCursoredNotifications);
+ipcMain.on("notifications/nb-new", sendNbNewNotifications);
 ipcMain.on("notifications/setNew", async () => {
     const results = await setNotificationIsNew();
     sendToClient("invalidate", "notifications");

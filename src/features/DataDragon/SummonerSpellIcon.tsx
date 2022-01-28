@@ -1,7 +1,7 @@
 import { Box, BoxProps, chakra, Spinner } from "@chakra-ui/react";
 import { useAtomValue } from "jotai/utils";
-import { Game, SummonerSpell } from "../../types";
 import { patchVersionAtom } from "../../components/LCUConnector";
+import { SummonerSpell } from "../../types";
 import { getSummonerSpellIcon, summonerSpellsListAtom } from "./useSummonerSpellsList";
 
 export const SummonerSpellIcon = ({

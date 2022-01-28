@@ -1,6 +1,6 @@
 import { Box, Center, Spinner } from "@chakra-ui/react";
 import { useAtomValue } from "jotai/utils";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import { lcuStatusAtom } from "./components/LCUConnector";
 import { Navbar, navbarHeight } from "./components/Navbar";
 import { FriendDetails } from "./features/FriendDetails/FriendDetails";
@@ -24,7 +24,7 @@ export const MainContainer = () => {
         <Box w="100vw" h="100vh" pos="relative">
             <Navbar pos="fixed" top="0" left="0" right="0" />
             <Box h={`calc(100% - ${navbarHeight}px)`}>
-                <Box pt={`${navbarHeight}px`} />
+                <Box mb={`${navbarHeight}px`} />
                 <AppRoutes />
             </Box>
         </Box>

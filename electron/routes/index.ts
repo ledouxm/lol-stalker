@@ -1,6 +1,6 @@
 import { getMatchHistoryBySummonerPuuid } from "../LCU/lcu";
 import { Prisma } from "../prismaClient";
-import { makeDebug, sendToClient } from "../utils";
+import { sendToClient } from "../utils";
 import {
     getFriendAndRankingsFromDb,
     getFriendsAndLastRankingFromDb,
@@ -9,12 +9,11 @@ import {
     toggleSelectFriends,
 } from "./friends";
 import {
-    getNotifications,
+    getCursoredNotifications,
     getFriendNotifications,
-    PaginationOptions,
-    getNewNotifications,
+    getNbNewNotifications,
+    setNotificationIsNew,
 } from "./notifications";
-const debug = makeDebug("routes");
 
 export const sendFriendList = async () => {
     const groups = await getFriendsAndLastRankingFromDb();
@@ -33,19 +32,20 @@ export const sendFriendListWithRankings = async () => {
     sendToClient("friendList/lastRank", groups);
 };
 
-export const sendNotifications = async (_: any, options: PaginationOptions = {}) => {
-    const notifications = await getNotifications(options);
-    sendToClient("notifications", notifications);
-};
-
-export const sendNewNotifications = async (_: any, options: PaginationOptions = {}) => {
-    const notifications = await getNewNotifications(options);
-    sendToClient("notifications/new", notifications);
-};
-
 export const sendFriendNotifications = async (_: any, puuid: Prisma.FriendCreateInput["puuid"]) => {
     const groups = await getFriendNotifications(puuid);
     sendToClient("notifications/friend", groups);
+};
+
+export const sendCursoredNotifications = async (_: any, cursors: { cursor?: number }) => {
+    const payload = await getCursoredNotifications(cursors);
+    sendToClient("notifications/all", payload);
+    await setNotificationIsNew(payload.content.map((content) => content.id));
+};
+
+export const sendNbNewNotifications = async (_: any, payload: { maxId: number }) => {
+    const nb = await getNbNewNotifications(payload);
+    sendToClient("notifications/nb-new", nb);
 };
 
 export const sendSelected = async () => {

@@ -1,7 +1,7 @@
 import { Box, BoxProps, chakra, Spinner } from "@chakra-ui/react";
 import { useAtomValue } from "jotai/utils";
-import { Champion } from "../../types";
 import { patchVersionAtom } from "../../components/LCUConnector";
+import { Champion } from "../../types";
 import { championsListAtom, getChampionIcon } from "./useChampionsList";
 
 export const ChampionIcon = ({
