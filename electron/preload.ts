@@ -14,7 +14,7 @@ export const api = {
      *
      * The function below can accessed using `window.Main.sayHello`
      */
-    sendMessage: (channel: string, message?: string) => {
+    sendMessage: (channel: string, message?: any) => {
         ipcRenderer.send(channel, message);
     },
     /**

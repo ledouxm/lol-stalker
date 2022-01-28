@@ -26,7 +26,6 @@ model Friend {
   oldNames      FriendName[]
   notifications Notification[]
   createdAt     DateTime       @default(now())
-  selected      Boolean        @default(true)
   isCurrentSummoner Boolean @default(false)
 }
 

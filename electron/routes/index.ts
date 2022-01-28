@@ -6,12 +6,14 @@ import {
     getFriendsAndLastRankingFromDb,
     getFriendsAndRankingsFromDb,
     getSelectedFriends,
+    selectAllFriends,
     toggleSelectFriends,
 } from "./friends";
 import {
     getCursoredNotifications,
     getFriendNotifications,
     getNbNewNotifications,
+    NotificationFilters,
     setNotificationIsNew,
 } from "./notifications";
 
@@ -37,13 +39,16 @@ export const sendFriendNotifications = async (_: any, puuid: Prisma.FriendCreate
     sendToClient("notifications/friend", groups);
 };
 
-export const sendCursoredNotifications = async (_: any, cursors: { cursor?: number }) => {
-    const payload = await getCursoredNotifications(cursors);
+export const sendCursoredNotifications = async (_: any, filters: NotificationFilters) => {
+    const payload = await getCursoredNotifications(filters);
     sendToClient("notifications/all", payload);
     await setNotificationIsNew(payload.content.map((content) => content.id));
 };
 
-export const sendNbNewNotifications = async (_: any, payload: { maxId: number }) => {
+export const sendNbNewNotifications = async (
+    _: any,
+    payload: { currentMaxId: number } & NotificationFilters
+) => {
     const nb = await getNbNewNotifications(payload);
     sendToClient("notifications/nb-new", nb);
 };
@@ -51,6 +56,11 @@ export const sendNbNewNotifications = async (_: any, payload: { maxId: number })
 export const sendSelected = async () => {
     const selected = await getSelectedFriends();
     sendToClient("friendList/selected", selected);
+};
+
+export const sendSelectAllFriends = async (_: any, select: boolean) => {
+    await selectAllFriends(select);
+    sendSelected();
 };
 
 export const sendMatches = async (_: any, puuid: Prisma.FriendCreateInput["puuid"]) => {

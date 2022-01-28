@@ -1,5 +1,16 @@
 import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import { chakra, Checkbox, Flex, FlexProps, Stack, useDisclosure } from "@chakra-ui/react";
+import {
+    AccordionButton,
+    AccordionIcon,
+    AccordionItem,
+    AccordionPanel,
+    chakra,
+    Checkbox,
+    Flex,
+    FlexProps,
+    Stack,
+    useDisclosure,
+} from "@chakra-ui/react";
 import { useAtom } from "jotai";
 import { useAtomValue } from "jotai/utils";
 import { ChangeEvent, useMemo } from "react";
@@ -8,7 +19,7 @@ import { openGroupsAtom } from "../../components/LCUConnector";
 import { FriendDto, FriendGroup } from "../../types";
 import { sendMessage } from "../../utils";
 import { ProfileIcon } from "../DataDragon/Profileicon";
-import { selectedFriendsAtom, useSelectedFriends } from "./useFriendList";
+import { selectedFriendsAtom } from "./useFriendList";
 
 export const FriendGroupRow = ({ group }: { group: FriendGroup }) => {
     const [openGroups, setOpenGroups] = useAtom(openGroupsAtom);
@@ -47,15 +58,15 @@ export const FriendGroupRow = ({ group }: { group: FriendGroup }) => {
     };
 
     return (
-        <Flex flexDir="column" pl="10px" mt="10px">
-            <Flex alignItems="center" onClick={onToggle}>
+        <AccordionItem>
+            <AccordionButton alignItems="center">
                 <Checkbox
                     isChecked={isChecked}
                     isIndeterminate={isIndeterminate}
                     onChange={onChange}
                 />
-                {isOpen ? <ChevronDownIcon /> : <ChevronRightIcon />}
                 <chakra.span
+                    ml="10px"
                     textTransform="uppercase"
                     fontWeight="bold"
                     cursor="pointer"
@@ -63,21 +74,28 @@ export const FriendGroupRow = ({ group }: { group: FriendGroup }) => {
                 >
                     {group.groupName} ({group.friends.length})
                 </chakra.span>
-            </Flex>
-            <Stack mt="10px" display={isOpen ? "flex" : "none"}>
+                <AccordionIcon />
+            </AccordionButton>
+            <AccordionPanel>
                 {group.friends
                     .sort((a, b) => a.name.localeCompare(b.name))
                     .map((friend) => (
-                        <FriendRow key={friend.puuid} friend={friend} />
+                        <FriendRow
+                            key={friend.puuid}
+                            friend={friend}
+                            isChecked={selectedFriends.includes(friend.puuid)}
+                        />
                     ))}
-            </Stack>
-        </Flex>
+            </AccordionPanel>
+        </AccordionItem>
     );
 };
 
-export const FriendRow = ({ friend, ...props }: { friend: FriendDto } & FlexProps) => {
-    const isChecked = useSelectedFriends(friend.puuid);
-
+export const FriendRow = ({
+    friend,
+    isChecked,
+    ...props
+}: { friend: FriendDto; isChecked: boolean } & FlexProps) => {
     const navigate = useNavigate();
 
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -89,7 +107,7 @@ export const FriendRow = ({ friend, ...props }: { friend: FriendDto } & FlexProp
     };
 
     return (
-        <Flex pl="15px" alignItems="center" opacity={isChecked ? "1" : ".3"} {...props}>
+        <Flex alignItems="center" opacity={isChecked ? "1" : ".3"} {...props} mb="10px">
             <Checkbox isChecked={isChecked} onChange={onChange} mr="10px" />
             <Flex
                 alignItems="center"

@@ -24,3 +24,5 @@ yarn-error.log*
 lol-stalking.db
 
 */prismaClient
+
+selectedFriends.json
