@@ -3,7 +3,7 @@ import { useQuery } from "react-query";
 import { FriendDto } from "../../../electron/LCU/types";
 import { NotificationDto } from "../../types";
 import { electronRequest } from "../../utils";
-import { NotificationItem } from "../Notifications/Notifications";
+import { NotificationItem } from "../Notifications/NotificationItem";
 
 const getFriendsNotifications = (puuid: FriendDto["puuid"]) =>
     electronRequest<NotificationDto[]>("notifications/friend", puuid);

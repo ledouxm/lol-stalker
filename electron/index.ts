@@ -1,7 +1,6 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import isDev from "electron-is-dev";
 import { join } from "path";
-import "./envVars";
 import { startCheckCurrentSummonerRank } from "./jobs/currentSummonerRank";
 import { startCheckFriendListJob } from "./jobs/friendListJob";
 import { connector, sendConnectorStatus } from "./LCU/lcu";
@@ -14,9 +13,11 @@ import {
     sendFriendRank,
     sendMatches,
     sendNbNewNotifications,
+    sendSelectAllFriends,
     sendSelected,
 } from "./routes";
 import { setNotificationIsNew } from "./routes/notifications";
+import { loadSelectedFriends } from "./selection";
 import { makeDebug, sendToClient } from "./utils";
 
 const debug = makeDebug("index");
@@ -52,6 +53,7 @@ export function makeWindow() {
 app.whenReady().then(async () => {
     debug("starting electron app");
     connector.start();
+    await loadSelectedFriends();
     makeWindow();
     startCheckFriendListJob();
     startCheckCurrentSummonerRank();
@@ -69,15 +71,11 @@ ipcMain.on("friendList/lastRank", sendFriendList);
 ipcMain.on("friendList/friend", sendFriendRank);
 ipcMain.on("friendList/ranks", sendFriendListWithRankings);
 ipcMain.on("friendList/select", receiveToggleSelectFriends);
+ipcMain.on("friendList/select-all", sendSelectAllFriends);
 ipcMain.on("friendList/selected", () => sendSelected());
 ipcMain.on("notifications/friend", sendFriendNotifications);
 ipcMain.on("notifications/all", sendCursoredNotifications);
 ipcMain.on("notifications/nb-new", sendNbNewNotifications);
-ipcMain.on("notifications/setNew", async () => {
-    const results = await setNotificationIsNew();
-    sendToClient("invalidate", "notifications");
-    console.log(results);
-});
 
 ipcMain.on("friend/matches", sendMatches);
 ipcMain.on("close", () => {

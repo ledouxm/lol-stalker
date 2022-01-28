@@ -38,11 +38,10 @@ export const LCUConnector = () => {
             queryClient.invalidateQueries(queryName)
         );
         window.Main.on("friendList/lastRank", setFriends);
-        window.Main.on("friendList/selected", (selected: Pick<FriendDto, "puuid" | "selected">[]) =>
-            setSelectedFriends(
-                selected.filter((friend) => !!friend.selected).map((friend) => friend.puuid)
-            )
-        );
+        window.Main.on("friendList/selected", setSelectedFriends);
+        // window.Main.on("friendList/selected", (selected: FriendDto["puuid"][]) =>
+        //     setSelectedFriends(selected)
+        // );
         sendMessage("friendList/lastRank");
         sendMessage("friendList/selected");
 

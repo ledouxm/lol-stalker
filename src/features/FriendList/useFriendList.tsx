@@ -16,7 +16,7 @@ export const useFriendList = () => {
     return { friends, friendGroups };
 };
 
-export const useSelectedFriends = (puuid: FriendDto["puuid"]) => {
+export const useIsFriendSelected = (puuid: FriendDto["puuid"]) => {
     const selectedFriends = useAtomValue(selectedFriendsAtom);
 
     return selectedFriends.includes(puuid);

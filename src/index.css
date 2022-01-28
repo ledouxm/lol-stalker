@@ -1,4 +1,5 @@
 html {
+    box-shadow: none !important;
     overflow-y: hidden;
 }
 
@@ -15,5 +16,11 @@ html {
 }
 
 .chakra-checkbox__control {
+    box-shadow: none !important;
+}
+
+*[data-focus],
+*:hover,
+*:focus {
     box-shadow: none !important;
 }

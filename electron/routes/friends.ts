@@ -2,6 +2,7 @@ import { pick } from "@pastable/core";
 import debug from "debug";
 import { prisma } from "../db";
 import { Prisma } from "../prismaClient";
+import { editSelectedFriends, persistSelectedFriends, selectedFriends } from "../selection";
 import { formatRank, makeDebug } from "../utils";
 
 const friendDebug = makeDebug("prisma/friend");
@@ -58,19 +59,21 @@ export const getFriendsAndLastRankingFromDb = async () => {
     });
 };
 
-export const getSelectedFriends = async () =>
-    prisma.friend.findMany({
-        where: { selected: true, isCurrentSummoner: { equals: false } },
-        select: { selected: true, puuid: true },
-    });
+export const getSelectedFriends = async () => Array.from(selectedFriends.current!);
 export const toggleSelectFriends = async (
     puuids: Prisma.FriendCreateInput["puuid"][],
     newState: boolean
-) => {
-    await prisma.friend.updateMany({
-        where: { puuid: { in: puuids } },
-        data: { selected: newState },
-    });
+) =>
+    editSelectedFriends(() =>
+        puuids.forEach((puuid) => selectedFriends.current?.[newState ? "add" : "delete"](puuid))
+    );
+export const selectAllFriends = async (select: boolean) => {
+    const friends = await getFriendsFromDb();
+    return editSelectedFriends(() =>
+        friends.forEach((friend) =>
+            selectedFriends.current?.[select ? "add" : "delete"](friend.puuid)
+        )
+    );
 };
 
 export const addOrUpdateFriends = async (friends: Prisma.FriendCreateInput[]) => {
@@ -83,8 +86,7 @@ export const addOrUpdateFriends = async (friends: Prisma.FriendCreateInput[]) =>
             if (
                 friendDto.gameName !== existingFriend.gameName ||
                 friendDto.groupId !== existingFriend.groupId ||
-                friendDto.groupName !== existingFriend.groupName ||
-                friendDto.selected !== existingFriend.selected
+                friendDto.groupName !== existingFriend.groupName
             ) {
                 if (friendDto.gameName !== existingFriend.gameName) {
                     await prisma.friendName.create({
@@ -106,9 +108,10 @@ export const addOrUpdateFriends = async (friends: Prisma.FriendCreateInput[]) =>
             await prisma.friend.create({
                 data: friendDto,
             });
+            selectedFriends.current?.add(friendDto.puuid);
         }
     }
-
+    await persistSelectedFriends();
     debug("add or update ended");
 };
 export const addRanking = async (
