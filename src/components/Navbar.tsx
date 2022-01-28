@@ -1,4 +1,4 @@
-import { Box, Center, Stack, StackProps } from "@chakra-ui/react";
+import { Box, Stack, StackProps } from "@chakra-ui/react";
 import { NavLink, NavLinkProps, useLocation } from "react-router-dom";
 
 export const navbarHeight = 60;

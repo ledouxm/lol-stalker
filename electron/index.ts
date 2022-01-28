@@ -1,23 +1,23 @@
 import { app, BrowserWindow, ipcMain } from "electron";
+import isDev from "electron-is-dev";
 import { join } from "path";
 import "./envVars";
+import { startCheckCurrentSummonerRank } from "./jobs/currentSummonerRank";
+import { startCheckFriendListJob } from "./jobs/friendListJob";
+import { connector, sendConnectorStatus } from "./LCU/lcu";
 import {
     receiveToggleSelectFriends,
-    sendNbNewNotifications,
     sendCursoredNotifications,
     sendFriendList,
     sendFriendListWithRankings,
     sendFriendNotifications,
     sendFriendRank,
     sendMatches,
+    sendNbNewNotifications,
     sendSelected,
 } from "./routes";
-import { makeDebug, sendToClient } from "./utils";
-import isDev from "electron-is-dev";
-import { connector, sendConnectorStatus } from "./LCU/lcu";
-import { startCheckFriendListJob } from "./jobs/friendListJob";
 import { setNotificationIsNew } from "./routes/notifications";
-import { startCheckCurrentSummonerRank } from "./jobs/currentSummonerRank";
+import { makeDebug, sendToClient } from "./utils";
 
 const debug = makeDebug("index");
 const height = 600;
@@ -36,7 +36,6 @@ export function makeWindow() {
         fullscreenable: true,
         webPreferences: {
             preload: join(__dirname, "preload.js"),
-            // contextIsolation: true,
             webSecurity: false,
             allowRunningInsecureContent: true,
             nodeIntegration: true,
@@ -54,7 +53,6 @@ app.whenReady().then(async () => {
     debug("starting electron app");
     connector.start();
     makeWindow();
-    // startCheckFriendList();
     startCheckFriendListJob();
     startCheckCurrentSummonerRank();
     app.on("activate", function () {

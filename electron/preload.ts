@@ -1,14 +1,8 @@
-import { ipcRenderer, contextBridge } from "electron";
-// import { prisma } from "./db";
-// import { friendsApi } from "./routes/friends";
-// import { notificationsApi } from "./routes/notifications";
+import { contextBridge, ipcRenderer } from "electron";
 declare global {
     interface Window {
         Main: typeof api;
         ipcRenderer: typeof ipcRenderer;
-        // friendsApi: typeof friendsApi;
-        // notificationsApi: typeof notificationsApi;
-        // prisma: typeof prisma;
     }
 }
 
@@ -33,11 +27,8 @@ export const api = {
     getEventNames: () => ipcRenderer.eventNames(),
 };
 contextBridge.exposeInMainWorld("Main", api);
-// contextBridge.exposeInMainWorld("friendsApi", friendsApi);
-// contextBridge.exposeInMainWorld("notificationsApi", notificationsApi);
 /**
  * Using the ipcRenderer directly in the browser through the contextBridge ist not really secure.
  * I advise using the Main/api way !!
  */
 contextBridge.exposeInMainWorld("ipcRenderer", ipcRenderer);
-// contextBridge.exposeInMainWorld("prisma", prisma);

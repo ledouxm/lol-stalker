@@ -1,8 +1,8 @@
 import { Box, BoxProps, chakra, Spinner } from "@chakra-ui/react";
 import { useAtomValue } from "jotai/utils";
-import { FriendDto, Stats } from "../../types";
-import { getProfileIconUrl } from "./utils";
 import { patchVersionAtom } from "../../components/LCUConnector";
+import { FriendDto } from "../../types";
+import { getProfileIconUrl } from "./utils";
 
 export const ProfileIcon = ({ icon, ...props }: { icon: FriendDto["icon"] } & BoxProps) => {
     const patchVersion = useAtomValue(patchVersionAtom);

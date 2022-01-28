@@ -1,7 +1,7 @@
+import { checkFriendList, compareFriends, connectorStatus, FriendChange } from "../LCU/lcu";
 import { addRanking, getFriendsAndLastRankingFromDb, getSelectedFriends } from "../routes/friends";
 import { addNotification } from "../routes/notifications";
 import { getRankDifference, sendToClient } from "../utils";
-import { connectorStatus, checkFriendList, compareFriends, FriendChange } from "../LCU/lcu";
 
 export const friendsRef = {
     current: null as any,
@@ -35,7 +35,6 @@ export const startCheckFriendListJob = async () => {
                     if (selectedFriends.find((friend) => friend.puuid === change.puuid))
                         toNotify.push(change);
                 }
-                // sendToClient("friendList/changes", toNotify);
                 sendToClient("invalidate", "notifications/nb-new");
             } else {
                 console.log("no soloQ played by friends");

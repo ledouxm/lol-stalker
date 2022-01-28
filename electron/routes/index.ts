@@ -9,10 +9,10 @@ import {
     toggleSelectFriends,
 } from "./friends";
 import {
-    getFriendNotifications,
     getCursoredNotifications,
-    setNotificationIsNew,
+    getFriendNotifications,
     getNbNewNotifications,
+    setNotificationIsNew,
 } from "./notifications";
 
 export const sendFriendList = async () => {

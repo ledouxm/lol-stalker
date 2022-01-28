@@ -1,4 +1,4 @@
-import { first, last } from "@pastable/core";
+import { last } from "@pastable/core";
 import { prisma } from "../db";
 import { Prisma } from "../prismaClient";
 
@@ -23,7 +23,6 @@ export const setNotificationIsNew = (notificationsIds?: number[]) =>
     });
 
 export const getCursoredNotifications = async ({ cursor }: { cursor?: number }) => {
-    // if (!cursor === null) {
     const content = await prisma.notification.findMany({
         take: 20,
         orderBy: { createdAt: "desc" },

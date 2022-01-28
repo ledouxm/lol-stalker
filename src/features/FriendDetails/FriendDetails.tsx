@@ -1,23 +1,13 @@
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import { Box, Center, Flex, Spinner, Stack } from "@chakra-ui/react";
+import { Box, Flex, Spinner, Stack } from "@chakra-ui/react";
+import { useState } from "react";
 import { useQuery } from "react-query";
-import {
-    BrowserRouter,
-    HashRouter,
-    NavLinkProps,
-    Route,
-    Routes,
-    useLocation,
-    useNavigate,
-    useParams,
-} from "react-router-dom";
-import { ProfileIcon } from "../DataDragon/Profileicon";
+import { useNavigate, useParams } from "react-router-dom";
 import { FriendAllRanksDto, FriendDto, RankDto } from "../../types";
 import { electronRequest } from "../../utils";
+import { ProfileIcon } from "../DataDragon/Profileicon";
 import { FriendMatches } from "./FriendMatches";
 import { FriendNotifications } from "./FriendNotifications";
-import { AppLink } from "../../components/Navbar";
-import { useState } from "react";
 import { StateTabs } from "./StateTabs";
 
 export const formatRank = (ranking: Pick<RankDto, "division" | "tier" | "leaguePoints">) =>

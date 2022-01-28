@@ -1,14 +1,14 @@
 import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { chakra, Checkbox, Flex, FlexProps, Stack, useDisclosure } from "@chakra-ui/react";
-import { ChangeEvent, useMemo } from "react";
-import { sendMessage } from "../../utils";
-import { ProfileIcon } from "../DataDragon/Profileicon";
-import { useNavigate } from "react-router-dom";
 import { useAtom } from "jotai";
+import { useAtomValue } from "jotai/utils";
+import { ChangeEvent, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { openGroupsAtom } from "../../components/LCUConnector";
 import { FriendDto, FriendGroup } from "../../types";
+import { sendMessage } from "../../utils";
+import { ProfileIcon } from "../DataDragon/Profileicon";
 import { selectedFriendsAtom, useSelectedFriends } from "./useFriendList";
-import { useAtomValue } from "jotai/utils";
 
 export const FriendGroupRow = ({ group }: { group: FriendGroup }) => {
     const [openGroups, setOpenGroups] = useAtom(openGroupsAtom);

@@ -1,8 +1,8 @@
+import { pick } from "@pastable/core";
+import debug from "debug";
 import { prisma } from "../db";
 import { Prisma } from "../prismaClient";
 import { formatRank, makeDebug } from "../utils";
-import debug from "debug";
-import { pick } from "@pastable/core";
 
 const friendDebug = makeDebug("prisma/friend");
 const rankingDebug = makeDebug("prisma/ranking");

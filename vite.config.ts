@@ -6,27 +6,6 @@ import react from "@vitejs/plugin-react";
 
 const srcRoot = join(__dirname, "src");
 
-// export default defineConfig({
-//     base: "/",
-//     root: "./",
-//     alias: {
-//                         "/@": srcRoot,
-//                     },
-//                     build: {
-//                         outDir: join(srcRoot, "/out"),
-//                         emptyOutDir: true,
-//                         rollupOptions: {},
-//                     },
-//     plugins: [reactRefresh()],
-//     resolve: {
-//         alias: [
-//             {
-//                 find: "@",
-//                 replacement: "/src",
-//             },
-//         ],
-//     },
-// });
 export default ({ command }: ConfigEnv): UserConfig => {
     // DEV
     if (command === "serve") {

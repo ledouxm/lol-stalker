@@ -1,6 +1,6 @@
-import { Prisma } from "./prismaClient";
 import debug from "debug";
 import { BrowserWindow } from "electron";
+import { Prisma } from "./prismaClient";
 
 export const sendToClient = (channel: string, ...args: any[]) =>
     console.log(channel)! || BrowserWindow.getAllWindows()?.[0]?.webContents.send(channel, ...args);

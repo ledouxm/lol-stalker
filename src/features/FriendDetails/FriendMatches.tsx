@@ -1,6 +1,5 @@
-import { Box, Center, chakra, Flex, Heading, Spinner, Stack } from "@chakra-ui/react";
+import { Box, Center, Flex, Spinner, Stack } from "@chakra-ui/react";
 import { makeArrayOf } from "@pastable/core";
-import { useAtomValue } from "jotai/utils";
 import { useQuery } from "react-query";
 import { FriendDto, Game, MatchDto } from "../../types";
 import { electronRequest } from "../../utils";

@@ -1,6 +1,6 @@
 import { Box, Center, Spinner } from "@chakra-ui/react";
 import { useAtomValue } from "jotai/utils";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import { lcuStatusAtom } from "./components/LCUConnector";
 import { Navbar, navbarHeight } from "./components/Navbar";
 import { FriendDetails } from "./features/FriendDetails/FriendDetails";

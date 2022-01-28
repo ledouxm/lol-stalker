@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
 import axios from "axios";
+import { atom } from "jotai";
+import { atomWithStorage, useUpdateAtom } from "jotai/utils";
+import { useEffect } from "react";
 import { useQuery, useQueryClient } from "react-query";
-import { atom, useAtom } from "jotai";
-import { atomWithStorage, useAtomValue, useUpdateAtom } from "jotai/utils";
-import { electronRequest, getRankDifference, sendMessage } from "../utils";
-import { friendsAtom, selectedFriendsAtom } from "../features/FriendList/useFriendList";
-import { AuthData, Champion, FriendDto } from "../types";
 import { useChampionsList } from "../features/DataDragon/useChampionsList";
-import { useSummonerSpellsList } from "../features/DataDragon/useSummonerSpellsList";
 import { useItemsList } from "../features/DataDragon/useItemsList";
+import { useSummonerSpellsList } from "../features/DataDragon/useSummonerSpellsList";
+import { friendsAtom, selectedFriendsAtom } from "../features/FriendList/useFriendList";
+import { AuthData, FriendDto } from "../types";
+import { electronRequest, sendMessage } from "../utils";
 
 export const lcuStatusAtom = atom<AuthData>(null as unknown as AuthData);
 
@@ -45,10 +45,6 @@ export const LCUConnector = () => {
         );
         sendMessage("friendList/lastRank");
         sendMessage("friendList/selected");
-
-        // electronRequest("notifications/all-new", { cursor: 900 }).then(console.log);
-        // electronRequest("notifications/all", { cursor: 900 }).then(console.log);
-        // window.prisma.notification.findMany().then(console.log);
 
         return () =>
             window.Main.getEventNames().forEach((eventName) =>

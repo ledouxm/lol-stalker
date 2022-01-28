@@ -36,7 +36,6 @@ const SwitchStateButton = ({
 }) => (
     <Box
         fontWeight={state === stateName ? "bold" : "initial"}
-        // textDecoration={state === stateName ? "underline" : "initial"}
         borderBottom={state === stateName ? "2px solid white" : "initial"}
         p="10px"
         m="10px"

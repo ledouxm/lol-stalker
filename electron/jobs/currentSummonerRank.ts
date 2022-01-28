@@ -1,8 +1,7 @@
 import { pick } from "@pastable/core";
 import { prisma } from "../db";
-import { getCurrentSummoner, getRankedStatsBySummonerPuuid, getSoloQRankedStats } from "../LCU/lcu";
+import { getCurrentSummoner, getSoloQRankedStats } from "../LCU/lcu";
 import { Prisma } from "../prismaClient";
-import { rankingFields } from "../routes/friends";
 
 export const startCheckCurrentSummonerRank = async () => {
     try {
@@ -24,8 +23,6 @@ export const startCheckCurrentSummonerRank = async () => {
             await prisma.friend.create({ data: currentSummoner });
         }
         const summonerRank = await getSoloQRankedStats(currentSummoner.puuid);
-
-        console.log(currentSummoner, summonerRank);
 
         if (!summonerRank) throw `Couldn't find last rank for summoner ${currentSummoner.name}`;
 
@@ -59,7 +56,6 @@ export const startCheckCurrentSummonerRank = async () => {
 
         setTimeout(() => startCheckCurrentSummonerRank(), 1000 * 60 * 15);
     } catch (e) {
-        console.log(e);
         console.log("something went wrong, retrying in 5s");
         setTimeout(() => startCheckCurrentSummonerRank(), 5000);
     }

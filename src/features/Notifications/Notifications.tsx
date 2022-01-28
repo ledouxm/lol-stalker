@@ -1,26 +1,13 @@
 import { InfoIcon } from "@chakra-ui/icons";
-import {
-    Box,
-    Button,
-    Center,
-    Checkbox,
-    Circle,
-    Flex,
-    Spinner,
-    Stack,
-    Tooltip,
-} from "@chakra-ui/react";
-import { omit } from "@pastable/core";
+import { Box, Button, Checkbox, Flex, Spinner, Stack, Tooltip } from "@chakra-ui/react";
 import { useAtom } from "jotai";
-import { atomWithStorage, useAtomValue, useUpdateAtom } from "jotai/utils";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { atomWithStorage } from "jotai/utils";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useInfiniteQuery, useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
-import { Pagination } from "../../components/Pagination";
 import { NotificationDto } from "../../types";
 import { electronRequest } from "../../utils";
 import { ProfileIcon } from "../DataDragon/Profileicon";
-import { selectedFriendsAtom } from "../FriendList/useFriendList";
 
 const getNotifications = (data: { pageParam?: number }) =>
     electronRequest<{ content: NotificationDto[] } & { nextCursor: number }>("notifications/all", {
@@ -68,7 +55,6 @@ export const Notifications = () => {
     }, [newNotificationsQuery, currentMaxId]);
 
     if (notificationsQuery.isError) return <Box>An error has occured</Box>;
-    console.log(diffNbNotifs);
 
     return (
         <Flex h="100%">

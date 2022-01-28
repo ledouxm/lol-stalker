@@ -1,4 +1,4 @@
-import { Box, Button, Center, Stack } from "@chakra-ui/react";
+import { Button, Center, Stack } from "@chakra-ui/react";
 
 export const OptionsPage = () => {
     return (
