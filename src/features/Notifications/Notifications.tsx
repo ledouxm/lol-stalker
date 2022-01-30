@@ -1,4 +1,4 @@
-import { Box, Flex, Spinner, Stack } from "@chakra-ui/react";
+import { Box, Center, Flex, Spinner, Stack } from "@chakra-ui/react";
 import { useCallback, useEffect, useRef } from "react";
 import { NotificationDto } from "../../types";
 import { NotificationItem } from "./NotificationItem";
@@ -18,7 +18,9 @@ export const Notifications = () => {
                 <NotificationsFilters />
             </Stack>
             {notificationsQuery.isLoading ? (
-                <Spinner />
+                <Center w="100%">
+                    <Spinner />
+                </Center>
             ) : (
                 <Stack ml="10px" overflowY="auto" height="100%" w="100%" overflowX="hidden">
                     {nbNewNotifications && nbNewNotifications > 0 && (
@@ -72,9 +74,9 @@ export const NotificationContent = ({
                     />
                 ))
             ) : (
-                <Box textAlign="center" mt="10px">
+                <Center w="100%" h="100%">
                     No notification
-                </Box>
+                </Center>
             )}
         </>
     );
