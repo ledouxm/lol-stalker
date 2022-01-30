@@ -20,7 +20,8 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-# *.db
+*.tgz
+
 *.db-journal
 lol-stalking.db.dev
 */prismaClient
