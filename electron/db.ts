@@ -1,8 +1,14 @@
+import isDev from "electron-is-dev";
+import path from "path";
 import sqlite3 from "sqlite3";
 import { PrismaClient } from "./prismaClient";
-
-export const db = new sqlite3.Database("lol-stalking.db");
+const dbUrl = isDev ? "lol-stalking.db.dev" : "lol-stalking.db";
+console.log(isDev);
+export const db = new sqlite3.Database(dbUrl);
 
 export const prisma = new PrismaClient({
+    datasources: {
+        db: { url: `file://${path.join(__dirname, "../" + dbUrl).replace("C:\\", "")}` },
+    },
     // log: ["query", "info", "warn", "error"],
 });

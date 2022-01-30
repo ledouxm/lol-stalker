@@ -1,14 +1,6 @@
-# Vite + React + Typescript + Electron - Starter
+# LoL friendlist ranking stalker
 
-![Vite + React + Typescript + Tailwind + Electron Starter](Screenshot.jpg)
-
-> It is a simple starter tempalte without unnecessary packages.
-
-This Starter utilizes [Vite](https://github.com/vitejs/vite), [Tailwind](https://tailwindcss.com/), [React](https://reactjs.org/), [Typescript](https://www.typescriptlang.org/) and [Electron](https://electronjs.org/).
-
-By default, the React framework is used for the interface, but you can easily use any other framework such as Vue, Preact, Angular, Svelte or anything else.
-
-> Vite is framework agnostic
+![LoL friendlist ranking stalker](Screenshot.png)
 
 ## Installation
 

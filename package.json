@@ -1,12 +1,12 @@
 {
-    "name": "vite-reactts-electron-starter",
+    "name": "lol-stalking",
     "version": "0.5.0",
     "license": "MIT",
     "main": "main/index.js",
     "author": {
-        "name": "Maximilian Stümpfl"
+        "name": "Ledoux Martin"
     },
-    "description": "Starter using Vite 2+ React +Typescript + Electron for fast prototyping.",
+    "description": "LoL friendlist ranking stalking",
     "keywords": [
         "vite",
         "react",
@@ -14,21 +14,20 @@
         "typescript"
     ],
     "repository": {
-        "url": "https://github.com/lTimeless/vite-reactts-electron-starter"
+        "url": "https://github.com/ledouxm/lol-stalking"
     },
-    "productName": "vite-reactts-electron-starter",
+    "productName": "LoL Stalker",
     "scripts": {
         "dev": "concurrently \"yarn dev:vite --port 3002\" \" yarn dev:electron\"",
         "dev:vite": "vite --https",
         "dev:electron": "npm run build:electron && electron .",
-        "build": "yarn migrate && npm run build:vite && npm run build:electron",
+        "build": "yarn clean && yarn migrate && npm run build:vite && npm run build:electron",
         "build:vite": "vite build",
         "build:electron": "tsc -p electron",
         "dist": "npm run build && electron-builder",
         "pack": "npm run build && electron-builder --dir",
         "clean": "rimraf dist main src/out",
         "type-check": "tsc",
-        "prebuild": "rimraf main && rimraf temp",
         "migrate": "yarn migration:create && yarn migration:up",
         "migration:create": "yarn prisma migrate dev",
         "migration:up": "yarn prisma generate"
