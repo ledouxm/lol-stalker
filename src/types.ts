@@ -9,6 +9,13 @@ export interface FriendDto {
     name: string;
     puuid: string;
     selected: boolean;
+    oldNames: OldNames[];
+}
+export interface OldNames {
+    id: number;
+    name: string;
+    createdAt: Date;
+    puuid: string;
 }
 
 export type FriendLastRankDto = FriendDto & Omit<RankDto, "id">;

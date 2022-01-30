@@ -18,7 +18,7 @@ export const NotificationItem = ({
     const isRed = ["LOSS", "DEMOTION"].includes(notification.type);
 
     return (
-        <Flex mt="10px">
+        <Flex mt="10px" width="700px">
             {withIcon && <ProfileIcon icon={notification.friend.icon} mr="10px" />}
             <Flex whiteSpace="nowrap" flexDir="column" pr="10px">
                 <Flex>

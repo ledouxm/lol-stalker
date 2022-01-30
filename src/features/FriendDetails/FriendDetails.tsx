@@ -1,5 +1,5 @@
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import { Box, Flex, Spinner, Stack } from "@chakra-ui/react";
+import { Box, Center, Flex, Spinner, Stack } from "@chakra-ui/react";
 import { useState } from "react";
 import { useQuery } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
@@ -8,6 +8,7 @@ import { electronRequest } from "../../utils";
 import { ProfileIcon } from "../DataDragon/Profileicon";
 import { FriendMatches } from "./FriendMatches";
 import { FriendNotifications } from "./FriendNotifications";
+import { FriendOldNames } from "./FriendOldNames";
 import { StateTabs } from "./StateTabs";
 
 export const formatRank = (ranking: Pick<RankDto, "division" | "tier" | "leaguePoints">) =>
@@ -26,14 +27,24 @@ export const FriendDetails = () => {
 
     const friendQuery = useQuery(["friend", puuid], () => getFriendRanks(puuid!));
 
-    if (friendQuery.isLoading) return <Spinner />;
-    if (friendQuery.error) return <Box>An error has occured</Box>;
+    if (friendQuery.isLoading)
+        return (
+            <Center h="100%">
+                <Spinner />
+            </Center>
+        );
+    if (friendQuery.error)
+        return (
+            <Center h="100%">
+                <Box>An error has occured</Box>
+            </Center>
+        );
     const friend = friendQuery.data!;
 
     return (
         <Stack flexDir="column" p="10px" w="100%" minW="700px" h="100%">
             <Flex pos="absolute" top="10px" left="10px" h="100%">
-                <ArrowBackIcon boxSize="30px" cursor="pointer" onClick={() => navigate("/")} />
+                <ArrowBackIcon boxSize="30px" cursor="pointer" onClick={() => navigate(-1)} />
             </Flex>
             <Flex alignItems="center" h="100px" justifyContent="center">
                 <ProfileIcon icon={friend.icon} />
@@ -57,14 +68,14 @@ export const FriendDetails = () => {
                 state={state}
             />
             <Flex whiteSpace="nowrap" w="100%" h="100%">
-                {renderComponentByState[state](puuid!)}
+                {renderComponentByState[state](friend)}
             </Flex>
         </Stack>
     );
 };
 
 const renderComponentByState = {
-    notifications: (puuid: string) => <FriendNotifications puuid={puuid} />,
-    "match-history": (puuid: string) => <FriendMatches puuid={puuid} />,
-    "old-names": (puuid: string) => <FriendNotifications puuid={puuid} />,
+    notifications: (friend: FriendDto) => <FriendNotifications puuid={friend.puuid} />,
+    "match-history": (friend: FriendDto) => <FriendMatches puuid={friend.puuid} />,
+    "old-names": (friend: FriendDto) => <FriendOldNames friend={friend} />,
 };

@@ -15,8 +15,18 @@ const getMatchesByPuuid = async (puuid: string) =>
 export const FriendMatches = ({ puuid }: Pick<FriendDto, "puuid">) => {
     const query = useQuery(["matches", puuid], () => getMatchesByPuuid(puuid));
 
-    if (query.isLoading) return <Spinner />;
-    if (query.isError) return <Box>An error has occured</Box>;
+    if (query.isLoading)
+        return (
+            <Center w="100%">
+                <Spinner />
+            </Center>
+        );
+    if (query.isError)
+        return (
+            <Center w="100%">
+                <Box>An error has occured</Box>
+            </Center>
+        );
 
     const matchObj = query.data!;
     const games = matchObj?.games?.games;

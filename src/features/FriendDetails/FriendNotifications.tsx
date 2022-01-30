@@ -1,4 +1,4 @@
-import { Box, Spinner, Stack } from "@chakra-ui/react";
+import { Box, Center, Spinner, Stack } from "@chakra-ui/react";
 import { useQuery } from "react-query";
 import { FriendDto, NotificationDto } from "../../types";
 import { electronRequest } from "../../utils";
@@ -16,7 +16,7 @@ export const FriendNotifications = ({ puuid }: Pick<FriendDto, "puuid">) => {
     const notifications = query.data!;
 
     return (
-        <Stack h="100%" overflowY="auto" w="100%">
+        <Center flexDir="column" h="100%" overflowY="auto" w="100%">
             {notifications.map((notif) => (
                 <NotificationItem
                     notification={notif}
@@ -25,6 +25,6 @@ export const FriendNotifications = ({ puuid }: Pick<FriendDto, "puuid">) => {
                     withIcon={false}
                 />
             ))}
-        </Stack>
+        </Center>
     );
 };
