@@ -20,7 +20,7 @@ export const loadSelectedFriends = async () => {
 
 export const editSelectedFriends = async (callback: () => void) => {
     callback();
-    return persistSelectedFriends();
+    persistSelectedFriends();
 };
 
 export const persistSelectedFriends = () =>

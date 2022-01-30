@@ -5,10 +5,8 @@ import LCUConnector from "lcu-connector";
 import { Prisma } from "../prismaClient";
 import { sendInvalidate } from "../routes";
 import { addOrUpdateFriends } from "../routes/friends";
-import { makeDebug, sendToClient } from "../utils";
+import { sendToClient } from "../utils";
 import { CurrentSummoner, FriendDto, MatchDto, Queue, RankedStats } from "./types";
-
-const debug = makeDebug("LCU");
 
 const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 export const connector = new LCUConnector();
@@ -70,10 +68,8 @@ type FriendStats = Pick<Prisma.FriendCreateInput, "name" | "puuid"> &
 
 export const checkFriendList = async () => {
     const friends = await getFriends();
-    debug(`fetched ${friends.length} friends`);
     await addOrUpdateFriends(friends);
     const stats = await getMultipleSummonerSoloQStats(friends);
-    debug(`fetched stats ${stats.length}`);
     return stats;
 };
 
@@ -103,7 +99,6 @@ export const getMultipleSummonerSoloQStats = async (
         try {
             const rank = await getSoloQRankedStats(summoner.puuid);
             if (!rank) {
-                debug("no rank found");
                 throw "no rank";
             }
             summonersRanks.push({

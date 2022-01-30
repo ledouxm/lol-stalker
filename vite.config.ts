@@ -43,6 +43,7 @@ export default ({ command }: ConfigEnv): UserConfig => {
                 emptyOutDir: true,
                 rollupOptions: {},
             },
+            esbuild: { jsxInject: "import React from 'react'" },
             server: {
                 port: process.env.PORT === undefined ? 3000 : +process.env.PORT,
             },

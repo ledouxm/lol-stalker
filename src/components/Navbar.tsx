@@ -25,7 +25,10 @@ export const AppLink = (props: NavLinkProps) => {
     const location = useLocation();
     const isActive = props.to === location.pathname;
     return (
-        <Box fontWeight={isActive ? "bold" : "initial"}>
+        <Box
+            fontWeight={isActive ? "bold" : "initial"}
+            color={isActive ? "white" : "whiteAlpha.600"}
+        >
             <NavLink {...props} />
         </Box>
     );

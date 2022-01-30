@@ -13,20 +13,20 @@ datasource db {
 }
 
 model Friend {
-  puuid         String         @id
-  id            String?        
-  gameName      String
-  gameTag       String?
-  groupId       Int            @default(0)
-  groupName     String         @default("NONE")
-  name          String
-  summonerId    Int
-  icon          Int
-  ranks         Ranking[]
-  oldNames      FriendName[]
-  notifications Notification[]
-  createdAt     DateTime       @default(now())
-  isCurrentSummoner Boolean @default(false)
+  puuid             String         @id
+  id                String?
+  gameName          String
+  gameTag           String?
+  groupId           Int            @default(0)
+  groupName         String         @default("NONE")
+  name              String
+  summonerId        Int
+  icon              Int
+  ranks             Ranking[]
+  oldNames          FriendName[]
+  notifications     Notification[]
+  createdAt         DateTime       @default(now())
+  isCurrentSummoner Boolean        @default(false)
 }
 
 model Ranking {

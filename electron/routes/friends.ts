@@ -3,10 +3,7 @@ import debug from "debug";
 import { prisma } from "../db";
 import { Prisma } from "../prismaClient";
 import { editSelectedFriends, persistSelectedFriends, selectedFriends } from "../selection";
-import { formatRank, makeDebug } from "../utils";
-
-const friendDebug = makeDebug("prisma/friend");
-const rankingDebug = makeDebug("prisma/ranking");
+import { formatRank } from "../utils";
 
 const friendFields: (keyof Omit<Prisma.FriendCreateInput, "oldNames" | "notifications">)[] = [
     "gameName",
@@ -97,14 +94,12 @@ export const addOrUpdateFriends = async (friends: Prisma.FriendCreateInput[]) =>
                     });
                 }
 
-                friendDebug(`update friend ${existingFriend.name}`);
                 await prisma.friend.update({
                     where: { puuid: friend.puuid },
                     data: friendDto,
                 });
             }
         } else {
-            friendDebug(`create friend ${friend.name}`);
             await prisma.friend.create({
                 data: friendDto,
             });
@@ -116,10 +111,8 @@ export const addOrUpdateFriends = async (friends: Prisma.FriendCreateInput[]) =>
 };
 export const addRanking = async (
     ranking: Omit<Prisma.RankingCreateInput, "friend" | "oldNames">,
-    puuid: Prisma.FriendCreateInput["puuid"],
-    name?: Prisma.FriendCreateInput["name"]
+    puuid: Prisma.FriendCreateInput["puuid"]
 ) => {
-    rankingDebug(`create ranking for friend ${name || puuid}: ${formatRank(ranking)}`);
     return prisma.ranking.create({
         data: {
             ...pick(ranking, rankingFields),

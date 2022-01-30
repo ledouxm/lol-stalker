@@ -1,5 +1,4 @@
 import { useAtom } from "jotai";
-import { useMemo } from "react";
 import { useInfiniteQuery, useQuery } from "react-query";
 import { filtersAtom, getNbNewNotifications, getNotifications } from "./notificationsRequests";
 

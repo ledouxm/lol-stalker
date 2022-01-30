@@ -15,7 +15,7 @@ export const FriendNotifications = ({ puuid }: Pick<FriendDto, "puuid">) => {
     if (query.isError) return <Box>An error has occured</Box>;
 
     const notifications = query.data!;
-
+    console.log(notifications);
     return (
         <Stack h="100%" overflowY="auto" w="100%">
             {notifications.map((notif) => (

@@ -19,15 +19,19 @@ export const FriendMatches = ({ puuid }: Pick<FriendDto, "puuid">) => {
     if (query.isError) return <Box>An error has occured</Box>;
 
     const matchObj = query.data!;
-    const games = matchObj.games.games;
+    const games = matchObj?.games?.games;
 
     return (
         <Center w="100%" h="100%" overflowY="auto">
-            <Stack spacing="5px" whiteSpace="nowrap" h="100%">
-                {games.map((game) => (
-                    <GameRow game={game} key={game.gameId} />
-                ))}
-            </Stack>
+            {query.isLoading ? (
+                <Spinner />
+            ) : (
+                <Stack spacing="5px" whiteSpace="nowrap" h="100%">
+                    {games.map((game) => (
+                        <GameRow game={game} key={game.gameId} />
+                    ))}
+                </Stack>
+            )}
         </Center>
     );
 };

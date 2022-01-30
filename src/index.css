@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&display=swap");
 html {
     box-shadow: none !important;
     overflow-y: hidden;
@@ -17,6 +18,11 @@ html {
 
 .chakra-checkbox__control {
     box-shadow: none !important;
+}
+
+* {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 200;
 }
 
 *[data-focus],

@@ -46,38 +46,25 @@ export const FriendDetails = () => {
                     </Box>
                 </Flex>
             </Flex>
-            {/* <Flex direction="row" spacing="30px" justifyContent="center">
-                <SwitchStateButton
-                    setState={(state: string) => setState(state as FriendDetailsState)}
-                    state={state}
-                    stateName="match-history"
-                >
-                    Match history
-                </SwitchStateButton>
-                <SwitchStateButton
-                    setState={(state: string) => setState(state as FriendDetailsState)}
-                    state={state}
-                    stateName="notifications"
-                >
-                    Notification history
-                </SwitchStateButton>
-            </Flex> */}
 
             <StateTabs
                 tabs={[
                     { name: "match-history", label: "Match history" },
                     { name: "notifications", label: "Notifications history" },
+                    { name: "old-names", label: "Names history" },
                 ]}
                 setState={setState as (state: string) => void}
                 state={state}
             />
             <Flex whiteSpace="nowrap" w="100%" h="100%">
-                {state === "notifications" ? (
-                    <FriendNotifications puuid={puuid!} />
-                ) : (
-                    <FriendMatches puuid={puuid!} />
-                )}
+                {renderComponentByState[state](puuid!)}
             </Flex>
         </Stack>
     );
+};
+
+const renderComponentByState = {
+    notifications: (puuid: string) => <FriendNotifications puuid={puuid} />,
+    "match-history": (puuid: string) => <FriendMatches puuid={puuid} />,
+    "old-names": (puuid: string) => <FriendNotifications puuid={puuid} />,
 };

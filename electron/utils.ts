@@ -8,7 +8,6 @@ export const sendToClient = (channel: string, ...args: any[]) =>
 export const makeDataDragonUrl = (buildVersion: string) =>
     `https://ddragon.leagueoflegends.com/cdn/dragontail-${buildVersion}.tgz`;
 
-export const makeDebug = (suffix: string) => debug("lol-stalking").extend(suffix);
 export const formatRank = (
     ranking: Pick<Prisma.RankingCreateInput, "division" | "tier" | "leaguePoints">
 ) =>

@@ -39,9 +39,6 @@ export const LCUConnector = () => {
         );
         window.Main.on("friendList/lastRank", setFriends);
         window.Main.on("friendList/selected", setSelectedFriends);
-        // window.Main.on("friendList/selected", (selected: FriendDto["puuid"][]) =>
-        //     setSelectedFriends(selected)
-        // );
         sendMessage("friendList/lastRank");
         sendMessage("friendList/selected");
 

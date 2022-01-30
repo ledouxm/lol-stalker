@@ -1,6 +1,8 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import dotenv from "dotenv";
+dotenv.config();
+import { app, BrowserWindow, ipcMain, shell } from "electron";
 import isDev from "electron-is-dev";
-import { join } from "path";
+import path, { join } from "path";
 import { startCheckCurrentSummonerRank } from "./jobs/currentSummonerRank";
 import { startCheckFriendListJob } from "./jobs/friendListJob";
 import { connector, sendConnectorStatus } from "./LCU/lcu";
@@ -16,11 +18,9 @@ import {
     sendSelectAllFriends,
     sendSelected,
 } from "./routes";
-import { setNotificationIsNew } from "./routes/notifications";
 import { loadSelectedFriends } from "./selection";
-import { makeDebug, sendToClient } from "./utils";
+import { sendToClient } from "./utils";
 
-const debug = makeDebug("index");
 const height = 600;
 const width = 1200;
 
@@ -51,7 +51,6 @@ export function makeWindow() {
     return window;
 }
 app.whenReady().then(async () => {
-    debug("starting electron app");
     connector.start();
     await loadSelectedFriends();
     makeWindow();
@@ -76,8 +75,20 @@ ipcMain.on("friendList/selected", () => sendSelected());
 ipcMain.on("notifications/friend", sendFriendNotifications);
 ipcMain.on("notifications/all", sendCursoredNotifications);
 ipcMain.on("notifications/nb-new", sendNbNewNotifications);
-
 ipcMain.on("friend/matches", sendMatches);
+
+ipcMain.on("config/dl-db", () => {
+    const url = path.join(__dirname, isDev ? "../lol-stalking.db" : "lol-stalking.db");
+    shell.showItemInFolder(url);
+    sendToClient("config/dl-db", "ok");
+});
+
+ipcMain.on("config/open-external", (_, url: string) => {
+    shell.openExternal(url);
+    sendToClient("config/open-external", "ok");
+});
+// sendToClient("config/db-path", path.join(__dirname, "lol-stalking.db"));
+
 ipcMain.on("close", () => {
     window.close();
     app.exit(0);
