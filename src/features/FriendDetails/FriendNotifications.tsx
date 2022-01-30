@@ -1,7 +1,6 @@
 import { Box, Spinner, Stack } from "@chakra-ui/react";
 import { useQuery } from "react-query";
-import { FriendDto } from "../../../electron/LCU/types";
-import { NotificationDto } from "../../types";
+import { FriendDto, NotificationDto } from "../../types";
 import { electronRequest } from "../../utils";
 import { NotificationItem } from "../Notifications/NotificationItem";
 
@@ -15,7 +14,7 @@ export const FriendNotifications = ({ puuid }: Pick<FriendDto, "puuid">) => {
     if (query.isError) return <Box>An error has occured</Box>;
 
     const notifications = query.data!;
-    console.log(notifications);
+
     return (
         <Stack h="100%" overflowY="auto" w="100%">
             {notifications.map((notif) => (

@@ -4,7 +4,6 @@ export const sendMessage = window.ipcRenderer.send;
 
 const timeoutDelay = 5000;
 export function electronRequest<T = any>(event: string, data?: any) {
-    console.log("sending " + event);
     return new Promise<T>((resolve, reject) => {
         const timeout = setTimeout(reject, timeoutDelay);
         window.Main.on(event, (data: any) => {

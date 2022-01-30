@@ -11,8 +11,7 @@ export const Notifications = () => {
 
     const notificationPages = notificationsQuery.data?.pages;
     const hasData = notificationPages?.every((arr) => !!arr.nextCursor);
-    console.log({ hasData });
-    console.log(notificationsQuery);
+
     return (
         <Flex h="100%">
             <Stack minW="150px" px="10px" h="100%" mt="10px">

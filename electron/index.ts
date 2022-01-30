@@ -3,6 +3,7 @@ dotenv.config();
 import { app, BrowserWindow, ipcMain, shell } from "electron";
 import isDev from "electron-is-dev";
 import path, { join } from "path";
+import { prisma } from "./db";
 import { startCheckCurrentSummonerRank } from "./jobs/currentSummonerRank";
 import { startCheckFriendListJob } from "./jobs/friendListJob";
 import { connector, sendConnectorStatus } from "./LCU/lcu";
@@ -44,7 +45,7 @@ export function makeWindow() {
     });
     const port = process.env.PORT || 3001;
     const url = isDev ? `https://localhost:${port}` : join(__dirname, "../src/out/index.html");
-    window.webContents.openDevTools();
+    // window.webContents.openDevTools();
 
     isDev ? window?.loadURL(url) : window?.loadFile(url);
 
@@ -60,6 +61,11 @@ app.whenReady().then(async () => {
         // On macOS it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.
         if (BrowserWindow.getAllWindows().length === 0) makeWindow();
+    });
+    app.on("window-all-closed", () => {
+        prisma.$disconnect();
+        app.quit();
+        process.exit(0);
     });
 });
 
