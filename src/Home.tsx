@@ -1,4 +1,4 @@
-import { Box, Center, Spinner } from "@chakra-ui/react";
+import { Box, Center, Icon, Spinner } from "@chakra-ui/react";
 import { useAtomValue } from "jotai/utils";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { lcuStatusAtom } from "./components/LCUConnector";
@@ -7,6 +7,7 @@ import { FriendDetails } from "./features/FriendDetails/FriendDetails";
 import { FriendList } from "./features/FriendList/FriendList";
 import { Notifications } from "./features/Notifications/Notifications";
 import { OptionsPage } from "./features/Options/OptionsPage";
+import { BiRefresh } from "react-icons/bi";
 
 export const Home = () => {
     const lcuStatus = useAtomValue(lcuStatusAtom);
@@ -25,6 +26,25 @@ export const Home = () => {
             <Box h={`calc(100% - ${navbarHeight}px)`}>
                 <Box mb={`${navbarHeight}px`} />
                 <AppRoutes />
+            </Box>
+            <Box
+                boxSize="50px"
+                position="absolute"
+                zIndex="11"
+                top={`${-navbarHeight + 5}px`}
+                right="10px"
+                cursor="pointer"
+                transition="transform .3s"
+                transitionProperty="transform"
+                _hover={{ transform: "rotate(90deg)" }}
+                onClick={() => window.location.reload()}
+            >
+                <Icon
+                    boxSize="50px"
+                    as={BiRefresh}
+                    transition="color .3s"
+                    _hover={{ color: "blue.400" }}
+                />
             </Box>
         </Box>
     );

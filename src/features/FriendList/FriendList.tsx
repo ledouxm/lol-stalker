@@ -1,10 +1,15 @@
-import { Accordion, Button, Flex, Spinner, Stack } from "@chakra-ui/react";
+import { Accordion, Button, Center, Flex, Spinner, Stack } from "@chakra-ui/react";
 import { FriendGroupRow } from "./FriendGroup";
 import { useFriendList } from "./useFriendList";
 
 export const FriendList = () => {
     const { friendGroups } = useFriendList();
-    if (!friendGroups?.length) return <Spinner />;
+    if (!friendGroups?.length)
+        return (
+            <Center direction="column" h="100%">
+                <Spinner />
+            </Center>
+        );
     return (
         <Flex direction="column" h="100%">
             <Flex p="10px">

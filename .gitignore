@@ -20,9 +20,9 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-*.db
-lol-stalking.db
-
+# *.db
+*.db-journal
+lol-stalking.db.dev
 */prismaClient
 
 selectedFriends.json
