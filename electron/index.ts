@@ -84,7 +84,7 @@ ipcMain.on("notifications/nb-new", sendNbNewNotifications);
 ipcMain.on("friend/matches", sendMatches);
 
 ipcMain.on("config/dl-db", () => {
-    const url = path.join(__dirname, isDev ? "../lol-stalking.db" : "lol-stalking.db");
+    const url = path.join(__dirname, isDev ? "../lol-stalker.db" : "lol-stalker.db");
     shell.showItemInFolder(url);
     sendToClient("config/dl-db", "ok");
 });
@@ -93,7 +93,6 @@ ipcMain.on("config/open-external", (_, url: string) => {
     shell.openExternal(url);
     sendToClient("config/open-external", "ok");
 });
-// sendToClient("config/db-path", path.join(__dirname, "lol-stalking.db"));
 
 ipcMain.on("close", () => {
     window.close();

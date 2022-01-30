@@ -9,7 +9,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:../lol-stalking.db"
+  url      = "file:../lol-stalker.db"
 }
 
 model Friend {

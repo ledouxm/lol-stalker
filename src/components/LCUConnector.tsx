@@ -13,7 +13,7 @@ import { electronRequest, sendMessage } from "../utils";
 export const lcuStatusAtom = atom<AuthData>(null as unknown as AuthData);
 
 export enum LocalStorageKeys {
-    OpenGroups = "lol-stalking/openGroups",
+    OpenGroups = "lol-stalker/openGroups",
 }
 
 export const openGroupsAtom = atomWithStorage<number[]>(LocalStorageKeys.OpenGroups, []);

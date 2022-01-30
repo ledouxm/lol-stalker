@@ -19,7 +19,7 @@ export interface NotificationFilters {
     selected?: boolean;
     types?: string[];
 }
-export const filtersAtom = atomWithStorage<NotificationFilters>("lol-stalking/filters", {
-    types: ["DEMOTION"],
+export const filtersAtom = atomWithStorage<NotificationFilters>("lol-stalker/filters", {
+    types: [],
     selected: false,
 });

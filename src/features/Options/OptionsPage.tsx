@@ -38,7 +38,7 @@ export const OptionsPage = () => {
                             as={AiFillGithub}
                             onClick={() =>
                                 openExternalBrowserMutation.mutate(
-                                    "https://github.com/ledouxm/lol-stalking"
+                                    "https://github.com/ledouxm/lol-stalker"
                                 )
                             }
                         />
