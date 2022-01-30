@@ -47,6 +47,7 @@ export const getNbNewNotifications = async ({
     currentMaxId,
     ...filters
 }: { currentMaxId: number } & NotificationFilters) =>
+    isFinite(currentMaxId) &&
     prisma.notification.count({
         where: { id: { gt: currentMaxId }, ...makeWhereFromFilters(filters) },
     });

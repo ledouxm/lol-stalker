@@ -47,9 +47,9 @@ export const sendCursoredNotifications = async (_: any, filters: NotificationFil
 
 export const sendNbNewNotifications = async (
     _: any,
-    payload: { currentMaxId: number } & NotificationFilters
+    filters: { currentMaxId: number } & NotificationFilters
 ) => {
-    const nb = await getNbNewNotifications(payload);
+    const nb = await getNbNewNotifications(filters);
     sendToClient("notifications/nb-new", nb);
 };
 

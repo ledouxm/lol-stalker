@@ -15,7 +15,6 @@ export const getNbNewNotifications = ({
     ...filters
 }: { currentMaxId: number } & NotificationFilters) =>
     electronRequest("notifications/nb-new", { currentMaxId, ...filters });
-
 export interface NotificationFilters {
     selected?: boolean;
     types?: string[];

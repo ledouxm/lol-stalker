@@ -9,6 +9,10 @@ export const Notifications = () => {
     const { notificationsQuery, nbNewNotifications } = useNotificationsQueries();
     if (notificationsQuery.isError) return <Box>An error has occured</Box>;
 
+    const notificationPages = notificationsQuery.data?.pages;
+    const hasData = notificationPages?.every((arr) => !!arr.nextCursor);
+    console.log({ hasData });
+    console.log(notificationsQuery);
     return (
         <Flex h="100%">
             <Stack minW="150px" px="10px" h="100%" mt="10px">
@@ -32,17 +36,48 @@ export const Notifications = () => {
                             {nbNewNotifications} new notification(s), click to update
                         </Box>
                     )}
-                    {notificationsQuery.data?.pages.map((page, index, arr) => (
-                        <NotificationItemPage
-                            key={index}
-                            notifications={page.content}
-                            isLastPage={index === arr.length - 1}
-                            fetchNextPage={notificationsQuery.fetchNextPage}
-                        />
-                    ))}
+                    <NotificationContent
+                        hasData={!!hasData}
+                        notificationPages={notificationPages!}
+                        fetchNextPage={notificationsQuery.fetchNextPage}
+                    />
                 </Stack>
             )}
         </Flex>
+    );
+};
+
+export const NotificationContent = ({
+    hasData,
+    notificationPages,
+    fetchNextPage,
+}: {
+    hasData: boolean;
+    notificationPages:
+        | ({
+              content: NotificationDto[];
+          } & {
+              nextCursor: number;
+          })[];
+    fetchNextPage: () => void;
+}) => {
+    return (
+        <>
+            {hasData ? (
+                notificationPages!.map((page, index, arr) => (
+                    <NotificationItemPage
+                        key={index}
+                        notifications={page.content}
+                        isLastPage={index === arr.length - 1}
+                        fetchNextPage={fetchNextPage}
+                    />
+                ))
+            ) : (
+                <Box textAlign="center" mt="10px">
+                    No notification
+                </Box>
+            )}
+        </>
     );
 };
 

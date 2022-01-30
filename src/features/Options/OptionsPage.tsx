@@ -29,14 +29,6 @@ export const OptionsPage = () => {
             </Center>
             <Center>
                 <Stack padding="10px">
-                    <Box
-                        cursor="pointer"
-                        onClick={() =>
-                            openExternalBrowserMutation.mutate("https://twitter.com/Tinmardoule")
-                        }
-                    >
-                        @Tinmardoule
-                    </Box>
                     <Center>
                         <Icon
                             transition="color .2s"

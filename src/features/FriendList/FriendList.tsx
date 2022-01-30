@@ -17,7 +17,7 @@ export const FriendList = () => {
                 <Button
                     ml="10px"
                     onClick={() => window.Main.sendMessage("friendList/select-all", false)}
-                    colorScheme="orange"
+                    colorScheme="red"
                 >
                     Unselect all
                 </Button>

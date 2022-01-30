@@ -29,7 +29,7 @@ export const NotificationsFilters = () => {
 
     return (
         <Stack shouldWrapChildren>
-            <Accordion allowMultiple>
+            <Accordion allowMultiple defaultIndex={[0]}>
                 <AccordionItem>
                     <AccordionButton>
                         <Box textAlign="left" flex="1">
@@ -77,7 +77,11 @@ export const NotificationsFilters = () => {
                 }
             >
                 Show all
-                <Tooltip label="You can hide friends in the Friendlist tab">
+                <Tooltip
+                    label={
+                        <Box textAlign="center">You can filter friends in the Friendlist tab</Box>
+                    }
+                >
                     <InfoIcon ml="10px" />
                 </Tooltip>
             </Checkbox>
