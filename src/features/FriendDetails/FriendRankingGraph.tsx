@@ -44,7 +44,13 @@ export const FriendRankingGraph = ({ friend }: { friend: FriendDto }) => {
             </Center>
         );
     }
-
+    if (!data?.length) {
+        return (
+            <Center w="100%">
+                <Box>No elo data</Box>
+            </Center>
+        );
+    }
     return (
         <ResponsiveContainer>
             <LineChart data={data}>
