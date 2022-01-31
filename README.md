@@ -7,6 +7,10 @@
 Clone this repo and install all dependencies  
 `yarn` or `npm install`
 
+## First start
+
+`yarn init:db`
+
 ## Development
 
 `yarn dev` or `npm run dev`
