@@ -1,6 +1,6 @@
 import debug from "debug";
 import { BrowserWindow } from "electron";
-import { Prisma } from "./prismaClient";
+import { Ranking } from "./entities/Ranking";
 
 export const sendToClient = (channel: string, ...args: any[]) =>
     console.log(channel)! || BrowserWindow.getAllWindows()?.[0]?.webContents.send(channel, ...args);
@@ -8,9 +8,7 @@ export const sendToClient = (channel: string, ...args: any[]) =>
 export const makeDataDragonUrl = (buildVersion: string) =>
     `https://ddragon.leagueoflegends.com/cdn/dragontail-${buildVersion}.tgz`;
 
-export const formatRank = (
-    ranking: Pick<Prisma.RankingCreateInput, "division" | "tier" | "leaguePoints">
-) =>
+export const formatRank = (ranking: Pick<Ranking, "division" | "tier" | "leaguePoints">) =>
     `${ranking.tier}${ranking.division !== "NA" ? ` ${ranking.division}` : ""} - ${
         ranking.leaguePoints
     } LPs`;
@@ -47,7 +45,7 @@ export const ranks: Rank[] = [
         leaguePoints: 100,
     },
 ];
-type Tier =
+export type Tier =
     | "IRON"
     | "SILVER"
     | "GOLD"

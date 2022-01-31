@@ -84,6 +84,7 @@ export const FriendGroupRow = ({ group }: { group: FriendGroup }) => {
                             key={friend.puuid}
                             friend={friend}
                             isChecked={selectedFriends.includes(friend.puuid)}
+                            mb="10px"
                         />
                     ))}
             </AccordionPanel>
@@ -107,7 +108,7 @@ export const FriendRow = ({
     };
 
     return (
-        <Flex alignItems="center" opacity={isChecked ? "1" : ".3"} {...props} mb="10px">
+        <Flex alignItems="center" opacity={isChecked ? "1" : ".3"} {...props}>
             <Checkbox isChecked={isChecked} onChange={onChange} mr="10px" />
             <Flex
                 alignItems="center"

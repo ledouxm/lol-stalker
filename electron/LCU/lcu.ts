@@ -2,10 +2,10 @@ import { pick } from "@pastable/core";
 import axios, { AxiosInstance } from "axios";
 import https from "https";
 import LCUConnector from "lcu-connector";
-import { Prisma } from "../prismaClient";
+import { Friend } from "../entities/Friend";
 import { sendInvalidate } from "../routes";
 import { addOrUpdateFriends } from "../routes/friends";
-import { sendToClient } from "../utils";
+import { sendToClient, Tier } from "../utils";
 import { CurrentSummoner, FriendDto, MatchDto, Queue, RankedStats } from "./types";
 
 const httpsAgent = new https.Agent({ rejectUnauthorized: false });
@@ -45,6 +45,7 @@ const theoPuuid = "4ab5d4e7-0e24-54ac-b8e7-2a72c8483712";
 const getTheoSoloQRank = () => getSoloQRankedStats(theoPuuid);
 export interface FriendChange extends FriendStats {
     oldFriend: FriendStats;
+    toNotify: boolean;
 }
 export const compareFriends = (oldFriends: FriendStats[], newFriends: FriendStats[]) => {
     const changes: FriendChange[] = [];
@@ -56,15 +57,15 @@ export const compareFriends = (oldFriends: FriendStats[], newFriends: FriendStat
             newFriend.tier !== oldFriend.tier ||
             newFriend.leaguePoints !== oldFriend.leaguePoints
         ) {
-            changes.push({ ...newFriend, oldFriend });
+            changes.push({ ...newFriend, oldFriend, toNotify: !!oldFriend.division });
         }
     });
 
     return changes;
 };
 
-type FriendStats = Pick<Prisma.FriendCreateInput, "name" | "puuid"> &
-    Pick<Queue, "division" | "tier" | "leaguePoints" | "wins" | "losses">;
+type FriendStats = Pick<Friend, "name" | "puuid"> &
+    Pick<Queue, "division" | "tier" | "leaguePoints" | "wins" | "losses" | "miniSeriesProgress">;
 
 export const checkFriendList = async () => {
     const friends = await getFriends();
@@ -72,6 +73,18 @@ export const checkFriendList = async () => {
     const stats = await getMultipleSummonerSoloQStats(friends);
     return stats;
 };
+
+export const getAllApexLeague = async () => {
+    const tiers: Tier[] = ["MASTER", "GRANDMASTER", "CHALLENGER"];
+    const payload: Partial<Record<Tier, number>> = {};
+    for (const tier of tiers) {
+        payload[tier] = (await getApexLeague(tier)).divisions[0].standings[0].leaguePoints;
+    }
+
+    return payload;
+};
+export const getApexLeague = (tier: RankedStats["queues"][0]["tier"]) =>
+    request<any>(`/lol-ranked/v1/apex-leagues/RANKED_SOLO_5x5/${tier}`);
 
 ///lol-ranked-stats/v1/stats/{summonerId}
 export const getHelp = () => request("/help?format=Console");
@@ -92,7 +105,7 @@ export const getSoloQRankedStats = async (puuid: string) =>
 export const getMatchHistoryBySummonerPuuid = (puuid: string) =>
     request<MatchDto>(`/lol-match-history/v1/products/lol/${puuid}/matches`);
 export const getMultipleSummonerSoloQStats = async (
-    summoners: Pick<Prisma.FriendCreateInput, "puuid" | "name">[]
+    summoners: Pick<Friend, "puuid" | "name">[]
 ) => {
     const summonersRanks = [];
     for (const summoner of summoners) {
@@ -102,7 +115,14 @@ export const getMultipleSummonerSoloQStats = async (
                 throw "no rank";
             }
             summonersRanks.push({
-                ...pick(rank, ["division", "tier", "leaguePoints", "wins", "losses"]),
+                ...pick(rank, [
+                    "division",
+                    "tier",
+                    "leaguePoints",
+                    "wins",
+                    "losses",
+                    "miniSeriesProgress",
+                ]),
                 ...pick(summoner, ["name", "puuid"]),
             });
         } catch (e) {

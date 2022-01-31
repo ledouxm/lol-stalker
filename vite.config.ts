@@ -32,8 +32,8 @@ export default ({ command }: ConfigEnv): UserConfig => {
     // PROD
     else {
         return {
-            base: `${__dirname}/src/out/`,
-            publicDir: `${__dirname}/public`,
+            base: `./`,
+            publicDir: `./public`,
             plugins: [],
             alias: {
                 "/@": srcRoot,

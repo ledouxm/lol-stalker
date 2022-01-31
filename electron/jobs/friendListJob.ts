@@ -1,3 +1,4 @@
+import { Friend } from "../entities/Friend";
 import { checkFriendList, compareFriends, connectorStatus } from "../LCU/lcu";
 import { addRanking, getFriendsAndLastRankingFromDb } from "../routes/friends";
 import { addNotification } from "../routes/notifications";
@@ -26,9 +27,17 @@ export const startCheckFriendListJob = async () => {
                     `${changes.length} change${changes.length > 1 ? "s" : ""} found in friendList`
                 );
                 for (const change of changes) {
-                    await addRanking(change, change.puuid);
-                    const notification = getRankDifference(change.oldFriend as any, change as any);
-                    await addNotification({ ...notification, puuid: change.puuid });
+                    await addRanking(change as any, change.puuid);
+
+                    if (change.toNotify) {
+                        const notification = getRankDifference(
+                            change.oldFriend as any,
+                            change as any
+                        );
+                        const friend = new Friend();
+                        friend.puuid = change.puuid;
+                        await addNotification({ ...notification, friend });
+                    }
                 }
                 sendToClient("invalidate", "notifications/nb-new");
             } else {

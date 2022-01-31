@@ -1,6 +1,6 @@
 import { Box, BoxProps, Flex } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { NotificationDto } from "../../types";
+import { FriendDto, NotificationDto } from "../../types";
 import { ProfileIcon } from "../DataDragon/Profileicon";
 import { formatTooltipLabel } from "./Notifications";
 
@@ -8,15 +8,16 @@ export const NotificationItem = ({
     notification,
     isClickable = true,
     withIcon = true,
+    friend,
 }: {
     notification: NotificationDto;
     isClickable?: boolean;
     withIcon?: boolean;
+    friend?: FriendDto;
 }) => {
     const navigate = useNavigate();
 
     const isRed = ["LOSS", "DEMOTION"].includes(notification.type);
-
     return (
         <Flex mt="10px" width="700px">
             {withIcon && <ProfileIcon icon={notification.friend.icon} mr="10px" />}
@@ -29,12 +30,14 @@ export const NotificationItem = ({
                             textDecoration: isClickable ? "underline" : "initial",
                         }}
                         cursor={isClickable ? "pointer" : "initial"}
-                        onClick={() => isClickable && navigate(`/friend/${notification.puuid}`)}
+                        onClick={() =>
+                            isClickable && navigate(`/friend/${notification.friend.puuid}`)
+                        }
                     >
                         {notification.isNew && withIcon && (
                             <Box boxSize="10px" bg="orange" borderRadius="50%" mr="5px" />
                         )}
-                        {notification.friend.name}
+                        {friend?.name || notification.friend.name}
                     </Flex>
                     <Box ml="10px" color={isRed ? "red-loss" : "blue-win"}>
                         {formatNotification(notification)}
@@ -44,8 +47,8 @@ export const NotificationItem = ({
                     {formatTooltipLabel(notification)}
                 </Box>
                 <Box fontSize="small" color="gray">
-                    {notification.createdAt?.toLocaleDateString()}{" "}
-                    {notification.createdAt?.toLocaleTimeString()}
+                    {new Date(notification.createdAt).toLocaleDateString()}{" "}
+                    {new Date(notification.createdAt).toLocaleTimeString()}
                 </Box>
             </Flex>
         </Flex>

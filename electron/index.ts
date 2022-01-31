@@ -3,16 +3,16 @@ dotenv.config();
 import { app, BrowserWindow, ipcMain, shell } from "electron";
 import isDev from "electron-is-dev";
 import path, { join } from "path";
-import { prisma } from "./db";
+import { makeDb } from "./db";
 import { startCheckCurrentSummonerRank } from "./jobs/currentSummonerRank";
 import { startCheckFriendListJob } from "./jobs/friendListJob";
 import { connector, sendConnectorStatus } from "./LCU/lcu";
 import {
     receiveToggleSelectFriends,
+    sendApex,
     sendCursoredNotifications,
     sendFriendList,
     sendFriendListWithRankings,
-    sendFriendNotifications,
     sendFriendRank,
     sendMatches,
     sendNbNewNotifications,
@@ -52,6 +52,7 @@ export function makeWindow() {
     return window;
 }
 app.whenReady().then(async () => {
+    const db = await makeDb();
     connector.start();
     await loadSelectedFriends();
     makeWindow();
@@ -63,7 +64,6 @@ app.whenReady().then(async () => {
         if (BrowserWindow.getAllWindows().length === 0) makeWindow();
     });
     app.on("window-all-closed", () => {
-        prisma.$disconnect();
         app.quit();
         process.exit(0);
     });
@@ -78,13 +78,14 @@ ipcMain.on("friendList/ranks", sendFriendListWithRankings);
 ipcMain.on("friendList/select", receiveToggleSelectFriends);
 ipcMain.on("friendList/select-all", sendSelectAllFriends);
 ipcMain.on("friendList/selected", () => sendSelected());
-ipcMain.on("notifications/friend", sendFriendNotifications);
 ipcMain.on("notifications/all", sendCursoredNotifications);
 ipcMain.on("notifications/nb-new", sendNbNewNotifications);
 ipcMain.on("friend/matches", sendMatches);
 
+ipcMain.on("config/apex", sendApex);
+
 ipcMain.on("config/dl-db", () => {
-    const url = path.join(__dirname, isDev ? "../lol-stalker.db" : "lol-stalker.db");
+    const url = path.join(__dirname, isDev ? "../database/lol-stalker.db" : "lol-stalker.db");
     shell.showItemInFolder(url);
     sendToClient("config/dl-db", "ok");
 });

@@ -44,6 +44,7 @@ const SwitchStateButton = ({
         textAlign="center"
         fontSize="16px"
         onClick={() => setState(stateName)}
+        userSelect="none"
         {...props}
     />
 );

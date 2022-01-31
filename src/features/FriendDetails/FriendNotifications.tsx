@@ -1,24 +1,21 @@
-import { Box, Center, Spinner, Stack } from "@chakra-ui/react";
-import { useQuery } from "react-query";
-import { FriendDto, NotificationDto } from "../../types";
-import { electronRequest } from "../../utils";
+import { Box, Center } from "@chakra-ui/react";
+import { FriendDto } from "../../types";
 import { NotificationItem } from "../Notifications/NotificationItem";
 
-const getFriendsNotifications = (puuid: FriendDto["puuid"]) =>
-    electronRequest<NotificationDto[]>("notifications/friend", puuid);
-
-export const FriendNotifications = ({ puuid }: Pick<FriendDto, "puuid">) => {
-    const query = useQuery(["friendNotifications", puuid], () => getFriendsNotifications(puuid));
-
-    if (query.isLoading) return <Spinner />;
-    if (query.isError) return <Box>An error has occured</Box>;
-
-    const notifications = query.data!;
+export const FriendNotifications = ({ friend }: { friend: FriendDto }) => {
+    const { notifications } = friend;
+    if (!notifications?.length)
+        return (
+            <Center w="100%">
+                <Box>No notification</Box>
+            </Center>
+        );
 
     return (
-        <Center flexDir="column" h="100%" overflowY="auto" w="100%">
+        <Center flexDir="column" h="100%" overflowY="auto" w="100%" justifyContent="flex-start">
             {notifications.map((notif) => (
                 <NotificationItem
+                    friend={friend}
                     notification={notif}
                     key={notif.id}
                     isClickable={false}
