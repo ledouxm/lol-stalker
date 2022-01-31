@@ -1,5 +1,6 @@
-import { Prisma } from "../prismaClient";
-export interface FriendDto extends Prisma.FriendCreateInput {
+import { Friend } from "../entities/Friend";
+
+export interface FriendDto extends Friend {
     availability: string;
     displayGroupId: number;
     displayGroupName: string;

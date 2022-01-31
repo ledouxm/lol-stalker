@@ -1,5 +1,6 @@
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import { Box, Center, Flex, Spinner, Stack } from "@chakra-ui/react";
+import { Box, Center, chakra, Flex, Spinner, Stack } from "@chakra-ui/react";
+import { last } from "@pastable/core";
 import { useState } from "react";
 import { useQuery } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
@@ -24,7 +25,6 @@ export const FriendDetails = () => {
     const { puuid } = useParams<{ puuid: string }>();
     const [state, setState] = useState<FriendDetailsState>("match-history");
     const navigate = useNavigate();
-
     const friendQuery = useQuery(["friend", puuid], () => getFriendRanks(puuid!));
 
     if (friendQuery.isLoading)
@@ -46,18 +46,7 @@ export const FriendDetails = () => {
             <Flex pos="absolute" top="10px" left="10px" h="100%">
                 <ArrowBackIcon boxSize="30px" cursor="pointer" onClick={() => navigate(-1)} />
             </Flex>
-            <Flex alignItems="center" h="100px" justifyContent="center">
-                <ProfileIcon icon={friend.icon} />
-                <Flex direction="column" ml="10px">
-                    <Box fontSize="20px" fontWeight="bold">
-                        {friend.name}
-                    </Box>
-                    <Box color="gray.400" mt="-5px">
-                        #{friend.gameTag}
-                    </Box>
-                </Flex>
-            </Flex>
-
+            <Profile friend={friend} />
             <StateTabs
                 tabs={[
                     { name: "match-history", label: "Match history" },
@@ -74,8 +63,29 @@ export const FriendDetails = () => {
     );
 };
 
+export const Profile = ({ friend }: { friend: FriendDto }) => {
+    const lastRanking = last(friend.rankings);
+    return (
+        <Flex alignItems="center" justifyContent="center">
+            <Flex alignItems="center">
+                <ProfileIcon icon={friend.icon} />
+                <Flex direction="column" ml="15px">
+                    <Box fontSize="20px" fontWeight="bold">
+                        {friend.name} <chakra.span color="gray.500">#{friend.gameTag}</chakra.span>
+                    </Box>
+                    {lastRanking && (
+                        <Box color="gray.400" mt="-5px">
+                            {formatRank(lastRanking)}
+                        </Box>
+                    )}
+                </Flex>
+            </Flex>
+        </Flex>
+    );
+};
+
 const renderComponentByState = {
-    notifications: (friend: FriendDto) => <FriendNotifications puuid={friend.puuid} />,
+    notifications: (friend: FriendDto) => <FriendNotifications friend={friend} />,
     "match-history": (friend: FriendDto) => <FriendMatches puuid={friend.puuid} />,
     "old-names": (friend: FriendDto) => <FriendOldNames friend={friend} />,
 };

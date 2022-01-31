@@ -10,7 +10,7 @@ export const Notifications = () => {
     if (notificationsQuery.isError) return <Box>An error has occured</Box>;
 
     const notificationPages = notificationsQuery.data?.pages;
-    const hasData = notificationPages?.every((arr) => !!arr.nextCursor);
+    const hasData = notificationPages?.some((arr) => !!arr.nextCursor);
 
     return (
         <Flex h="100%">

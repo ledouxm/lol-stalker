@@ -12,6 +12,7 @@ export const Navbar = (props: StackProps) => {
                 zIndex="10"
                 height={`${navbarHeight}px`}
                 bgColor="blackAlpha.700"
+                userSelect="none"
                 {...props}
             >
                 <AppLink to="/">Notifications</AppLink>

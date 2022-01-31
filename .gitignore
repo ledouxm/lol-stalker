@@ -23,7 +23,6 @@ yarn-error.log*
 *.tgz
 
 *.db-journal
-lol-stalker.db.dev
-*/prismaClient
+database/**
 
 selectedFriends.json

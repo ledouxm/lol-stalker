@@ -4,7 +4,7 @@ import { FriendDto } from "../../types";
 export const FriendOldNames = ({ friend }: { friend: FriendDto }) => {
     return !friend.oldNames?.length ? (
         <Center w="100%">
-            <Box>No old names</Box>
+            <Box>No old name</Box>
         </Center>
     ) : (
         <Center alignItems="flex-start" w="100%">

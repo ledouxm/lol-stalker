@@ -1,11 +1,13 @@
 import { pick } from "@pastable/core";
 import debug from "debug";
-import { prisma } from "../db";
-import { Prisma } from "../prismaClient";
+import { getManager } from "typeorm";
+import { Friend } from "../entities/Friend";
+import { FriendName } from "../entities/FriendName";
+import { Ranking } from "../entities/Ranking";
+import { FriendDto } from "../LCU/types";
 import { editSelectedFriends, persistSelectedFriends, selectedFriends } from "../selection";
-import { formatRank } from "../utils";
 
-const friendFields: (keyof Omit<Prisma.FriendCreateInput, "oldNames" | "notifications">)[] = [
+const friendFields: (keyof FriendDto)[] = [
     "gameName",
     "gameTag",
     "icon",
@@ -15,8 +17,9 @@ const friendFields: (keyof Omit<Prisma.FriendCreateInput, "oldNames" | "notifica
     "summonerId",
     "groupId",
     "groupName",
+    "isCurrentSummoner",
 ];
-export const rankingFields: (keyof Omit<Prisma.RankingCreateInput, "friend">)[] = [
+export const rankingFields: (keyof Ranking)[] = [
     "division",
     "tier",
     "leaguePoints",
@@ -25,42 +28,40 @@ export const rankingFields: (keyof Omit<Prisma.RankingCreateInput, "friend">)[] 
     "miniSeriesProgress",
 ];
 
-export const getFriendsFromDb = () =>
-    prisma.friend.findMany({ where: { isCurrentSummoner: { equals: false } } });
+export const getFriendsFromDb = () => {
+    const manager = getManager();
+    return manager.find(Friend, { where: { isCurrentSummoner: false } });
+};
 
-export const getFriendsAndRankingsFromDb = () =>
-    prisma.friend.findMany({
-        where: { isCurrentSummoner: { equals: false } },
-        include: { ranks: true },
+export const getFriendsAndRankingsFromDb = () => {
+    const manager = getManager();
+    return manager.find(Friend, {
+        relations: ["rankings"],
+        where: { isCurrentSummoner: false },
     });
+};
 
-export const getFriendAndRankingsFromDb = (puuid: Prisma.FriendCreateInput["puuid"]) =>
-    prisma.friend.findUnique({
+export const getFriendAndRankingsFromDb = (puuid: Friend["puuid"]) =>
+    getManager().findOne(Friend, {
         where: { puuid },
-        include: {
-            ranks: { orderBy: { createdAt: "desc" } },
-            oldNames: { orderBy: { createdAt: "desc" } },
-        },
+        relations: ["rankings", "friendNames", "notifications"],
     });
-
 export const getFriendsAndLastRankingFromDb = async () => {
     const friends = await getFriendsAndRankingsFromDb();
     return friends.map((friend) => {
-        const lastRank = friend.ranks.sort(
-            (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+        const lastRank = friend.rankings.sort(
+            //@ts-ignore
+            (a, b) => b.createdAt - a.createdAt
         )[0];
         return {
-            ...pick(friend, friendFields),
+            ...pick(friend, friendFields as any),
             ...(lastRank ? pick(lastRank, rankingFields) : {}),
         };
     });
 };
 
 export const getSelectedFriends = async () => Array.from(selectedFriends.current!);
-export const toggleSelectFriends = async (
-    puuids: Prisma.FriendCreateInput["puuid"][],
-    newState: boolean
-) =>
+export const toggleSelectFriends = async (puuids: Friend["puuid"][], newState: boolean) =>
     editSelectedFriends(() =>
         puuids.forEach((puuid) => selectedFriends.current?.[newState ? "add" : "delete"](puuid))
     );
@@ -73,9 +74,27 @@ export const selectAllFriends = async (select: boolean) => {
     );
 };
 
-export const addOrUpdateFriends = async (friends: Prisma.FriendCreateInput[]) => {
-    const existingFriends = await getFriendsFromDb();
+const friendDtoToFriend = (friendDto: FriendDto): Friend => {
+    return getManager().create(Friend, {
+        isCurrentSummoner: false,
 
+        ...pick(friendDto, [
+            "puuid",
+            "id",
+            "gameName",
+            "gameTag",
+            "groupId",
+            "groupName",
+            "name",
+            "summonerId",
+            "icon",
+        ]),
+    });
+};
+
+export const addOrUpdateFriends = async (friends: FriendDto[]) => {
+    const existingFriends = await getFriendsFromDb();
+    const manager = getManager();
     for (const friend of friends) {
         const friendDto = pick(friend, friendFields);
         const existingFriend = existingFriends.find((ef) => ef.puuid === friend.puuid);
@@ -86,39 +105,34 @@ export const addOrUpdateFriends = async (friends: Prisma.FriendCreateInput[]) =>
                 friendDto.groupName !== existingFriend.groupName
             ) {
                 if (friendDto.gameName !== existingFriend.gameName) {
-                    await prisma.friendName.create({
-                        data: {
-                            puuid: friendDto.puuid,
-                            name: existingFriend.name,
-                        },
-                    });
+                    await manager.save(
+                        //@ts-ignore
+                        manager.create(FriendName, {
+                            name: existingFriend.gameName,
+                            friend: friendDto.puuid,
+                        })
+                    );
                 }
 
-                await prisma.friend.update({
-                    where: { puuid: friend.puuid },
-                    data: friendDto,
-                });
+                await manager.update(
+                    Friend,
+                    { friend: friend.puuid },
+                    { ...friendDtoToFriend(friendDto) }
+                );
             }
         } else {
-            await prisma.friend.create({
-                data: friendDto,
-            });
+            await manager.save(friendDtoToFriend(friendDto));
             selectedFriends.current?.add(friendDto.puuid);
         }
     }
     await persistSelectedFriends();
     debug("add or update ended");
 };
-export const addRanking = async (
-    ranking: Omit<Prisma.RankingCreateInput, "friend" | "oldNames">,
-    puuid: Prisma.FriendCreateInput["puuid"]
-) => {
-    return prisma.ranking.create({
-        data: {
-            ...pick(ranking, rankingFields),
-            puuid,
-        },
-    });
+export const addRanking = async (ranking: Ranking, puuid: Friend["puuid"]) => {
+    return getManager().save(
+        //@ts-ignore
+        getManager().create(Ranking, { ...pick(ranking, rankingFields), friend: puuid })
+    );
 };
 
 export const friendsApi = {

@@ -33,14 +33,14 @@ export const FriendMatches = ({ puuid }: Pick<FriendDto, "puuid">) => {
 
     return (
         <Center w="100%" h="100%" overflowY="auto">
-            {query.isLoading ? (
-                <Spinner />
-            ) : (
+            {games.length ? (
                 <Stack spacing="5px" whiteSpace="nowrap" h="100%">
                     {games.map((game) => (
                         <GameRow game={game} key={game.gameId} />
                     ))}
                 </Stack>
+            ) : (
+                <>No game</>
             )}
         </Center>
     );

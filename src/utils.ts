@@ -8,6 +8,7 @@ export function electronRequest<T = any>(event: string, data?: any) {
         const timeout = setTimeout(reject, timeoutDelay);
         window.Main.on(event, (data: any) => {
             clearTimeout(timeout);
+            if (!data) reject(404);
             resolve(data);
         });
         window.ipcRenderer.send(event, data);

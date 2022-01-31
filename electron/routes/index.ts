@@ -1,5 +1,5 @@
+import { Friend } from "../entities/Friend";
 import { getMatchHistoryBySummonerPuuid } from "../LCU/lcu";
-import { Prisma } from "../prismaClient";
 import { sendToClient } from "../utils";
 import {
     getFriendAndRankingsFromDb,
@@ -24,7 +24,7 @@ export const sendFriendList = async () => {
 
 export const sendInvalidate = async (queryName: string) => sendToClient("invalidate", queryName);
 
-export const sendFriendRank = async (_: any, puuid: Prisma.FriendCreateInput["puuid"]) => {
+export const sendFriendRank = async (_: any, puuid: Friend["puuid"]) => {
     const groups = await getFriendAndRankingsFromDb(puuid);
     sendToClient("friendList/friend", groups);
 };
@@ -32,11 +32,6 @@ export const sendFriendRank = async (_: any, puuid: Prisma.FriendCreateInput["pu
 export const sendFriendListWithRankings = async () => {
     const groups = await getFriendsAndRankingsFromDb();
     sendToClient("friendList/lastRank", groups);
-};
-
-export const sendFriendNotifications = async (_: any, puuid: Prisma.FriendCreateInput["puuid"]) => {
-    const groups = await getFriendNotifications(puuid);
-    sendToClient("notifications/friend", groups);
 };
 
 export const sendCursoredNotifications = async (_: any, filters: NotificationFilters) => {
@@ -63,7 +58,7 @@ export const sendSelectAllFriends = async (_: any, select: boolean) => {
     sendSelected();
 };
 
-export const sendMatches = async (_: any, puuid: Prisma.FriendCreateInput["puuid"]) => {
+export const sendMatches = async (_: any, puuid: Friend["puuid"]) => {
     const matches = await getMatchHistoryBySummonerPuuid(puuid);
     sendToClient("friend/matches", matches);
 };
@@ -73,7 +68,7 @@ export const receiveToggleSelectFriends = async (
     _: any,
     data: {
         type: SelectEventType;
-        puuids: Prisma.FriendCreateInput["puuid"] | Prisma.FriendCreateInput["puuid"][];
+        puuids: Friend["puuid"] | Friend["puuid"][];
     }
 ) => {
     const { type, puuids } = data;

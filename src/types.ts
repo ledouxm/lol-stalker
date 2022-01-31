@@ -10,6 +10,8 @@ export interface FriendDto {
     puuid: string;
     selected: boolean;
     oldNames: OldNames[];
+    notifications: NotificationDto[];
+    rankings: RankDto[];
 }
 export interface OldNames {
     id: number;
@@ -45,8 +47,8 @@ export interface NotificationDto {
     to: string;
     content: string;
     puuid: string;
-    createdAt: Date;
-    friend: Pick<FriendDto, "icon" | "name">;
+    createdAt: number;
+    friend: Pick<FriendDto, "icon" | "name" | "puuid">;
     isNew: boolean;
 }
 
