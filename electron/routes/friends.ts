@@ -122,7 +122,6 @@ export const addOrUpdateFriends = async (friends: FriendDto[]) => {
             }
         } else {
             await manager.save(friendDtoToFriend(friendDto));
-            selectedFriends.current?.add(friendDto.puuid);
         }
     }
     await persistSelectedFriends();

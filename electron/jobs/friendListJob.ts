@@ -1,3 +1,5 @@
+import { Notification } from "electron";
+import { config } from "../config";
 import { Friend } from "../entities/Friend";
 import { checkFriendList, compareFriends, connectorStatus } from "../LCU/lcu";
 import { addRanking, getFriendsAndLastRankingFromDb } from "../routes/friends";
@@ -21,7 +23,7 @@ export const startCheckFriendListJob = async () => {
 
         while (true) {
             const friendListStats = await checkFriendList();
-            const changes = compareFriends(friendsRef.current, friendListStats);
+            const changes = await compareFriends(friendsRef.current, friendListStats);
             if (changes.length) {
                 console.log(
                     `${changes.length} change${changes.length > 1 ? "s" : ""} found in friendList`
@@ -36,6 +38,12 @@ export const startCheckFriendListJob = async () => {
                         );
                         const friend = new Friend();
                         friend.puuid = change.puuid;
+                        console.log(config.current);
+                        if (config.current?.windowsNotifications && change.windowsNotification)
+                            new Notification({
+                                title: change.name,
+                                body: notification.content,
+                            }).show();
                         await addNotification({ ...notification, friend });
                     }
                 }

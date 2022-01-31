@@ -1,6 +1,6 @@
-import { Box, Button, Center, Icon, Input, Stack } from "@chakra-ui/react";
+import { Box, Button, Center, Checkbox, Icon, Input, Spinner, Stack } from "@chakra-ui/react";
 // import { shell } from "electron";
-import { useMutation } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import { electronRequest } from "../../utils";
 import { AiFillGithub, AiFillTwitterCircle } from "react-icons/ai";
 export const OptionsPage = () => {
@@ -8,11 +8,11 @@ export const OptionsPage = () => {
     const openExternalBrowserMutation = useMutation((url: string) =>
         electronRequest("config/open-external", url)
     );
-
     return (
         <Stack h="100%">
             <Center h="100%">
                 <Stack>
+                    <ConfigPanel />
                     <Button colorScheme="twitter" onClick={() => dlDbMutation.mutate()}>
                         Open db folder
                     </Button>
@@ -59,5 +59,25 @@ export const OptionsPage = () => {
                 </Stack>
             </Center>
         </Stack>
+    );
+};
+
+export const ConfigPanel = () => {
+    const configQuery = useQuery("config", () => electronRequest<Record<string, any>>("config"));
+    const editConfigQuery = useMutation((obj: Record<string, any>) =>
+        electronRequest("config/set", obj)
+    );
+    console.log(configQuery);
+
+    if (configQuery.isLoading) return <Spinner />;
+    const config = configQuery.data!;
+    console.log(config);
+    return (
+        <Checkbox
+            isChecked={config.windowsNotifications}
+            onChange={(e) => editConfigQuery.mutate({ windowsNotifications: e.target.checked })}
+        >
+            Windows notifications
+        </Checkbox>
     );
 };

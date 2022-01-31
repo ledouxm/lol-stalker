@@ -3,6 +3,7 @@ dotenv.config();
 import { app, BrowserWindow, ipcMain, shell } from "electron";
 import isDev from "electron-is-dev";
 import path, { join } from "path";
+import { config, loadConfig, persistConfig } from "./config";
 import { makeDb } from "./db";
 import { startCheckCurrentSummonerRank } from "./jobs/currentSummonerRank";
 import { startCheckFriendListJob } from "./jobs/friendListJob";
@@ -55,6 +56,7 @@ app.whenReady().then(async () => {
     const db = await makeDb();
     connector.start();
     await loadSelectedFriends();
+    await loadConfig();
     makeWindow();
     startCheckFriendListJob();
     startCheckCurrentSummonerRank();
@@ -68,6 +70,7 @@ app.whenReady().then(async () => {
         process.exit(0);
     });
 });
+app.setAppUserModelId("LoL Stalker");
 
 ipcMain.on("lcu/connection", () => {
     sendConnectorStatus();
@@ -84,8 +87,19 @@ ipcMain.on("friend/matches", sendMatches);
 
 ipcMain.on("config/apex", sendApex);
 
+ipcMain.on("config", () => sendToClient("config", config.current));
+ipcMain.on("config/set", async (_, data) => {
+    Object.entries(data).forEach(([key, val]) => (config.current![key] = val));
+    sendToClient("config/set", "ok");
+    sendToClient("invalidate", "config");
+    await persistConfig();
+});
+
 ipcMain.on("config/dl-db", () => {
-    const url = path.join(__dirname, isDev ? "../database/lol-stalker.db" : "lol-stalker.db");
+    const url = path.join(
+        __dirname,
+        isDev ? "../database/lol-stalker.db" : "./database/lol-stalker.db"
+    );
     shell.showItemInFolder(url);
     sendToClient("config/dl-db", "ok");
 });

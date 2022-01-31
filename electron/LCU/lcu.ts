@@ -4,7 +4,8 @@ import https from "https";
 import LCUConnector from "lcu-connector";
 import { Friend } from "../entities/Friend";
 import { sendInvalidate } from "../routes";
-import { addOrUpdateFriends } from "../routes/friends";
+import { addOrUpdateFriends, getSelectedFriends } from "../routes/friends";
+import { selectedFriends } from "../selection";
 import { sendToClient, Tier } from "../utils";
 import { CurrentSummoner, FriendDto, MatchDto, Queue, RankedStats } from "./types";
 
@@ -46,8 +47,9 @@ const getTheoSoloQRank = () => getSoloQRankedStats(theoPuuid);
 export interface FriendChange extends FriendStats {
     oldFriend: FriendStats;
     toNotify: boolean;
+    windowsNotification?: boolean;
 }
-export const compareFriends = (oldFriends: FriendStats[], newFriends: FriendStats[]) => {
+export const compareFriends = async (oldFriends: FriendStats[], newFriends: FriendStats[]) => {
     const changes: FriendChange[] = [];
     oldFriends.forEach((oldFriend) => {
         const newFriend = newFriends.find((newFriend) => newFriend.puuid === oldFriend.puuid);
@@ -57,7 +59,12 @@ export const compareFriends = (oldFriends: FriendStats[], newFriends: FriendStat
             newFriend.tier !== oldFriend.tier ||
             newFriend.leaguePoints !== oldFriend.leaguePoints
         ) {
-            changes.push({ ...newFriend, oldFriend, toNotify: !!oldFriend.division });
+            changes.push({
+                ...newFriend,
+                oldFriend,
+                toNotify: !!oldFriend.division,
+                windowsNotification: selectedFriends.current?.has(newFriend.puuid),
+            });
         }
     });
 
