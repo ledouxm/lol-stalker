@@ -5,7 +5,7 @@ import LCUConnector from "lcu-connector";
 import { Friend } from "../entities/Friend";
 import { sendInvalidate } from "../routes";
 import { addOrUpdateFriends } from "../routes/friends";
-import { sendToClient } from "../utils";
+import { sendToClient, Tier } from "../utils";
 import { CurrentSummoner, FriendDto, MatchDto, Queue, RankedStats } from "./types";
 
 const httpsAgent = new https.Agent({ rejectUnauthorized: false });
@@ -73,6 +73,18 @@ export const checkFriendList = async () => {
     const stats = await getMultipleSummonerSoloQStats(friends);
     return stats;
 };
+
+export const getAllApexLeague = async () => {
+    const tiers: Tier[] = ["MASTER", "GRANDMASTER", "CHALLENGER"];
+    const payload: Partial<Record<Tier, number>> = {};
+    for (const tier of tiers) {
+        payload[tier] = (await getApexLeague(tier)).divisions[0].standings[0].leaguePoints;
+    }
+
+    return payload;
+};
+export const getApexLeague = (tier: RankedStats["queues"][0]["tier"]) =>
+    request<any>(`/lol-ranked/v1/apex-leagues/RANKED_SOLO_5x5/${tier}`);
 
 ///lol-ranked-stats/v1/stats/{summonerId}
 export const getHelp = () => request("/help?format=Console");

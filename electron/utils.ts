@@ -45,7 +45,7 @@ export const ranks: Rank[] = [
         leaguePoints: 100,
     },
 ];
-type Tier =
+export type Tier =
     | "IRON"
     | "SILVER"
     | "GOLD"

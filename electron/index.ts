@@ -9,6 +9,7 @@ import { startCheckFriendListJob } from "./jobs/friendListJob";
 import { connector, sendConnectorStatus } from "./LCU/lcu";
 import {
     receiveToggleSelectFriends,
+    sendApex,
     sendCursoredNotifications,
     sendFriendList,
     sendFriendListWithRankings,
@@ -80,6 +81,8 @@ ipcMain.on("friendList/selected", () => sendSelected());
 ipcMain.on("notifications/all", sendCursoredNotifications);
 ipcMain.on("notifications/nb-new", sendNbNewNotifications);
 ipcMain.on("friend/matches", sendMatches);
+
+ipcMain.on("config/apex", sendApex);
 
 ipcMain.on("config/dl-db", () => {
     const url = path.join(__dirname, isDev ? "../database/lol-stalker.db" : "lol-stalker.db");

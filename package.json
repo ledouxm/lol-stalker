@@ -18,7 +18,7 @@
     },
     "productName": "LoL Stalker",
     "scripts": {
-        "dev": "yarn init:db && yarn migration:up && concurrently \"yarn dev:vite --port 3002\" \" yarn dev:electron\"",
+        "dev": "yarn migration:up && concurrently \"yarn dev:vite --port 3002\" \" yarn dev:electron\"",
         "dev:vite": "vite --https",
         "dev:electron": "npm run build:electron && electron .",
         "build": "yarn clean && yarn init:db &&  npm run build:vite && npm run build:electron && yarn migration:up",
@@ -53,6 +53,7 @@
         "react-icons": "^4.3.1",
         "react-query": "^3.34.8",
         "react-router-dom": "6",
+        "recharts": "^2.1.8",
         "sqlite3": "^5.0.2",
         "typeorm": "^0.2.41",
         "yenv": "^3.0.1"

@@ -8,7 +8,7 @@ export const FriendList = () => {
     if (!friendGroups?.length)
         return (
             <Center direction="column" h="100%">
-                <Box>No friend</Box>
+                <Box>No friend. You can try refreshing the page (CTRL-R)</Box>
             </Center>
         );
     return (

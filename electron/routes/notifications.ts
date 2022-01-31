@@ -47,6 +47,7 @@ const applyFilters = (query: SelectQueryBuilder<Notification>, filters: Notifica
 
     return query
         .orderBy("notification.createdAt", "DESC")
+        .orderBy("notification.id", "DESC")
         .where(whereClauses.join(" AND "), payload);
 };
 

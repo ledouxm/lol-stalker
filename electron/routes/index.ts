@@ -1,5 +1,5 @@
 import { Friend } from "../entities/Friend";
-import { getMatchHistoryBySummonerPuuid } from "../LCU/lcu";
+import { getAllApexLeague, getMatchHistoryBySummonerPuuid } from "../LCU/lcu";
 import { sendToClient } from "../utils";
 import {
     getFriendAndRankingsFromDb,
@@ -76,4 +76,9 @@ export const receiveToggleSelectFriends = async (
 
     await toggleSelectFriends(payload, type === "add");
     sendSelected();
+};
+
+export const sendApex = async () => {
+    const payload = await getAllApexLeague();
+    sendToClient("config/apex", payload);
 };
