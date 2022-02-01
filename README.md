@@ -1,6 +1,6 @@
 # LoL friendlist ranking stalker
 
-![LoL friendlist ranking stalker](Screenshot.png)
+![LoL friendlist ranking stalker](https://user-images.githubusercontent.com/32564108/151961241-d387f21c-926b-46fe-82d4-ab41456154ae.png)
 
 ## Installation
 
