@@ -1,7 +1,7 @@
 import { pick } from "@pastable/core";
 import debug from "debug";
 import { getManager } from "typeorm";
-import { sendFriendList } from ".";
+import { sendFriendList, sendInvalidate } from ".";
 import { Friend } from "../entities/Friend";
 import { FriendName } from "../entities/FriendName";
 import { Ranking } from "../entities/Ranking";
@@ -91,10 +91,26 @@ const friendDtoToFriend = (friendDto: FriendDto): Partial<Friend> => ({
     ]),
 });
 
+export const inGameFriends: { current: any[] } = {
+    current: null as any,
+};
+
 export const addOrUpdateFriends = async (friends: FriendDto[]) => {
     const existingFriends = await getFriendsFromDb();
     const manager = getManager();
+
+    const currentInGame = [];
+
     for (const friend of friends) {
+        if (
+            friend.lol.gameStatus !== "outOfGame" &&
+            friend.lol.gameQueueType === "RANKED_SOLO_5x5"
+        ) {
+            currentInGame.push({
+                ...pick(friend, ["puuid", "gameName", "icon"]),
+                ...pick(friend.lol, ["championId", "timeStamp", "gameStatus"]),
+            }); // championId: friend.lol.championId});
+        }
         const friendDto = pick(friend, friendFields);
         const existingFriend = existingFriends.find((ef) => ef.puuid === friend.puuid);
         if (existingFriend) {
@@ -122,8 +138,9 @@ export const addOrUpdateFriends = async (friends: FriendDto[]) => {
             await manager.save(manager.create(Friend, friendDtoToFriend(friendDto)));
         }
     }
+    inGameFriends.current = [...currentInGame];
+    sendInvalidate("friendList/in-game");
     sendFriendList();
-    await persistSelectedFriends();
     debug("add or update ended");
 };
 export const addRanking = async (ranking: Ranking, puuid: Friend["puuid"]) => {

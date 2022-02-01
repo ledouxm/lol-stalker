@@ -1,6 +1,7 @@
-import { Box, Center, Flex, Spinner, Stack } from "@chakra-ui/react";
+import { Box, Center, Flex, Heading, Spinner, Stack } from "@chakra-ui/react";
 import { useCallback, useEffect, useRef } from "react";
 import { NotificationDto } from "../../types";
+import { InGameFriends } from "./InGameFriends";
 import { NotificationItem } from "./NotificationItem";
 import { NotificationsFilters } from "./NotificationsFilters";
 import { useNotificationsQueries } from "./useNotificationsQueries";
@@ -12,7 +13,6 @@ export const Notifications = () => {
     const notificationPages = notificationsQuery.data?.pages;
     const hasData = notificationPages?.some((arr) => !!arr.nextCursor);
 
-    console.log(notificationPages);
     return (
         <Flex h="100%">
             <Stack minW="150px" px="10px" h="100%" mt="10px">
@@ -45,9 +45,20 @@ export const Notifications = () => {
                     />
                 </Stack>
             )}
+            <Stack>
+                <InGameFriends />
+            </Stack>
         </Flex>
     );
 };
+
+export interface InGameFriend {
+    championId: number;
+    gameName: string;
+    gameStatus: string;
+    timeStamp: number;
+    puuid: string;
+}
 
 export const NotificationContent = ({
     hasData,

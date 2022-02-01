@@ -18,6 +18,7 @@ export interface FriendDto extends Friend {
     statusMessage: string;
     summary: string;
     time: number;
+    lol: any;
 }
 
 export interface RerollPoints {

@@ -20,6 +20,7 @@ import {
     sendSelectAllFriends,
     sendSelected,
 } from "./routes";
+import { inGameFriends } from "./routes/friends";
 import { loadSelectedFriends } from "./selection";
 import { sendToClient } from "./utils";
 
@@ -81,6 +82,7 @@ ipcMain.on("friendList/ranks", sendFriendListWithRankings);
 ipcMain.on("friendList/select", receiveToggleSelectFriends);
 ipcMain.on("friendList/select-all", sendSelectAllFriends);
 ipcMain.on("friendList/selected", () => sendSelected());
+ipcMain.on("friendList/in-game", () => sendToClient("friendList/in-game", inGameFriends.current));
 ipcMain.on("notifications/all", sendCursoredNotifications);
 ipcMain.on("notifications/nb-new", sendNbNewNotifications);
 ipcMain.on("friend/matches", sendMatches);
