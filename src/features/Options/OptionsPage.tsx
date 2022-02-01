@@ -3,6 +3,7 @@ import { Box, Button, Center, Checkbox, Icon, Input, Spinner, Stack } from "@cha
 import { useMutation, useQuery } from "react-query";
 import { electronRequest } from "../../utils";
 import { AiFillGithub, AiFillTwitterCircle } from "react-icons/ai";
+import { CopyIcon } from "@chakra-ui/icons";
 export const OptionsPage = () => {
     const dlDbMutation = useMutation(() => electronRequest("config/dl-db"));
     const openExternalBrowserMutation = useMutation((url: string) =>
@@ -67,17 +68,24 @@ export const ConfigPanel = () => {
     const editConfigQuery = useMutation((obj: Record<string, any>) =>
         electronRequest("config/set", obj)
     );
-    console.log(configQuery);
 
     if (configQuery.isLoading) return <Spinner />;
     const config = configQuery.data!;
-    console.log(config);
+
     return (
-        <Checkbox
-            isChecked={config.windowsNotifications}
-            onChange={(e) => editConfigQuery.mutate({ windowsNotifications: e.target.checked })}
-        >
-            Windows notifications
-        </Checkbox>
+        <>
+            <Checkbox
+                isChecked={config.windowsNotifications}
+                onChange={(e) => editConfigQuery.mutate({ windowsNotifications: e.target.checked })}
+            >
+                Windows notifications
+            </Checkbox>
+            <Button
+                leftIcon={<CopyIcon />}
+                onClick={() => navigator.clipboard.writeText(config.dirname)}
+            >
+                {config.dirname}
+            </Button>
+        </>
     );
 };

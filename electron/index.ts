@@ -54,7 +54,7 @@ export function makeWindow() {
     return window;
 }
 app.whenReady().then(async () => {
-    const db = await makeDb();
+    await makeDb();
     connector.start();
     await loadSelectedFriends();
     await loadConfig();

@@ -5,6 +5,7 @@ export const config: { current: Record<string, any> | null } = { current: null }
 
 const initialConfig = {
     windowsNotifications: true,
+    dirname: __dirname,
 };
 const configFilePath = path.join(__dirname, "config.json");
 export const loadConfig = async () => {
