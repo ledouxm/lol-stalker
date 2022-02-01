@@ -6,6 +6,8 @@ export const config: { current: Record<string, any> | null } = { current: null }
 const initialConfig = {
     windowsNotifications: true,
     dirname: __dirname,
+    defaultLossMessage:
+        "\u{1F602}\u{1F602}\u{1F602}\u{1F602}\u{1F602}\u{1F602}\u{1F602}\u{1F602}\u{1F602}\u{1F602}\u{1F602}\u{1F602}\u{1F602}",
 };
 const configFilePath = path.join(__dirname, "config.json");
 export const loadConfig = async () => {

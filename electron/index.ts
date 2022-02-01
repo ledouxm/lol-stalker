@@ -15,6 +15,7 @@ import {
     sendFriendList,
     sendFriendListWithRankings,
     sendFriendRank,
+    sendInstantMessage,
     sendMatches,
     sendNbNewNotifications,
     sendSelectAllFriends,
@@ -83,6 +84,8 @@ ipcMain.on("friendList/select", receiveToggleSelectFriends);
 ipcMain.on("friendList/select-all", sendSelectAllFriends);
 ipcMain.on("friendList/selected", () => sendSelected());
 ipcMain.on("friendList/in-game", () => sendToClient("friendList/in-game", inGameFriends.current));
+ipcMain.on("friendList/message", sendInstantMessage);
+
 ipcMain.on("notifications/all", sendCursoredNotifications);
 ipcMain.on("notifications/nb-new", sendNbNewNotifications);
 ipcMain.on("friend/matches", sendMatches);

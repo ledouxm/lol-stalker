@@ -1,9 +1,21 @@
-import { Box, Button, Center, Checkbox, Icon, Input, Spinner, Stack } from "@chakra-ui/react";
+import {
+    Box,
+    Button,
+    Center,
+    CenterProps,
+    Checkbox,
+    FormLabel,
+    Icon,
+    Input,
+    Spinner,
+    Stack,
+} from "@chakra-ui/react";
 // import { shell } from "electron";
 import { useMutation, useQuery } from "react-query";
 import { electronRequest } from "../../utils";
 import { AiFillGithub, AiFillTwitterCircle } from "react-icons/ai";
 import { CopyIcon } from "@chakra-ui/icons";
+import { useForm } from "react-hook-form";
 export const OptionsPage = () => {
     const dlDbMutation = useMutation(() => electronRequest("config/dl-db"));
     const openExternalBrowserMutation = useMutation((url: string) =>
@@ -74,6 +86,7 @@ export const ConfigPanel = () => {
 
     return (
         <>
+            <ConfigForm config={config} mb="50px" />
             <Checkbox
                 isChecked={config.windowsNotifications}
                 onChange={(e) => editConfigQuery.mutate({ windowsNotifications: e.target.checked })}
@@ -87,5 +100,25 @@ export const ConfigPanel = () => {
                 {config.dirname}
             </Button>
         </>
+    );
+};
+
+export const ConfigForm = ({ config, ...props }: { config: Record<string, any> } & CenterProps) => {
+    const { handleSubmit, register } = useForm({
+        defaultValues: { defaultLossMessage: config.defaultLossMessage },
+    });
+
+    const onSubmit = (data: any) => console.log(data);
+
+    return (
+        <form onSubmit={handleSubmit(onSubmit)}>
+            <Center flexDir="column" {...props}>
+                <FormLabel>Default loss message</FormLabel>
+                <Input type="text" {...register("defaultLossMessage")} />
+                <Button mt="10px" type="submit">
+                    Save
+                </Button>
+            </Center>
+        </form>
     );
 };

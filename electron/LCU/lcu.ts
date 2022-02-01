@@ -81,6 +81,13 @@ export const checkFriendList = async () => {
     return stats;
 };
 
+export const postMessage = (payload: { summonerName: string; message: string }) => {
+    const url = `/lol-game-client-chat/v1/instant-messages?summonerName=${encodeURI(
+        payload.summonerName
+    )}&message=${encodeURI(payload.message)}`;
+    return connectorStatus.api.post(url);
+};
+
 export const getAllApexLeague = async () => {
     const tiers: Tier[] = ["MASTER", "GRANDMASTER", "CHALLENGER"];
     const payload: Partial<Record<Tier, number>> = {};

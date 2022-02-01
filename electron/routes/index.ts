@@ -1,5 +1,6 @@
+import { config } from "../config";
 import { Friend } from "../entities/Friend";
-import { getAllApexLeague, getMatchHistoryBySummonerPuuid } from "../LCU/lcu";
+import { getAllApexLeague, getMatchHistoryBySummonerPuuid, postMessage } from "../LCU/lcu";
 import { sendToClient } from "../utils";
 import {
     getFriendAndRankingsFromDb,
@@ -81,4 +82,10 @@ export const receiveToggleSelectFriends = async (
 export const sendApex = async () => {
     const payload = await getAllApexLeague();
     sendToClient("config/apex", payload);
+};
+
+export const sendInstantMessage = async (_: any, { summonerName }: { summonerName: string }) => {
+    if (!config.current) return;
+    await postMessage({ summonerName, message: config.current.defaultLossMessage });
+    sendToClient("friendList/message", "ok");
 };

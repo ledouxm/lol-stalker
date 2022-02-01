@@ -1,4 +1,5 @@
-import { Box, BoxProps, Flex } from "@chakra-ui/react";
+import { ChatIcon } from "@chakra-ui/icons";
+import { Box, BoxProps, chakra, Flex, IconButton, Tooltip } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { FriendDto, NotificationDto } from "../../types";
 import { ProfileIcon } from "../DataDragon/Profileicon";
@@ -39,9 +40,27 @@ export const NotificationItem = ({
                         )}
                         {friend?.name || notification.friend.name}
                     </Flex>
-                    <Box ml="10px" color={isRed ? "red-loss" : "blue-win"}>
-                        {formatNotification(notification)}
-                    </Box>
+                    <Flex ml="10px" alignItems="center">
+                        <chakra.span color={isRed ? "red-loss" : "blue-win"}>
+                            {formatNotificationContent(notification)}
+                        </chakra.span>
+                        {["DEMOTION", "LOSS"].includes(notification.type) && (
+                            <Tooltip label="Send recorded message to this friend">
+                                <IconButton
+                                    aria-label="Send message"
+                                    icon={<ChatIcon />}
+                                    onClick={() =>
+                                        window.Main.sendMessage("friendList/message", {
+                                            summonerName: notification.friend.name,
+                                        })
+                                    }
+                                    h="auto"
+                                    py="6px"
+                                    ml="10px"
+                                />
+                            </Tooltip>
+                        )}
+                    </Flex>
                 </Flex>
                 <Box fontSize="small" color="gray.400">
                     {formatTooltipLabel(notification)}
@@ -55,7 +74,7 @@ export const NotificationItem = ({
     );
 };
 
-const formatNotification = (notification: NotificationDto) => {
+const formatNotificationContent = (notification: NotificationDto) => {
     if (notification.from.slice(0, 4) === "NONE") {
         return (
             <Flex alignItems="center">
