@@ -73,7 +73,7 @@ export const FriendRankingGraph = ({ friend }: { friend: FriendDto }) => {
                 <Line dataKey="totalLp" stroke="#0a9396" strokeWidth={5} fill="#0a9396" />
                 <XAxis
                     dataKey="createdAt"
-                    tickFormatter={(value: Date) => value.toLocaleDateString()}
+                    tickFormatter={(value: Date) => new Date(value).toLocaleDateString()}
                 />
             </LineChart>
         </ResponsiveContainer>
