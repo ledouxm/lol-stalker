@@ -7,7 +7,7 @@ import { useChampionsList } from "../features/DataDragon/useChampionsList";
 import { useItemsList } from "../features/DataDragon/useItemsList";
 import { useSummonerSpellsList } from "../features/DataDragon/useSummonerSpellsList";
 import { friendsAtom, selectedFriendsAtom } from "../features/FriendList/useFriendList";
-import { AuthData, FriendDto } from "../types";
+import { AuthData, FriendDto, FriendLastRankDto } from "../types";
 import { electronRequest, sendMessage } from "../utils";
 
 export const lcuStatusAtom = atom<AuthData>(null as unknown as AuthData);
@@ -37,7 +37,7 @@ export const LCUConnector = () => {
         window.Main.on("invalidate", (queryName: string) =>
             queryClient.invalidateQueries(queryName)
         );
-        window.Main.on("friendList/lastRank", setFriends);
+        window.Main.on("friendList/lastRank", (data: FriendLastRankDto[]) => setFriends([...data]));
         window.Main.on("friendList/selected", setSelectedFriends);
         sendMessage("friendList/lastRank");
         sendMessage("friendList/selected");

@@ -1,11 +1,13 @@
 import { pick } from "@pastable/core";
 import debug from "debug";
 import { getManager } from "typeorm";
+import { sendFriendList } from ".";
 import { Friend } from "../entities/Friend";
 import { FriendName } from "../entities/FriendName";
 import { Ranking } from "../entities/Ranking";
 import { FriendDto } from "../LCU/types";
 import { editSelectedFriends, persistSelectedFriends, selectedFriends } from "../selection";
+import { sendToClient } from "../utils";
 
 const friendFields: (keyof FriendDto)[] = [
     "gameName",
@@ -74,23 +76,20 @@ export const selectAllFriends = async (select: boolean) => {
     );
 };
 
-const friendDtoToFriend = (friendDto: FriendDto): Friend => {
-    return getManager().create(Friend, {
-        isCurrentSummoner: false,
-
-        ...pick(friendDto, [
-            "puuid",
-            "id",
-            "gameName",
-            "gameTag",
-            "groupId",
-            "groupName",
-            "name",
-            "summonerId",
-            "icon",
-        ]),
-    });
-};
+const friendDtoToFriend = (friendDto: FriendDto): Partial<Friend> => ({
+    isCurrentSummoner: false,
+    ...pick(friendDto, [
+        "puuid",
+        "id",
+        "gameName",
+        "gameTag",
+        "groupId",
+        "groupName",
+        "name",
+        "summonerId",
+        "icon",
+    ]),
+});
 
 export const addOrUpdateFriends = async (friends: FriendDto[]) => {
     const existingFriends = await getFriendsFromDb();
@@ -106,32 +105,36 @@ export const addOrUpdateFriends = async (friends: FriendDto[]) => {
             ) {
                 if (friendDto.gameName !== existingFriend.gameName) {
                     await manager.save(
-                        //@ts-ignore
                         manager.create(FriendName, {
                             name: existingFriend.gameName,
-                            friend: friendDto.puuid,
+                            friend: { puuid: friend.puuid },
                         })
                     );
                 }
 
                 await manager.update(
                     Friend,
-                    { friend: friend.puuid },
+                    { puuid: friend.puuid },
                     { ...friendDtoToFriend(friendDto) }
                 );
             }
         } else {
-            await manager.save(friendDtoToFriend(friendDto));
+            await manager.save(manager.create(Friend, friendDtoToFriend(friendDto)));
         }
     }
+    sendFriendList();
     await persistSelectedFriends();
     debug("add or update ended");
 };
 export const addRanking = async (ranking: Ranking, puuid: Friend["puuid"]) => {
-    return getManager().save(
-        //@ts-ignore
-        getManager().create(Ranking, { ...pick(ranking, rankingFields), friend: puuid })
-    );
+    const manager = getManager();
+    const friend = new Friend();
+    friend.puuid = puuid;
+    const payload = { ...pick(ranking, rankingFields), friend };
+
+    const newRanking = manager.create(Ranking, payload);
+
+    return manager.save(newRanking);
 };
 
 export const friendsApi = {
