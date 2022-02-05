@@ -1,5 +1,5 @@
 {
-    "windowsNotifications": true,
+    "windowsNotifications": false,
     "dirname": "C:\\Users\\Martin\\dev\\lol-stalking\\main\\features",
     "defaultLossMessage": "😂😂😂😂😂😂😂😂😂😂😂😂😂",
     "socketId": "iwwfhzfS8ZxY",

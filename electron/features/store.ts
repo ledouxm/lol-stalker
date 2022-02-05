@@ -154,5 +154,13 @@ export const sendStore = () => {
         .filter(([_, config]) => config.notifyOnChange)
         .map(([entryName]) => entryName as keyof Store);
 
-    sendToClient("store", pick(store, notified));
+    const payload = notified.reduce(
+        (acc, entryName) => ({
+            ...acc,
+            [entryName]: storeConfig[entryName]?.formatter?.(store[entryName]) || store[entryName],
+        }),
+        {}
+    );
+
+    sendToClient("store", payload);
 };

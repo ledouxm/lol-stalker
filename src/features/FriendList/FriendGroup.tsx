@@ -18,7 +18,7 @@ import { ProfileIcon } from "../DataDragon/Profileicon";
 
 export const FriendGroupRow = ({ group }: { group: FriendGroup }) => {
     const selectedFriends = useAtomValue(selectedFriendsAtom);
-
+    console.log(selectedFriends);
     const isChecked = useMemo(
         () => group.friends.every((friend) => selectedFriends?.includes(friend.puuid)),
         [group, selectedFriends]
