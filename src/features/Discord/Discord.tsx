@@ -28,7 +28,7 @@ import { useSelection } from "@pastable/core";
 import { useAtomValue } from "jotai/utils";
 import { useEffect } from "react";
 import { AiOutlineArrowRight } from "react-icons/ai";
-import { BiLogOut, BiPlusCircle, BiRefresh, BiRightArrow } from "react-icons/bi";
+import { BiFolder, BiLogOut, BiPlusCircle, BiRefresh, BiRightArrow } from "react-icons/bi";
 import { FaDiscord } from "react-icons/fa";
 import { useQuery } from "react-query";
 import {
@@ -325,7 +325,7 @@ const AddSummonerModal = ({
     };
 
     return (
-        <ModalContent>
+        <ModalContent p="20px">
             <ModalCloseButton />
             {selection.length !== 0 && (
                 <Center position="fixed" bottom="0" left="50%" transform="translateX(-50%)">
@@ -334,13 +334,14 @@ const AddSummonerModal = ({
                     </Button>
                 </Center>
             )}
-            <Box p="10px" pr="50px" color="gray.400" textAlign="center">
+            <Box pb="20px" pr="50px" color="gray.400" textAlign="center">
                 Add or remove summoners to <b>{guildName}</b> stalking list
             </Box>
             {meQuery.isSuccess && (
                 <Box
                     userSelect="none"
                     p="5px"
+                    pl="20px"
                     w="100%"
                     cursor="pointer"
                     bg={getBgColor(summonersIds, selectionIds, meQuery.data?.puuid)}
@@ -352,13 +353,18 @@ const AddSummonerModal = ({
                         })
                     }
                 >
-                    Me
+                    Me ({meQuery.data.displayName})
                 </Box>
             )}
             <Accordion allowMultiple>
                 {friendGroups.map((group) => (
                     <AccordionItem key={group.groupId}>
-                        <AccordionButton>{group.groupName}</AccordionButton>
+                        <AccordionButton alignItems="center">
+                            <Icon as={BiFolder} boxSize="20px" />
+                            <Box ml="10px" fontWeight="600">
+                                {group.groupName}
+                            </Box>
+                        </AccordionButton>
                         <AccordionPanel>
                             <Stack>
                                 {group.friends.map((friend) => (

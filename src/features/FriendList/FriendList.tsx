@@ -12,7 +12,7 @@ export const FriendList = () => {
             </Center>
         );
     return (
-        <Flex direction="column" h="100%">
+        <Center flexDirection="column" h="100%">
             <Flex p="10px">
                 <Button
                     onClick={() => window.Main.sendMessage("friendList/select-all", true)}
@@ -28,11 +28,11 @@ export const FriendList = () => {
                     Unselect all
                 </Button>
             </Flex>
-            <Accordion whiteSpace="nowrap" overflowY="auto" h="100%" allowMultiple>
+            <Accordion whiteSpace="nowrap" overflowY="auto" w="500px" h="100%" allowMultiple>
                 {friendGroups?.map((group) => (
                     <FriendGroupRow key={group.groupId} group={group} />
                 ))}
             </Accordion>
-        </Flex>
+        </Center>
     );
 };
