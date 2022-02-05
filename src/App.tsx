@@ -2,6 +2,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { HashRouter } from "react-router-dom";
 import { LCUConnector } from "./components/LCUConnector";
+import { SocketStatus } from "./components/SocketStatus";
 import { Home } from "./Home";
 import theme from "./theme";
 

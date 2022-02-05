@@ -1,5 +1,7 @@
 import debug from "debug";
 import { BrowserWindow } from "electron";
+import electronIsDev from "electron-is-dev";
+import path from "path";
 import { Ranking } from "./entities/Ranking";
 
 export const sendToClient = (channel: string, ...args: any[]) =>
@@ -56,8 +58,8 @@ export type Tier =
     | "CHALLENGER";
 type Division = "I" | "II" | "III" | "IV";
 interface Rank {
-    tier: Tier;
-    division: Division;
+    tier: string;
+    division: string;
     leaguePoints: number;
 }
 const tiers = [
@@ -104,3 +106,9 @@ export const getRankDifference = (oldRank: Rank, newRank: Rank) => {
         content: `${hasLost ? "LOST" : "GAINED"} ${Math.abs(lpDifference)} LP`,
     };
 };
+
+export const getDbPath = () =>
+    path.join(
+        __dirname,
+        electronIsDev ? "../database/lol-stalker.db" : "./database/lol-stalker.db"
+    );

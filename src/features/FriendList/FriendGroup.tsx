@@ -1,4 +1,3 @@
-import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import {
     AccordionButton,
     AccordionIcon,
@@ -8,46 +7,24 @@ import {
     Checkbox,
     Flex,
     FlexProps,
-    Stack,
-    useDisclosure,
 } from "@chakra-ui/react";
-import { useAtom } from "jotai";
 import { useAtomValue } from "jotai/utils";
 import { ChangeEvent, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { openGroupsAtom } from "../../components/LCUConnector";
+import { selectedFriendsAtom } from "../../components/LCUConnector";
 import { FriendDto, FriendGroup } from "../../types";
 import { sendMessage } from "../../utils";
 import { ProfileIcon } from "../DataDragon/Profileicon";
-import { selectedFriendsAtom } from "./useFriendList";
 
 export const FriendGroupRow = ({ group }: { group: FriendGroup }) => {
-    const [openGroups, setOpenGroups] = useAtom(openGroupsAtom);
-    const defaultIsOpen = useMemo(() => openGroups.includes(group.groupId), []);
     const selectedFriends = useAtomValue(selectedFriendsAtom);
 
-    const { isOpen, onToggle } = useDisclosure({
-        onOpen: () => {
-            setOpenGroups((openGroups) => {
-                if (openGroups.includes(group.groupId)) return openGroups;
-                return [...openGroups, group.groupId];
-            });
-        },
-        onClose: () => {
-            setOpenGroups((openGroups) => {
-                if (!openGroups.includes(group.groupId)) return openGroups;
-                return openGroups.filter((groupId) => groupId !== group.groupId);
-            });
-        },
-        defaultIsOpen,
-    });
-
     const isChecked = useMemo(
-        () => group.friends.every((friend) => selectedFriends.includes(friend.puuid)),
+        () => group.friends.every((friend) => selectedFriends?.includes(friend.puuid)),
         [group, selectedFriends]
     );
     const isIndeterminate = useMemo(
-        () => !isChecked && group.friends.some((friend) => selectedFriends.includes(friend.puuid)),
+        () => !isChecked && group.friends.some((friend) => selectedFriends?.includes(friend.puuid)),
         [group, selectedFriends]
     );
 
@@ -83,7 +60,7 @@ export const FriendGroupRow = ({ group }: { group: FriendGroup }) => {
                         <FriendRow
                             key={friend.puuid}
                             friend={friend}
-                            isChecked={selectedFriends.includes(friend.puuid)}
+                            isChecked={!!selectedFriends?.includes(friend.puuid)}
                             mb="10px"
                         />
                     ))}

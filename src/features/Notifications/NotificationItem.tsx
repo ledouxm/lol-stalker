@@ -75,23 +75,6 @@ export const NotificationItem = ({
 };
 
 const formatNotificationContent = (notification: NotificationDto) => {
-    if (notification.from.slice(0, 4) === "NONE") {
-        return (
-            <Flex alignItems="center">
-                CAME BACK FROM
-                <TurkeyFlag ml="10px" />
-            </Flex>
-        );
-    }
-    if (notification.to.slice(0, 4) === "NONE") {
-        return (
-            <Flex alignItems="center">
-                WENT TO
-                <TurkeyFlag ml="10px" />
-            </Flex>
-        );
-    }
-
     return notification.content.replace(" NA ", " ");
 };
 

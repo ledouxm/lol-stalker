@@ -30,6 +30,8 @@ export const Navbar = (props: StackProps) => {
                 <AppLink to="/">Notifications</AppLink>
                 <AppLink to="/friendlist">Friendlist</AppLink>
                 <AppLink to="/options">Options</AppLink>
+                <AppLink to="/dev">Dev tools</AppLink>
+                <AppLink to="/discord">Discord</AppLink>
                 {hasSubMenu && (
                     <Center>
                         <Box fontSize="sm">

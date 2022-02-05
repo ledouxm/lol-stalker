@@ -1,4 +1,4 @@
-import { Friend } from "../entities/Friend";
+import { Friend } from "../../entities/Friend";
 
 export interface FriendDto extends Friend {
     availability: string;

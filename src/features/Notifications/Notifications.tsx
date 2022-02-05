@@ -8,6 +8,7 @@ import { useNotificationsQueries } from "./useNotificationsQueries";
 
 export const Notifications = () => {
     const { notificationsQuery, nbNewNotifications } = useNotificationsQueries();
+    console.log(notificationsQuery);
     if (notificationsQuery.isError) return <Box>An error has occured</Box>;
 
     const notificationPages = notificationsQuery.data?.pages;

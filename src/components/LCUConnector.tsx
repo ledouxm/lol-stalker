@@ -1,3 +1,4 @@
+import { useInterval } from "@chakra-ui/react";
 import axios from "axios";
 import { atom } from "jotai";
 import { atomWithStorage, useUpdateAtom } from "jotai/utils";
@@ -6,41 +7,97 @@ import { useQuery, useQueryClient } from "react-query";
 import { useChampionsList } from "../features/DataDragon/useChampionsList";
 import { useItemsList } from "../features/DataDragon/useItemsList";
 import { useSummonerSpellsList } from "../features/DataDragon/useSummonerSpellsList";
-import { friendsAtom, selectedFriendsAtom } from "../features/FriendList/useFriendList";
+import { friendsAtom } from "../features/FriendList/useFriendList";
 import { AuthData, FriendDto, FriendLastRankDto } from "../types";
 import { electronRequest, sendMessage } from "../utils";
 
-export const lcuStatusAtom = atom<AuthData>(null as unknown as AuthData);
-
-export enum LocalStorageKeys {
-    OpenGroups = "lol-stalker/openGroups",
+export interface DiscordGuild {
+    channelId: string;
+    guildId: string;
+    name: string;
+    channelName: string;
+    nbStalkers: number;
+    summoners: { id: number; puuid: string; channelId: string; name: string }[];
+}
+export interface ConnectorStatus {
+    address: string;
+    port: number;
+    username: string;
+    password: string;
+    protocol: string;
+}
+export interface DiscordAuth {
+    access_token: string;
+    expires_in: number;
+    refresh_token: string;
+    scope: string;
+    token_type: string;
 }
 
-export const openGroupsAtom = atomWithStorage<number[]>(LocalStorageKeys.OpenGroups, []);
+export type SocketStatus = "initial" | "connecting" | "connected" | "error" | "closed";
+export interface DiscordUrls {
+    inviteUrl: string;
+    authUrl: string;
+}
+export interface Me {
+    id: string;
+    username: string;
+    avatar: string;
+    discriminator: string;
+    public_flags: number;
+    flags: number;
+    banner?: any;
+    banner_color?: any;
+    accent_color?: any;
+    locale: string;
+    mfa_enabled: boolean;
+    premium_type: number;
+}
+export interface Store {
+    config: Record<string, any>;
+    selectedFriends: Array<string> | null;
+    connectorStatus: null | ConnectorStatus;
+    inGameFriends: null | any[];
+    userGuilds: null | DiscordGuild[];
+    discordAuth: null | DiscordAuth;
+    socketStatus: SocketStatus;
+    discordUrls: null | DiscordUrls;
+    me: null | Me;
+}
 
-const getLCUStatus = () => electronRequest<AuthData>("lcu/connection");
+export const storeAtom = atom<Store | null>(null);
+export const lcuStatusAtom = atom((get) => get(storeAtom)?.connectorStatus);
+export const discordGuildsAtom = atom((get) => get(storeAtom)?.userGuilds);
+export const configAtom = atom((get) => get(storeAtom)?.config);
+export const socketStatusAtom = atom((get) => get(storeAtom)?.socketStatus);
+export const selectedFriendsAtom = atom((get) => get(storeAtom)?.selectedFriends);
+export const discordAuthAtom = atom((get) => get(storeAtom)?.discordAuth);
+export const discordUrlsAtom = atom((get) => get(storeAtom)?.discordUrls);
+export const meAtom = atom((get) => get(storeAtom)?.me);
 
 export const LCUConnector = () => {
     const setFriends = useUpdateAtom(friendsAtom);
-    const setSelectedFriends = useUpdateAtom(selectedFriendsAtom);
-    const setLcuStatus = useUpdateAtom(lcuStatusAtom);
+    const setStore = useUpdateAtom(storeAtom);
     const queryClient = useQueryClient();
 
-    useQuery("lcuStatus", getLCUStatus, { onSuccess: setLcuStatus });
+    useQuery("store", () => electronRequest("store"), {
+        onSuccess: (store) => setStore(store),
+    });
+
     usePatchVersion();
     useChampionsList();
     useItemsList();
     useSummonerSpellsList();
 
     useEffect(() => {
-        window.ipcRenderer.send("lcu/connection");
         window.Main.on("invalidate", (queryName: string) =>
             queryClient.invalidateQueries(queryName)
         );
+        window.Main.on("store/update", (data: Partial<Store>) =>
+            setStore((store) => (store ? { ...store, ...data } : null))
+        );
         window.Main.on("friendList/lastRank", (data: FriendLastRankDto[]) => setFriends([...data]));
-        window.Main.on("friendList/selected", setSelectedFriends);
         sendMessage("friendList/lastRank");
-        sendMessage("friendList/selected");
 
         return () =>
             window.Main.getEventNames().forEach((eventName) =>

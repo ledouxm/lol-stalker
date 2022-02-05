@@ -3,6 +3,7 @@ import { RankDto } from "./types";
 export const sendMessage = window.ipcRenderer.send;
 
 const timeoutDelay = 5000;
+export const electronMutation = (event: string, data?: any) => window.ipcRenderer.send(event, data);
 export function electronRequest<T = any>(event: string, data?: any) {
     return new Promise<T>((resolve, reject) => {
         const timeout = setTimeout(reject, timeoutDelay);

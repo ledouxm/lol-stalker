@@ -1,35 +1,22 @@
 import dotenv from "dotenv";
-dotenv.config();
-import { app, BrowserWindow, ipcMain, shell } from "electron";
+import { app, BrowserWindow, dialog } from "electron";
 import isDev from "electron-is-dev";
-import path, { join } from "path";
-import { config, loadConfig, persistConfig } from "./config";
+import path from "path";
 import { makeDb } from "./db";
 import { startCheckCurrentSummonerRank } from "./jobs/currentSummonerRank";
 import { startCheckFriendListJob } from "./jobs/friendListJob";
-import { connector, sendConnectorStatus } from "./LCU/lcu";
-import {
-    receiveToggleSelectFriends,
-    sendApex,
-    sendCursoredNotifications,
-    sendFriendList,
-    sendFriendListWithRankings,
-    sendFriendRank,
-    sendInstantMessage,
-    sendMatches,
-    sendNbNewNotifications,
-    sendSelectAllFriends,
-    sendSelected,
-} from "./routes";
-import { inGameFriends } from "./routes/friends";
-import { loadSelectedFriends } from "./selection";
-import { sendToClient } from "./utils";
+import { connector } from "./features/lcu/lcu";
+import { registerInternalRoutes } from "./features/routes/internal";
+import { makeSocketClient } from "./features/ws/discord";
+import { loadStore } from "./features/store";
+dotenv.config();
 
 const height = 600;
 const width = 1200;
 
 const baseBounds = { height, width };
 let window: BrowserWindow;
+
 export function makeWindow() {
     // Create the browser window.
     window = new BrowserWindow({
@@ -40,26 +27,34 @@ export function makeWindow() {
         autoHideMenuBar: true,
         fullscreenable: true,
         webPreferences: {
-            preload: join(__dirname, "preload.js"),
+            preload: path.join(__dirname, "preload.js"),
             webSecurity: false,
             allowRunningInsecureContent: true,
             nodeIntegration: true,
         },
     });
     const port = process.env.PORT || 3001;
-    const url = isDev ? `https://localhost:${port}` : join(__dirname, "../src/out/index.html");
+    const url = isDev ? `https://localhost:${port}` : path.join(__dirname, "../src/out/index.html");
     // window.webContents.openDevTools();
 
     isDev ? window?.loadURL(url) : window?.loadFile(url);
 
     return window;
 }
+
+// Create window, load the rest of the app, etc...
 app.whenReady().then(async () => {
     await makeDb();
+    await loadStore();
     connector.start();
-    await loadSelectedFriends();
-    await loadConfig();
+    registerInternalRoutes();
+    makeSocketClient();
     makeWindow();
+    window.webContents.on("will-navigate", function (event, newUrl) {
+        console.log(newUrl);
+        // More complex code to handle tokens goes here
+    });
+
     startCheckFriendListJob();
     startCheckCurrentSummonerRank();
     app.on("activate", function () {
@@ -71,53 +66,18 @@ app.whenReady().then(async () => {
         app.quit();
         process.exit(0);
     });
+    app.on("open-url", (event, url) => {
+        console.log("oui");
+        dialog.showErrorBox("Welcome Back", `You arrived from: ${url}`);
+    });
 });
+
+// Handle the protocol. In this case, we choose to show an Error Box.
+app.on("open-url", (event, url) => {
+    dialog.showErrorBox("Welcome Back", `You arrived from: ${url}`);
+});
+
 app.setAppUserModelId("LoL Stalker");
-
-ipcMain.on("lcu/connection", () => {
-    sendConnectorStatus();
-});
-ipcMain.on("friendList/lastRank", sendFriendList);
-ipcMain.on("friendList/friend", sendFriendRank);
-ipcMain.on("friendList/ranks", sendFriendListWithRankings);
-ipcMain.on("friendList/select", receiveToggleSelectFriends);
-ipcMain.on("friendList/select-all", sendSelectAllFriends);
-ipcMain.on("friendList/selected", () => sendSelected());
-ipcMain.on("friendList/in-game", () => sendToClient("friendList/in-game", inGameFriends.current));
-ipcMain.on("friendList/message", sendInstantMessage);
-
-ipcMain.on("notifications/all", sendCursoredNotifications);
-ipcMain.on("notifications/nb-new", sendNbNewNotifications);
-ipcMain.on("friend/matches", sendMatches);
-
-ipcMain.on("config/apex", sendApex);
-
-ipcMain.on("config", () => sendToClient("config", config.current));
-ipcMain.on("config/set", async (_, data) => {
-    Object.entries(data).forEach(([key, val]) => (config.current![key] = val));
-    sendToClient("config/set", "ok");
-    sendToClient("invalidate", "config");
-    await persistConfig();
-});
-
-ipcMain.on("config/dl-db", () => {
-    const url = path.join(
-        __dirname,
-        isDev ? "../database/lol-stalker.db" : "./database/lol-stalker.db"
-    );
-    shell.showItemInFolder(url);
-    sendToClient("config/dl-db", "ok");
-});
-
-ipcMain.on("config/open-external", (_, url: string) => {
-    shell.openExternal(url);
-    sendToClient("config/open-external", "ok");
-});
-
-ipcMain.on("close", () => {
-    window.close();
-    app.exit(0);
-});
 
 app.on("window-all-closed", function () {
     if (process.platform !== "darwin") app.quit();

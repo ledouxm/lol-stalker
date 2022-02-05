@@ -2,27 +2,22 @@ import { pick } from "@pastable/core";
 import axios, { AxiosInstance } from "axios";
 import https from "https";
 import LCUConnector from "lcu-connector";
-import { Friend } from "../entities/Friend";
-import { sendInvalidate } from "../routes";
-import { addOrUpdateFriends, getSelectedFriends } from "../routes/friends";
-import { selectedFriends } from "../selection";
-import { sendToClient, Tier } from "../utils";
+import { Friend } from "../../entities/Friend";
+import { sendToClient, Tier } from "../../utils";
 import { CurrentSummoner, FriendDto, MatchDto, Queue, RankedStats } from "./types";
+import { editStoreEntry, store } from "../store";
+import { addOrUpdateFriends } from "../routes/friends";
 
 const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 export const connector = new LCUConnector();
-export const connectorStatus = {
-    current: null as any,
-    api: null as unknown as AxiosInstance,
-};
 
-export const sendConnectorStatus = () => sendToClient("lcu/connection", connectorStatus.current);
+export const sendConnectorStatus = () => sendToClient("lcu/connection", store.connectorStatus);
 
 connector.on("connect", async (data) => {
-    connectorStatus.current = data;
+    editStoreEntry("connectorStatus", data);
     const { protocol, username, password, address, port } = data;
     const baseURL = `${protocol}://${username}:${password}@${address}:${port}`;
-    connectorStatus.api = axios.create({
+    store.lcu = axios.create({
         baseURL,
         httpsAgent,
         headers: { Authorization: `Basic ${data.password}` },
@@ -30,8 +25,7 @@ connector.on("connect", async (data) => {
     console.log("connected to riot client");
 });
 connector.on("disconnect", () => {
-    connectorStatus.current = null;
-    sendInvalidate("lcuStatus");
+    editStoreEntry("connectorStatus", null);
 });
 
 export interface AuthData {
@@ -63,7 +57,7 @@ export const compareFriends = async (oldFriends: FriendStats[], newFriends: Frie
                 ...newFriend,
                 oldFriend,
                 toNotify: !!oldFriend.division,
-                windowsNotification: selectedFriends.current?.has(newFriend.puuid),
+                windowsNotification: store.selectedFriends?.has(newFriend.puuid),
             });
         }
     });
@@ -85,7 +79,7 @@ export const postMessage = (payload: { summonerName: string; message: string }) 
     const url = `/lol-game-client-chat/v1/instant-messages?summonerName=${encodeURI(
         payload.summonerName
     )}&message=${encodeURI(payload.message)}`;
-    return connectorStatus.api.post(url);
+    return store.lcu?.post(url);
 };
 
 export const getAllApexLeague = async () => {
@@ -153,4 +147,4 @@ export const getSwagger = () => request("/swagger/v2/swagger.json");
 
 type AxiosMethod = "get" | "post" | "put" | "delete" | "patch";
 export const request = async <T>(uri: string, method: AxiosMethod = "get") =>
-    (await connectorStatus.api[method]<T>(uri)).data as T;
+    (await store.lcu?.[method]<T>(uri))?.data as T;

@@ -1,6 +1,5 @@
 import isDev from "electron-is-dev";
 import path from "path";
-import sqlite3 from "sqlite3";
 
 import { createConnection } from "typeorm";
 const dbUrl = path.join(__dirname, "database", "lol-stalker.db");

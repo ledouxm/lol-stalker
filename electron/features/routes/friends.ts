@@ -2,12 +2,11 @@ import { pick } from "@pastable/core";
 import debug from "debug";
 import { getManager } from "typeorm";
 import { sendFriendList, sendInvalidate } from ".";
-import { Friend } from "../entities/Friend";
-import { FriendName } from "../entities/FriendName";
-import { Ranking } from "../entities/Ranking";
-import { FriendDto } from "../LCU/types";
-import { editSelectedFriends, persistSelectedFriends, selectedFriends } from "../selection";
-import { sendToClient } from "../utils";
+import { Friend } from "../../entities/Friend";
+import { FriendName } from "../../entities/FriendName";
+import { Ranking } from "../../entities/Ranking";
+import { FriendDto } from "../lcu/types";
+import { editStoreEntry, store } from "../store";
 
 const friendFields: (keyof FriendDto)[] = [
     "gameName",
@@ -62,18 +61,19 @@ export const getFriendsAndLastRankingFromDb = async () => {
     });
 };
 
-export const getSelectedFriends = async () => Array.from(selectedFriends.current!);
-export const toggleSelectFriends = async (puuids: Friend["puuid"][], newState: boolean) =>
-    editSelectedFriends(() =>
-        puuids.forEach((puuid) => selectedFriends.current?.[newState ? "add" : "delete"](puuid))
-    );
+export const toggleSelectFriends = async (puuids: Friend["puuid"][], newState: boolean) => {
+    const newSelectedFriends = new Set(store.selectedFriends);
+
+    puuids.forEach((puuid) => newSelectedFriends?.[newState ? "add" : "delete"](puuid));
+    await editStoreEntry("selectedFriends", newSelectedFriends);
+};
+
 export const selectAllFriends = async (select: boolean) => {
     const friends = await getFriendsFromDb();
-    return editSelectedFriends(() =>
-        friends.forEach((friend) =>
-            selectedFriends.current?.[select ? "add" : "delete"](friend.puuid)
-        )
-    );
+    const newSelectedFriends = new Set(store.selectedFriends);
+
+    friends.forEach((friend) => newSelectedFriends?.[select ? "add" : "delete"](friend.puuid));
+    await editStoreEntry("selectedFriends", newSelectedFriends);
 };
 
 const friendDtoToFriend = (friendDto: FriendDto): Partial<Friend> => ({
@@ -91,10 +91,6 @@ const friendDtoToFriend = (friendDto: FriendDto): Partial<Friend> => ({
     ]),
 });
 
-export const inGameFriends: { current: any[] } = {
-    current: null as any,
-};
-
 export const addOrUpdateFriends = async (friends: FriendDto[]) => {
     const existingFriends = await getFriendsFromDb();
     const manager = getManager();
@@ -109,7 +105,7 @@ export const addOrUpdateFriends = async (friends: FriendDto[]) => {
             currentInGame.push({
                 ...pick(friend, ["puuid", "gameName", "icon"]),
                 ...pick(friend.lol, ["championId", "timeStamp", "gameStatus"]),
-            }); // championId: friend.lol.championId});
+            });
         }
         const friendDto = pick(friend, friendFields);
         const existingFriend = existingFriends.find((ef) => ef.puuid === friend.puuid);
@@ -138,7 +134,8 @@ export const addOrUpdateFriends = async (friends: FriendDto[]) => {
             await manager.save(manager.create(Friend, friendDtoToFriend(friendDto)));
         }
     }
-    inGameFriends.current = [...currentInGame];
+
+    await editStoreEntry("inGameFriends", [...currentInGame]);
     sendInvalidate("friendList/in-game");
     sendFriendList();
     debug("add or update ended");
@@ -159,7 +156,6 @@ export const friendsApi = {
     getFriendsAndRankingsFromDb,
     getFriendAndRankingsFromDb,
     getFriendsAndLastRankingFromDb,
-    getSelectedFriends,
     toggleSelectFriends,
     addOrUpdateFriends,
     addRanking,

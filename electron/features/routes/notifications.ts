@@ -1,8 +1,8 @@
 import { last } from "@pastable/core";
 import { getManager, In, LessThan, MoreThan, SelectQueryBuilder } from "typeorm";
-import { Friend } from "../entities/Friend";
-import { Notification } from "../entities/Notification";
-import { selectedFriends } from "../selection";
+import { Friend } from "../../entities/Friend";
+import { Notification } from "../../entities/Notification";
+import { store } from "../store";
 
 export const addNotification = (data: Partial<Notification>) =>
     getManager().save(getManager().create(Notification, data));
@@ -36,9 +36,9 @@ const applyFilters = (query: SelectQueryBuilder<Notification>, filters: Notifica
         whereClauses.push("notification.id > :currentMaxId");
         payload.currentMaxId = filters.currentMaxId;
     }
-    if (filters.selected && selectedFriends.current) {
+    if (filters.selected && store.selectedFriends) {
         whereClauses.push("friend.puuid IN (:...puuids)");
-        payload.puuids = Array.from(selectedFriends.current?.values());
+        payload.puuids = Array.from(store.selectedFriends?.values());
     }
     if (filters.types?.length) {
         whereClauses.push("notification.type IN (:...types)");

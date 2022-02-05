@@ -1,18 +1,16 @@
-import { config } from "../config";
-import { Friend } from "../entities/Friend";
-import { getAllApexLeague, getMatchHistoryBySummonerPuuid, postMessage } from "../LCU/lcu";
-import { sendToClient } from "../utils";
+import { Friend } from "../../entities/Friend";
+import { sendToClient } from "../../utils";
+import { getAllApexLeague, getMatchHistoryBySummonerPuuid, postMessage } from "../lcu/lcu";
+import { sendStoreEntry, store } from "../store";
 import {
     getFriendAndRankingsFromDb,
     getFriendsAndLastRankingFromDb,
     getFriendsAndRankingsFromDb,
-    getSelectedFriends,
     selectAllFriends,
     toggleSelectFriends,
 } from "./friends";
 import {
     getCursoredNotifications,
-    getFriendNotifications,
     getNbNewNotifications,
     NotificationFilters,
     setNotificationIsNew,
@@ -49,14 +47,9 @@ export const sendNbNewNotifications = async (
     sendToClient("notifications/nb-new", nb);
 };
 
-export const sendSelected = async () => {
-    const selected = await getSelectedFriends();
-    sendToClient("friendList/selected", selected);
-};
-
 export const sendSelectAllFriends = async (_: any, select: boolean) => {
     await selectAllFriends(select);
-    sendSelected();
+    sendStoreEntry("selectedFriends");
 };
 
 export const sendMatches = async (_: any, puuid: Friend["puuid"]) => {
@@ -76,7 +69,7 @@ export const receiveToggleSelectFriends = async (
     const payload = Array.isArray(puuids) ? puuids : [puuids];
 
     await toggleSelectFriends(payload, type === "add");
-    sendSelected();
+    sendStoreEntry("selectedFriends");
 };
 
 export const sendApex = async () => {
@@ -85,7 +78,7 @@ export const sendApex = async () => {
 };
 
 export const sendInstantMessage = async (_: any, { summonerName }: { summonerName: string }) => {
-    if (!config.current) return;
-    await postMessage({ summonerName, message: config.current.defaultLossMessage });
+    if (!store.config) return;
+    await postMessage({ summonerName, message: store.config.defaultLossMessage });
     sendToClient("friendList/message", "ok");
 };
