@@ -88,19 +88,14 @@ const BotInfos = (props: BoxProps) => {
         >
             <Flex flexDir="column">
                 {me && (
-                    <Flex alignItems="center" mt="5px">
-                        <Icon as={FaDiscord} fontSize="40px" />
-                        <Box fontSize="18px" fontWeight="600" ml="20px">
-                            Connected as {me.username}
-                            <chakra.span>#{me.discriminator}</chakra.span>
-                        </Box>
-
-                        <IconButton
-                            ml="10px"
-                            onClick={() => electronMutation("store/set", { discordAuth: null })}
-                            icon={<BiLogOut size="20px" />}
-                            aria-label="Logout"
-                        />
+                    <Flex alignItems="center">
+                        <Icon as={FaDiscord} fontSize="50px" />
+                        <Flex direction="column" ml="20px" fontSize="18px">
+                            <chakra.span fontSize="15px">Connected as</chakra.span>
+                            <chakra.span fontWeight="600">
+                                {me.username} <chakra.span>#{me.discriminator}</chakra.span>
+                            </chakra.span>
+                        </Flex>
                     </Flex>
                 )}
                 <Divider mt="15px" mb="20px" />
@@ -159,8 +154,8 @@ const DiscordGuildList = (props: BoxProps) => {
 
     return (
         <Stack {...props} p="10px">
-            <Flex alignItems="center">
-                <Box fontSize="20px" my="10px" fontWeight="bold">
+            <Flex alignItems="center" pb="3px">
+                <Box fontSize="20px" my="12px" fontWeight="bold">
                     Stalked summoners
                 </Box>
                 <IconButton
@@ -175,7 +170,7 @@ const DiscordGuildList = (props: BoxProps) => {
                     <AccordionItem key={guild.guildId}>
                         <AccordionButton>
                             <Flex direction="column" textAlign="left">
-                                <Box fontSize="20px">
+                                <Box fontSize="20px" pb="3px">
                                     {guild.name} - {guild.channelName}{" "}
                                     <chakra.span fontWeight="600">
                                         ({guild.summoners.length})
@@ -213,7 +208,6 @@ const DiscordGuildList = (props: BoxProps) => {
 };
 export const DiscordLoginButton = (props: CenterProps) => {
     const discordUrls = useAtomValue(discordUrlsAtom);
-    console.log(discordUrls);
 
     useEffect(() => {
         if (!discordUrls) electronRequest("config/discord-urls");
@@ -305,7 +299,7 @@ const AddSummonerModal = ({
             { toAdd: [] as SummonerSelection[], toRemove: [] as SummonerSelection[] }
         );
         if (toAdd.length) {
-            console.log("add", toAdd);
+            // console.log("add", toAdd);
             window.Main.sendMessage("discord/add-friends", {
                 channelId,
                 guildId,
@@ -313,7 +307,7 @@ const AddSummonerModal = ({
             });
         }
         if (toRemove.length) {
-            console.log("remove", toRemove);
+            // console.log("remove", toRemove);
 
             window.Main.sendMessage("discord/remove-friends", {
                 channelId,

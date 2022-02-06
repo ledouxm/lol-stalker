@@ -8,7 +8,7 @@ import { useChampionsList } from "../features/DataDragon/useChampionsList";
 import { useItemsList } from "../features/DataDragon/useItemsList";
 import { useSummonerSpellsList } from "../features/DataDragon/useSummonerSpellsList";
 import { friendsAtom } from "../features/FriendList/useFriendList";
-import { AuthData, FriendDto, FriendLastRankDto } from "../types";
+import { AuthData, CurrentSummoner, FriendDto, FriendLastRankDto } from "../types";
 import { electronRequest, sendMessage } from "../utils";
 
 export interface DiscordGuild {
@@ -62,6 +62,7 @@ export interface Store {
     discordAuth: null | DiscordAuth;
     socketStatus: SocketStatus;
     discordUrls: null | DiscordUrls;
+    leagueSummoner: null | CurrentSummoner;
     me: null | Me;
 }
 
@@ -74,6 +75,7 @@ export const selectedFriendsAtom = atom((get) => get(storeAtom)?.selectedFriends
 export const discordAuthAtom = atom((get) => get(storeAtom)?.discordAuth);
 export const discordUrlsAtom = atom((get) => get(storeAtom)?.discordUrls);
 export const meAtom = atom((get) => get(storeAtom)?.me);
+export const leagueSummonerAtom = atom((get) => get(storeAtom)?.leagueSummoner);
 
 export const LCUConnector = () => {
     const setFriends = useUpdateAtom(friendsAtom);

@@ -39,24 +39,16 @@ export const makeSocketClient = () => {
         connection.on("message", function (message) {
             if (message.type === "utf8") {
                 const { event, data } = JSON.parse(message.utf8Data);
-                console.log("received", event, data);
+                console.log("received", event);
                 makeCallback[event]?.(data);
-
-                console.log(store.config.socketId);
             }
         });
     });
 
-    console.log(
-        (electronIsDev ? "http://localhost:8080/ws" : "https://back.chainbreak.dev/ws") +
-            (store.config.socketId ? `?id=${store.config.socketId}` : "")
-    );
-    console.log(store);
     const params = {
         ...(store.config.socketId ? { id: store.config.socketId } : {}),
         ...(store.discordAuth ? store.discordAuth : {}),
     };
-    console.log("params", params);
     const search = new URLSearchParams(
         Object.entries(params).reduce(
             (acc, [key, value]) => ({ ...acc, ...(!!value ? { [key]: value } : {}) }),
@@ -80,16 +72,13 @@ const makeCallback: Record<string, (data?: any) => void> = {
         await editStoreEntry("config", { ...store.config, socketId: data });
     },
     guilds: async (guilds: string[]) => {
-        console.log("guilds", guilds);
         await editStoreEntry("userGuilds", guilds);
     },
     auth: async (data: DiscordAuth) => {
-        console.log("logged in", data);
         sendWs("guilds", { accessToken: data.access_token });
         await editStoreEntry("discordAuth", data);
     },
     me: async (data) => {
-        console.log("me", data);
         await editStoreEntry("me", data);
     },
     summoners: async (data) => console.log(data),

@@ -65,7 +65,7 @@ const AppRoutes = () => {
             <Route path="/friendlist" element={<FriendList />} />
             <Route path="/friend/:puuid" element={<FriendDetails />} />
             <Route path="/options" element={<OptionsPage />} />
-            <Route path="/dev" element={<DevTools />} />
+            {process.env.NODE_ENV !== "PRODUCTION" && <Route path="/dev" element={<DevTools />} />}
             <Route path="/discord" element={<Discord />} />
         </Routes>
     );

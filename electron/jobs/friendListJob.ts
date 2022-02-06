@@ -13,7 +13,6 @@ export const startCheckFriendListJob = async () => {
         if (!store.connectorStatus) throw "not connected to LCU";
         console.log("start checking friendlist");
         await editStoreEntry("friends", await getFriendsAndLastRankingFromDb());
-        console.log("friends", store.friends?.length);
         if (!store.friends?.length) {
             const friendListStats = await checkFriendList();
             await editStoreEntry("friends", friendListStats);
@@ -21,7 +20,6 @@ export const startCheckFriendListJob = async () => {
 
         while (true) {
             const friendListStats = await checkFriendList();
-            console.log(store.friends?.length);
             const changes = await compareFriends(store.friends!, friendListStats);
             await editStoreEntry("friends", friendListStats);
             if (changes.length) {

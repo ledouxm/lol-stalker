@@ -50,10 +50,6 @@ app.whenReady().then(async () => {
     registerInternalRoutes();
     makeSocketClient();
     makeWindow();
-    window.webContents.on("will-navigate", function (event, newUrl) {
-        console.log(newUrl);
-        // More complex code to handle tokens goes here
-    });
 
     startCheckFriendListJob();
     startCheckCurrentSummonerRank();
@@ -67,7 +63,6 @@ app.whenReady().then(async () => {
         process.exit(0);
     });
     app.on("open-url", (event, url) => {
-        console.log("oui");
         dialog.showErrorBox("Welcome Back", `You arrived from: ${url}`);
     });
 });

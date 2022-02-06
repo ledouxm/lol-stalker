@@ -2,7 +2,9 @@ import fs from "fs/promises";
 import { AxiosInstance } from "axios";
 import { connection } from "websocket";
 import { sendToClient } from "../utils";
-import { pick } from "@pastable/core";
+import path from "path";
+import electronIsDev from "electron-is-dev";
+import { CurrentSummoner } from "./lcu/types";
 
 export const initialConfig = {
     windowsNotifications: true,
@@ -42,6 +44,7 @@ export interface Store {
     friends: null | any[];
     socketStatus: SocketStatus;
     discordUrls: null | DiscordUrls;
+    leagueSummoner: null | CurrentSummoner;
     me: any | null;
 }
 
@@ -64,6 +67,7 @@ export const store: Store = {
     friends: null,
     socketStatus: "initial",
     discordUrls: null,
+    leagueSummoner: null,
     me: null,
 };
 
@@ -83,8 +87,8 @@ const storeConfig: Partial<Record<keyof Store, StoreConfig>> = {
     selectedFriends: {
         persist: true,
         notifyOnChange: true,
-        formatter: (data: Set<string>) => Array.from(data),
-        onLoad: (data: string[]) => new Set(data),
+        formatter: (data: Set<string>) => data && Array.from(data),
+        onLoad: (data: string[]) => data && new Set(data),
     },
     inGameFriends: {
         notifyOnChange: true,
@@ -102,6 +106,9 @@ const storeConfig: Partial<Record<keyof Store, StoreConfig>> = {
         notifyOnChange: true,
         persist: true,
     },
+    leagueSummoner: {
+        notifyOnChange: true,
+    },
 };
 
 export const editStoreEntry = async <Entry extends keyof Store>(
@@ -109,13 +116,12 @@ export const editStoreEntry = async <Entry extends keyof Store>(
     value: Store[Entry]
 ) => {
     const config = storeConfig[entryName];
-    console.log("editing", entryName, config);
     store[entryName] = value;
 
     const payload = config?.formatter?.(value) || value;
 
     if (config?.persist) {
-        await fs.writeFile(`${entryName}.json`, JSON.stringify(payload, null, 4));
+        await fs.writeFile(getJsonPath(entryName), JSON.stringify(payload, null, 4));
     }
 
     if (config?.notifyOnChange) {
@@ -132,14 +138,21 @@ export const getValue = (entryName: keyof Store) =>
     storeConfig[entryName]?.formatter?.(store[entryName]) || store[entryName];
 
 export const loadStore = async () => {
+    try {
+        await fs.stat(jsonFolderPath);
+        await fs.readdir(jsonFolderPath);
+    } catch (e) {
+        console.log(e);
+        await fs.mkdir(jsonFolderPath);
+    }
+
     const persisted = Object.entries(storeConfig)
         .filter(([_, config]) => config.persist)
         .map(([entryName]) => entryName as keyof Store);
     for (const entryName of persisted) {
         try {
-            const stored = JSON.parse(await fs.readFile(`${entryName}.json`, "utf-8"));
+            const stored = JSON.parse(await fs.readFile(getJsonPath(entryName), "utf-8"));
             if (stored) {
-                console.log("restoring", entryName, stored);
                 store[entryName] = storeConfig[entryName]?.onLoad?.(stored) || stored;
             }
         } catch (e) {
@@ -148,6 +161,10 @@ export const loadStore = async () => {
         }
     }
 };
+export const getJsonFolder = () => path.join(__dirname, electronIsDev ? "../data" : "../data");
+
+const jsonFolderPath = path.join(__dirname, electronIsDev ? "../data" : "./data");
+const getJsonPath = (name: string) => path.join(jsonFolderPath, name + ".json");
 
 export const sendStore = () => {
     const notified = Object.entries(storeConfig)

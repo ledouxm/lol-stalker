@@ -3,6 +3,7 @@ import { getManager } from "typeorm";
 import { Friend } from "../entities/Friend";
 import { Ranking } from "../entities/Ranking";
 import { getCurrentSummoner, getSoloQRankedStats } from "../features/lcu/lcu";
+import { editStoreEntry } from "../features/store";
 import { sendWs } from "../features/ws/discord";
 import { getRankDifference } from "../utils";
 
@@ -10,6 +11,7 @@ export const startCheckCurrentSummonerRank = async () => {
     try {
         console.log("starting check current summoner");
         const currentSummonerFromLCU = await getCurrentSummoner();
+        await editStoreEntry("leagueSummoner", currentSummonerFromLCU);
         const summonerRank = await getSoloQRankedStats(currentSummonerFromLCU.puuid);
 
         if (!summonerRank) throw "no summoner rank found";

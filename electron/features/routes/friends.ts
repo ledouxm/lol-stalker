@@ -103,7 +103,7 @@ export const addOrUpdateFriends = async (friends: FriendDto[]) => {
             friend.lol.gameQueueType === "RANKED_SOLO_5x5"
         ) {
             currentInGame.push({
-                ...pick(friend, ["puuid", "gameName", "icon"]),
+                ...pick(friend, ["puuid", "gameName", "icon", "name"]),
                 ...pick(friend.lol, ["championId", "timeStamp", "gameStatus"]),
             });
         }

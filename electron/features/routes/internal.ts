@@ -29,9 +29,10 @@ const setStore: InternalCallback = async (_, payload) => {
     }
 };
 const passThrough =
-    (event: string, formattedData?: any): InternalCallback =>
+    (event: string, formatter?: (data: any) => any): InternalCallback =>
     (_, data) =>
-        sendWs(event, formattedData || data);
+        //@ts-ignore
+        console.log("sending ws", event) || sendWs(event, formatter?.(data) || data);
 
 const getDiscordUrls = async () => {
     sendWs("discordUrls");
@@ -50,6 +51,11 @@ const openExternal: InternalCallback = (_, url: string) => {
     shell.openExternal(url);
     sendToClient("config/open-external", "ok");
 };
+
+const injectAccessToken = (obj?: any) => ({
+    ...(obj || {}),
+    accessToken: store.discordAuth?.access_token,
+});
 
 type InternalCallback = (event: IpcMainEvent, data: any) => any;
 const internalCallbacks: Record<string, InternalCallback> = {
@@ -71,9 +77,9 @@ const internalCallbacks: Record<string, InternalCallback> = {
     "store/set": setStore,
     "config/set": setConfig,
     "discord/guilds": () => sendWs("guilds", { accessToken: store.discordAuth?.access_token }),
-    "discord/remove-friends": passThrough("removeSummoners"),
-    "discord/add-friends": passThrough("addSummoners"),
-    ws: (_, data) => passThrough(data.event, data.data),
+    "discord/remove-friends": passThrough("removeSummoners", injectAccessToken),
+    "discord/add-friends": passThrough("addSummoners", injectAccessToken),
+    ws: (_, data) => passThrough(data.event, data.data)(_, data),
     "config/discord-urls": getDiscordUrls,
     "config/dl-db": dlDb,
     "config/open-external": openExternal,

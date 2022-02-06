@@ -1,4 +1,14 @@
-import { Box, BoxProps, Center, chakra, Flex, Spinner, Stack, useInterval } from "@chakra-ui/react";
+import {
+    Box,
+    BoxProps,
+    Center,
+    chakra,
+    Divider,
+    Flex,
+    Spinner,
+    Stack,
+    useInterval,
+} from "@chakra-ui/react";
 import { useState } from "react";
 import { useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
@@ -35,9 +45,10 @@ export const InGameFriends = () => {
 
     return (
         <Stack w="300px" overflowY="auto">
-            <Box fontSize="20px" textAlign="center" pt="5px">
+            <Box fontSize="20px" pt="5px" my="10px" fontWeight="bold">
                 Friend activity
             </Box>
+            <Divider w="70%" mx="0" />
             {inGameFriends
                 .sort((a, b) => a.timeStamp - b.timeStamp)
                 .sort(
@@ -62,7 +73,7 @@ const InGameFriendRow = ({ friend }: { friend: InGameFriend }) => {
                     onClick={() => navigate(`/friend/${friend.puuid}`)}
                     cursor="pointer"
                 >
-                    {friend.gameName}
+                    {friend.name}
                 </Box>
                 <Flex mt="-3px" justifyContent="space-between">
                     <chakra.span color="gray.500">

@@ -59,7 +59,6 @@ export const makeTierData = (apex: LeagueApex) => {
 
 export const getTotalLpFromRank = (rank: RankDto, tierData: TierData) => {
     let totalLp = 0;
-    console.log(rank);
 
     const tierIndex = tiers.findIndex((tier) => tier === rank.tier);
     totalLp += rank.leaguePoints;

@@ -1,4 +1,4 @@
-import { Box, Center, Flex, Heading, Spinner, Stack } from "@chakra-ui/react";
+import { Box, Center, Divider, Flex, Heading, Spinner, Stack } from "@chakra-ui/react";
 import { useCallback, useEffect, useRef } from "react";
 import { NotificationDto } from "../../types";
 import { InGameFriends } from "./InGameFriends";
@@ -8,7 +8,6 @@ import { useNotificationsQueries } from "./useNotificationsQueries";
 
 export const Notifications = () => {
     const { notificationsQuery, nbNewNotifications } = useNotificationsQueries();
-    console.log(notificationsQuery);
     if (notificationsQuery.isError) return <Box>An error has occured</Box>;
 
     const notificationPages = notificationsQuery.data?.pages;
@@ -16,15 +15,24 @@ export const Notifications = () => {
 
     return (
         <Flex h="100%">
-            <Stack minW="150px" px="10px" h="100%" mt="10px">
+            <Stack minW="150px" px="10px" h="100%" my="10px" pt="5px">
+                <Box fontSize="20px" px="10px" fontWeight="bold" mb="10px">
+                    Filters
+                </Box>
                 <NotificationsFilters />
             </Stack>
+            <Divider h="70%" alignSelf="center" mx="20px" orientation="vertical" />
             {notificationsQuery.isLoading ? (
                 <Center w="100%">
                     <Spinner />
                 </Center>
             ) : (
                 <Stack ml="10px" overflowY="auto" height="100%" w="100%" overflowX="hidden">
+                    <Box fontSize="20px" pt="5px" my="10px" fontWeight="bold">
+                        Recent notifications
+                    </Box>
+                    <Divider w="70%" mx="0" />
+
                     {nbNewNotifications && nbNewNotifications > 0 && (
                         <Box
                             onClick={() => notificationsQuery.refetch()}
@@ -46,6 +54,7 @@ export const Notifications = () => {
                     />
                 </Stack>
             )}
+            <Divider h="70%" alignSelf="center" mx="20px" orientation="vertical" />
             <Stack>
                 <InGameFriends />
             </Stack>
@@ -59,6 +68,7 @@ export interface InGameFriend {
     gameStatus: string;
     timeStamp: number;
     puuid: string;
+    name: string;
 }
 
 export const NotificationContent = ({
