@@ -35,6 +35,9 @@ export class Friend {
     @Column("datetime", { name: "createdAt", default: () => "CURRENT_TIMESTAMP" })
     createdAt: Date;
 
+    @Column("text", { name: "subscription", nullable: true })
+    subscription: string;
+
     @Column("boolean", { name: "isCurrentSummoner", default: () => "false" })
     isCurrentSummoner: boolean;
 

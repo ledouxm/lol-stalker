@@ -5,6 +5,7 @@ import { sendToClient } from "../utils";
 import path from "path";
 import electronIsDev from "electron-is-dev";
 import { CurrentSummoner } from "./lcu/types";
+import { app } from "electron";
 
 export const initialConfig = {
     windowsNotifications: true,
@@ -167,9 +168,8 @@ export const loadStore = async () => {
         }
     }
 };
-export const getJsonFolder = () => path.join(__dirname, electronIsDev ? "../data" : "../data");
 
-const jsonFolderPath = path.join(__dirname, electronIsDev ? "../data" : "./data");
+const jsonFolderPath = path.join(app.getPath("userData"), "jsons");
 const getJsonPath = (name: string) => path.join(jsonFolderPath, name + ".json");
 
 export const sendStore = () => {
