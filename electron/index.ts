@@ -41,42 +41,55 @@ export function makeWindow() {
 
     return window;
 }
+const gotTheLock = app.requestSingleInstanceLock();
 
-// Create window, load the rest of the app, etc...
-app.whenReady().then(async () => {
-    await makeDb();
-    await loadStore();
-    connector.start();
-    registerInternalRoutes();
-    await makeSocketClient();
-    makeWindow();
+if (!gotTheLock && !isDev) {
+    app.quit();
+} else {
+    if (!isDev)
+        app.on("second-instance", (event, commandLine, workingDirectory) => {
+            // Someone tried to run a second instance, we should focus our window.
+            if (window) {
+                if (window.isMinimized()) window.restore();
+                window.focus();
+            }
+        });
+    // Create window, load the rest of the app, etc...
+    app.whenReady().then(async () => {
+        await makeDb();
+        await loadStore();
+        connector.start();
+        registerInternalRoutes();
+        await makeSocketClient();
+        makeWindow();
 
-    startCheckFriendListJob();
-    startCheckCurrentSummonerRank();
-    app.on("activate", function () {
-        // On macOS it's common to re-create a window in the app when the
-        // dock icon is clicked and there are no other windows open.
-        if (BrowserWindow.getAllWindows().length === 0) makeWindow();
+        startCheckFriendListJob();
+        startCheckCurrentSummonerRank();
+        app.on("activate", function () {
+            // On macOS it's common to re-create a window in the app when the
+            // dock icon is clicked and there are no other windows open.
+            if (BrowserWindow.getAllWindows().length === 0) makeWindow();
+        });
+        app.on("window-all-closed", () => {
+            app.quit();
+            process.exit(0);
+        });
+        app.on("open-url", (event, url) => {
+            dialog.showErrorBox("Welcome Back", `You arrived from: ${url}`);
+        });
     });
-    app.on("window-all-closed", () => {
-        app.quit();
-        process.exit(0);
-    });
+
+    // Handle the protocol. In this case, we choose to show an Error Box.
     app.on("open-url", (event, url) => {
         dialog.showErrorBox("Welcome Back", `You arrived from: ${url}`);
     });
-});
 
-// Handle the protocol. In this case, we choose to show an Error Box.
-app.on("open-url", (event, url) => {
-    dialog.showErrorBox("Welcome Back", `You arrived from: ${url}`);
-});
+    app.setAppUserModelId("LoL Stalker");
 
-app.setAppUserModelId("LoL Stalker");
+    app.on("window-all-closed", function () {
+        if (process.platform !== "darwin") app.quit();
+    });
 
-app.on("window-all-closed", function () {
-    if (process.platform !== "darwin") app.quit();
-});
-
-app.commandLine.appendSwitch("disable-site-isolation-trials");
-app.commandLine.appendSwitch("ignore-certificate-errors");
+    app.commandLine.appendSwitch("disable-site-isolation-trials");
+    app.commandLine.appendSwitch("ignore-certificate-errors");
+}

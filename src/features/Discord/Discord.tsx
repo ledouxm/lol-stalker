@@ -96,6 +96,12 @@ const BotInfos = (props: BoxProps) => {
                                 {me.username} <chakra.span>#{me.discriminator}</chakra.span>
                             </chakra.span>
                         </Flex>
+                        <IconButton
+                            ml="10px"
+                            onClick={() => electronMutation("store/set", { discordAuth: null })}
+                            icon={<BiLogOut size="20px" />}
+                            aria-label="Logout"
+                        />
                     </Flex>
                 )}
                 <Divider mt="15px" mb="20px" />
@@ -144,16 +150,8 @@ const DiscordGuildList = (props: BoxProps) => {
         if (!guilds) refreshGuilds();
     }, [guilds]);
 
-    if (!guilds?.length) {
-        return (
-            <Center {...props}>
-                <Box>No guild</Box>
-            </Center>
-        );
-    }
-
     return (
-        <Stack {...props} p="10px">
+        <Stack {...props} p="10px" h="100%" overflowY="auto">
             <Flex alignItems="center" pb="3px">
                 <Box fontSize="20px" my="12px" fontWeight="bold">
                     Stalked summoners
@@ -166,41 +164,45 @@ const DiscordGuildList = (props: BoxProps) => {
                 />
             </Flex>
             <Accordion allowMultiple>
-                {guilds.map((guild) => (
-                    <AccordionItem key={guild.guildId}>
-                        <AccordionButton>
-                            <Flex direction="column" textAlign="left">
-                                <Box fontSize="20px" pb="3px">
-                                    {guild.name} - {guild.channelName}{" "}
-                                    <chakra.span fontWeight="600">
-                                        ({guild.summoners.length})
-                                    </chakra.span>
-                                </Box>
-                                <Box fontSize="sm" color="gray.400" mt="-6px">
-                                    {guild.nbStalkers} active stalker
-                                    {guild.nbStalkers > 1 ? "s" : ""}
-                                </Box>
-                            </Flex>
-                            <AccordionIcon ml="10px" />
-                        </AccordionButton>
-                        <AccordionPanel>
-                            {guild.summoners.map((summoner) => (
-                                <SummonerPanel
-                                    key={summoner.id}
-                                    summoner={summoner}
-                                    channelId={guild.channelId}
+                {!guilds?.length ? (
+                    <Box>No guild</Box>
+                ) : (
+                    guilds.map((guild) => (
+                        <AccordionItem key={guild.guildId}>
+                            <AccordionButton>
+                                <Flex direction="column" textAlign="left">
+                                    <Box fontSize="20px" pb="3px">
+                                        {guild.name} - {guild.channelName}{" "}
+                                        <chakra.span fontWeight="600">
+                                            ({guild.summoners.length})
+                                        </chakra.span>
+                                    </Box>
+                                    <Box fontSize="sm" color="gray.400" mt="-6px">
+                                        {guild.nbStalkers} active stalker
+                                        {guild.nbStalkers > 1 ? "s" : ""}
+                                    </Box>
+                                </Flex>
+                                <AccordionIcon ml="10px" />
+                            </AccordionButton>
+                            <AccordionPanel>
+                                {guild.summoners.map((summoner) => (
+                                    <SummonerPanel
+                                        key={summoner.id}
+                                        summoner={summoner}
+                                        channelId={guild.channelId}
+                                        guildId={guild.guildId}
+                                    />
+                                ))}
+                                <AddSummonerButton
                                     guildId={guild.guildId}
+                                    name={guild.name}
+                                    channelId={guild.channelId}
+                                    summoners={guild.summoners}
                                 />
-                            ))}
-                            <AddSummonerButton
-                                guildId={guild.guildId}
-                                name={guild.name}
-                                channelId={guild.channelId}
-                                summoners={guild.summoners}
-                            />
-                        </AccordionPanel>
-                    </AccordionItem>
-                ))}
+                            </AccordionPanel>
+                        </AccordionItem>
+                    ))
+                )}
             </Accordion>
             <Stack>{}</Stack>
         </Stack>

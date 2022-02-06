@@ -34,31 +34,28 @@ export const InGameFriends = () => {
                 <Box>An error has occured</Box>
             </Center>
         );
-    if (!query.data)
-        return (
-            <Center w="200px">
-                <Box>No friend activity</Box>
-            </Center>
-        );
-
     const inGameFriends = query.data;
 
     return (
-        <Stack w="300px" overflowY="auto">
+        <Stack w="300px" overflowY="auto" h="100%">
             <Box fontSize="20px" pt="5px" my="10px" fontWeight="bold">
                 Friend activity
             </Box>
             <Divider w="70%" mx="0" />
-            {inGameFriends
-                .sort((a, b) => a.timeStamp - b.timeStamp)
-                .sort(
-                    (a, b) =>
-                        gameStatusOrder.findIndex((item) => item === a.gameStatus) -
-                        gameStatusOrder.findIndex((item) => item === b.gameStatus)
-                )
-                .map((friend) => (
-                    <InGameFriendRow friend={friend} key={friend.puuid} />
-                ))}
+            {!inGameFriends ? (
+                <Center h="100%">
+                    <Box>No friend activity</Box>
+                </Center>
+            ) : (
+                inGameFriends
+                    .sort((a, b) => a.timeStamp - b.timeStamp)
+                    .sort(
+                        (a, b) =>
+                            gameStatusOrder.findIndex((item) => item === a.gameStatus) -
+                            gameStatusOrder.findIndex((item) => item === b.gameStatus)
+                    )
+                    .map((friend) => <InGameFriendRow friend={friend} key={friend.puuid} />)
+            )}
         </Stack>
     );
 };

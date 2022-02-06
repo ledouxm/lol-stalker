@@ -89,7 +89,6 @@ const storeConfig: Partial<Record<keyof Store, StoreConfig>> = {
     },
     discordUrls: {
         notifyOnChange: true,
-        persist: true,
     },
     selectedFriends: {
         persist: true,

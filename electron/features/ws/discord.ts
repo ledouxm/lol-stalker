@@ -64,7 +64,7 @@ export const makeSocketClient = async () => {
     );
 
     client.connect(
-        (electronIsDev ? "http://localhost:8080/ws" : "https://back.chainbreak.dev/ws") +
+        (electronIsDev && false ? "http://localhost:8080/ws" : "https://back.chainbreak.dev/ws") +
             "?" +
             search.toString(),
         "echo-protocol"

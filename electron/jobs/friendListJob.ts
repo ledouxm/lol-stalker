@@ -33,11 +33,18 @@ export const startCheckFriendListJob = async () => {
                             change.oldFriend as any,
                             change as any
                         );
-                        sendWs("update", {
+                        const payload = {
                             ...notification,
+                            fromDivision: change.oldFriend.division,
+                            fromTier: change.oldFriend.tier,
+                            fromLeaguePoints: change.oldFriend.leaguePoints,
+                            toDivision: change.division,
+                            toTier: change.tier,
+                            toLeaguePoints: change.leaguePoints,
                             puuid: change.puuid,
                             name: change.name,
-                        });
+                        };
+                        sendWs("update", payload);
                         const friend = new Friend();
                         friend.puuid = change.puuid;
                         if (store.config?.windowsNotifications && change.windowsNotification)
