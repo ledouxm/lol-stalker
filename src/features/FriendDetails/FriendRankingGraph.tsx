@@ -27,10 +27,11 @@ import { formatRank } from "./FriendDetails";
 export const FriendRankingGraph = ({ friend }: { friend: FriendDto }) => {
     const tierDataRef = useRef<TierData>(null as any);
     const query = useQuery("config/apex", () => electronRequest<LeagueApex>("config/apex"));
+    console.log(friend);
     const data = useMemo(() => {
         if (!query.data) return [];
         tierDataRef.current = makeTierData(query.data);
-        return friend.rankings.map((rank) => ({
+        return friend?.rankings?.map((rank) => ({
             ...rank,
             totalLp: getTotalLpFromRank(rank, tierDataRef.current),
         }));

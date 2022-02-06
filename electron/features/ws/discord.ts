@@ -5,12 +5,19 @@ import fs from "fs/promises";
 import electronIsDev from "electron-is-dev";
 import { DiscordAuth, editStoreEntry, store } from "../store";
 import { sendToClient } from "../../utils";
-export const makeSocketClient = () => {
+export const makeSocketClient = async () => {
     const client = new WebSocketClient();
 
-    client.on("connectFailed", function (error) {
+    client.on("connectFailed", async function (error: any) {
         console.log("Connect Error: " + error.toString());
+        console.log(Object.entries(error));
+        await editStoreEntry(
+            "socketStatus",
+            error.code === "ECONNREFUSED" ? "can't reach server" : "error"
+        );
     });
+
+    await editStoreEntry("socketStatus", "connecting");
 
     client.on("connect", async function (connection) {
         console.log("WebSocket Client Connected");

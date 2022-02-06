@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import { app, BrowserWindow, dialog } from "electron";
+dotenv.config();
 import isDev from "electron-is-dev";
 import path from "path";
 import { makeDb } from "./db";
@@ -9,7 +10,6 @@ import { connector } from "./features/lcu/lcu";
 import { registerInternalRoutes } from "./features/routes/internal";
 import { makeSocketClient } from "./features/ws/discord";
 import { loadStore } from "./features/store";
-dotenv.config();
 
 const height = 600;
 const width = 1200;
@@ -48,7 +48,7 @@ app.whenReady().then(async () => {
     await loadStore();
     connector.start();
     registerInternalRoutes();
-    makeSocketClient();
+    await makeSocketClient();
     makeWindow();
 
     startCheckFriendListJob();

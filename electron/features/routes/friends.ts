@@ -48,9 +48,9 @@ export const getFriendAndRankingsFromDb = (puuid: Friend["puuid"]) =>
         .leftJoinAndSelect("friend.rankings", "rankings")
         .leftJoinAndSelect("friend.friendNames", "friendNames")
         .leftJoinAndSelect("friend.notifications", "notifications")
-        .orderBy("friend.rankings.createdAt", "DESC")
+        .orderBy("rankings.createdAt", "DESC")
         .where("friend.puuid = :puuid", { puuid })
-        .getMany();
+        .getOne();
 
 export const getFriendsAndLastRankingFromDb = async () => {
     const friends = await getFriendsAndRankingsFromDb();

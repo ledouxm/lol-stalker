@@ -30,7 +30,6 @@ export interface RankDto {
     losses: number;
     leaguePoints: number;
     division: string;
-    puuid: string;
     createdAt: Date;
 }
 

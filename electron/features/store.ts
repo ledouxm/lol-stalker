@@ -27,7 +27,13 @@ export interface DiscordAuth {
     scope: string;
     token_type: string;
 }
-export type SocketStatus = "initial" | "connecting" | "connected" | "error" | "closed";
+export type SocketStatus =
+    | "initial"
+    | "connecting"
+    | "connected"
+    | "error"
+    | "closed"
+    | "can't reach server";
 export interface DiscordUrls {
     inviteUrl: string;
     authUrl: string;
