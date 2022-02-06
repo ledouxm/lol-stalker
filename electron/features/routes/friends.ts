@@ -43,10 +43,15 @@ export const getFriendsAndRankingsFromDb = () => {
 };
 
 export const getFriendAndRankingsFromDb = (puuid: Friend["puuid"]) =>
-    getManager().findOne(Friend, {
-        where: { puuid },
-        relations: ["rankings", "friendNames", "notifications"],
-    });
+    getManager()
+        .createQueryBuilder(Friend, "friend")
+        .leftJoinAndSelect("friend.rankings", "rankings")
+        .leftJoinAndSelect("friend.friendNames", "friendNames")
+        .leftJoinAndSelect("friend.notifications", "notifications")
+        .orderBy("friend.rankings.createdAt", "DESC")
+        .where("friend.puuid = :puuid", { puuid })
+        .getMany();
+
 export const getFriendsAndLastRankingFromDb = async () => {
     const friends = await getFriendsAndRankingsFromDb();
     return friends.map((friend) => {

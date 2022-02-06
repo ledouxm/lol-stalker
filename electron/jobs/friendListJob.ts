@@ -21,7 +21,6 @@ export const startCheckFriendListJob = async () => {
         while (true) {
             const friendListStats = await checkFriendList();
             const changes = await compareFriends(store.friends!, friendListStats);
-            await editStoreEntry("friends", friendListStats);
             if (changes.length) {
                 console.log(
                     `${changes.length} change${changes.length > 1 ? "s" : ""} found in friendList`
@@ -53,6 +52,7 @@ export const startCheckFriendListJob = async () => {
             } else {
                 console.log("no soloQ played by friends");
             }
+            await editStoreEntry("friends", friendListStats);
 
             await new Promise((resolve) => setTimeout(resolve, 10000));
         }
