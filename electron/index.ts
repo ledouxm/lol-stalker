@@ -10,6 +10,7 @@ import { connector } from "./features/lcu/lcu";
 import { registerInternalRoutes } from "./features/routes/internal";
 import { makeSocketClient } from "./features/ws/discord";
 import { loadStore } from "./features/store";
+import { startUpdateApex } from "./jobs/updateApex";
 
 const height = 600;
 const width = 1200;
@@ -65,6 +66,8 @@ if (!gotTheLock && !isDev) {
 
         startCheckFriendListJob();
         startCheckCurrentSummonerRank();
+        startUpdateApex();
+
         app.on("activate", function () {
             // On macOS it's common to re-create a window in the app when the
             // dock icon is clicked and there are no other windows open.
