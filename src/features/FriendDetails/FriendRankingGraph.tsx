@@ -55,7 +55,7 @@ export const FriendRankingGraph = ({ friend }: { friend: FriendDto }) => {
     return (
         <ResponsiveContainer>
             <LineChart data={data}>
-                <YAxis domain={["dataMin - 500", "dataMax + 500"]} />
+                <YAxis domain={["dataMin - 250", "dataMax + 250"]} />
                 <Tooltip
                     isAnimationActive={false}
                     contentStyle={{ color: "black" }}

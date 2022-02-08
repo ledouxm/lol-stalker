@@ -4,6 +4,9 @@ import electronIsDev from "electron-is-dev";
 import path from "path";
 import { Ranking } from "./entities/Ranking";
 
+export const baseURL = electronIsDev ? "http://localhost:8080/" : "https://back.chainbreak.dev/";
+export const wsUrl = baseURL + "ws";
+
 export const sendToClient = (channel: string, ...args: any[]) =>
     console.log(channel)! || BrowserWindow.getAllWindows()?.[0]?.webContents.send(channel, ...args);
 

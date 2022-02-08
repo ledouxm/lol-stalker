@@ -72,7 +72,7 @@ export const FriendDetails = () => {
                 setState={setState as (state: string) => void}
                 state={state}
             />
-            <Flex whiteSpace="nowrap" w="100%" h="100%">
+            <Flex whiteSpace="nowrap" w="100%" h="100%" maxH="calc(100% - 140px)">
                 {renderComponentByState[state](friend)}
             </Flex>
         </Stack>

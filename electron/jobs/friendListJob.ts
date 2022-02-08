@@ -1,7 +1,7 @@
 import { Notification } from "electron";
 import { Friend } from "../entities/Friend";
-import { checkFriendList, compareFriends } from "../features/lcu/lcu";
-import { getRankDifference, sendToClient } from "../utils";
+import { checkFriendList, compareFriends, getAllApexLeague } from "../features/lcu/lcu";
+import { getRankDifference, sendToClient, Tier } from "../utils";
 import { getFriendsAndLastRankingFromDb, addRanking } from "../features/routes/friends";
 import { addNotification } from "../features/routes/notifications";
 import { sendWs } from "../features/ws/discord";
@@ -21,6 +21,7 @@ export const startCheckFriendListJob = async () => {
         while (true) {
             const friendListStats = await checkFriendList();
             const changes = await compareFriends(store.friends!, friendListStats);
+            const apexFromLCU = await getAllApexLeague();
             if (changes.length) {
                 console.log(
                     `${changes.length} change${changes.length > 1 ? "s" : ""} found in friendList`
@@ -33,6 +34,11 @@ export const startCheckFriendListJob = async () => {
                             change.oldFriend as any,
                             change as any
                         );
+
+                        const apex =
+                            apexFromLCU[change.oldFriend.tier as Tier] ||
+                            apexFromLCU[change.tier as Tier];
+
                         const payload = {
                             ...notification,
                             fromDivision: change.oldFriend.division,
@@ -43,8 +49,11 @@ export const startCheckFriendListJob = async () => {
                             toLeaguePoints: change.leaguePoints,
                             puuid: change.puuid,
                             name: change.name,
+                            apex,
                         };
+
                         sendWs("update", payload);
+
                         const friend = new Friend();
                         friend.puuid = change.puuid;
                         if (store.config?.windowsNotifications && change.windowsNotification)

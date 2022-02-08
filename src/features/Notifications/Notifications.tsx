@@ -27,7 +27,14 @@ export const Notifications = () => {
                     <Spinner />
                 </Center>
             ) : (
-                <Stack ml="10px" overflowY="auto" height="100%" w="100%" overflowX="hidden">
+                <Stack
+                    ml="10px"
+                    overflowY="auto"
+                    height="100%"
+                    w="100%"
+                    overflowX="hidden"
+                    pl="20px"
+                >
                     <Box fontSize="20px" pt="5px" my="10px" fontWeight="bold">
                         Recent notifications
                     </Box>
@@ -54,7 +61,7 @@ export const Notifications = () => {
                     />
                 </Stack>
             )}
-            <Divider h="70%" alignSelf="center" mx="20px" orientation="vertical" />
+            <Divider h="70%" alignSelf="center" mr="20px" orientation="vertical" />
             <Stack>
                 <InGameFriends />
             </Stack>

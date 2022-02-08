@@ -49,6 +49,8 @@ export const getFriendAndRankingsFromDb = (puuid: Friend["puuid"]) =>
         .leftJoinAndSelect("friend.friendNames", "friendNames")
         .leftJoinAndSelect("friend.notifications", "notifications")
         .orderBy("rankings.createdAt", "DESC")
+        .orderBy("notifications.createdAt", "DESC")
+        .orderBy("friendNames.createdAt", "DESC")
         .where("friend.puuid = :puuid", { puuid })
         .getOne();
 

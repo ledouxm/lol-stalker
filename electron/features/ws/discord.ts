@@ -4,7 +4,7 @@ import { pick } from "@pastable/core";
 import fs from "fs/promises";
 import electronIsDev from "electron-is-dev";
 import { DiscordAuth, editStoreEntry, store } from "../store";
-import { sendToClient } from "../../utils";
+import { sendToClient, wsUrl } from "../../utils";
 export const makeSocketClient = async () => {
     const client = new WebSocketClient();
 
@@ -63,12 +63,7 @@ export const makeSocketClient = async () => {
         )
     );
 
-    client.connect(
-        (electronIsDev && false ? "http://localhost:8080/ws" : "https://back.chainbreak.dev/ws") +
-            "?" +
-            search.toString(),
-        "echo-protocol"
-    );
+    client.connect(wsUrl + "?" + search.toString(), "echo-protocol");
 
     return client;
 };
