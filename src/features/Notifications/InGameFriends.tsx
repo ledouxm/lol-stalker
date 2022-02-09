@@ -113,15 +113,9 @@ const CountDown = ({ timeStamp, ...props }: { timeStamp: number } & BoxProps) =>
         </Box>
     );
 };
-type GameStatus = "hosting_RANKED_SOLO_5x5" | "inQueue" | "inGame" | "championSelect";
-const gameStatusOrder: GameStatus[] = [
-    "inGame",
-    "championSelect",
-    "inQueue",
-    "hosting_RANKED_SOLO_5x5",
-];
+type GameStatus = "inQueue" | "inGame" | "championSelect";
+const gameStatusOrder: GameStatus[] = ["inGame", "championSelect", "inQueue"];
 const gameStatusLabelMap: Record<string, string> = {
-    hosting_RANKED_SOLO_5x5: "In Lobby",
     inQueue: "In queue",
     inGame: "In game",
     championSelect: "In champion select",
