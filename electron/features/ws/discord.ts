@@ -5,6 +5,7 @@ import fs from "fs/promises";
 import electronIsDev from "electron-is-dev";
 import { DiscordAuth, editStoreEntry, store } from "../store";
 import { sendToClient, wsUrl } from "../../utils";
+import { focusWindow } from "../..";
 export const makeSocketClient = async () => {
     const client = new WebSocketClient();
 
@@ -78,6 +79,7 @@ const makeCallback: Record<string, (data?: any) => void> = {
     },
     auth: async (data: DiscordAuth) => {
         sendWs("guilds", { accessToken: data.access_token });
+        focusWindow();
         await editStoreEntry("discordAuth", data);
     },
     me: async (data) => {

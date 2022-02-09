@@ -44,6 +44,11 @@ export function makeWindow() {
 }
 const gotTheLock = app.requestSingleInstanceLock();
 
+export const focusWindow = () => {
+    window?.show();
+    window?.focus();
+};
+
 if (!gotTheLock && !isDev) {
     app.quit();
 } else {
