@@ -4,7 +4,9 @@ import electronIsDev from "electron-is-dev";
 import path from "path";
 import { Ranking } from "./entities/Ranking";
 
-export const baseURL = electronIsDev ? "http://localhost:8080/" : "https://back.chainbreak.dev/";
+export const baseURL = electronIsDev
+    ? "http://localhost:8080/"
+    : "https://stalker.back.chainbreak.dev/";
 export const wsUrl = baseURL + "ws";
 
 export const sendToClient = (channel: string, ...args: any[]) =>
@@ -67,6 +69,7 @@ interface Rank {
 }
 const tiers = [
     "IRON",
+    "BRONZE",
     "SILVER",
     "GOLD",
     "PLATINUM",
