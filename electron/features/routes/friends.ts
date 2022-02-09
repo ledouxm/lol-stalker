@@ -106,7 +106,7 @@ export const addOrUpdateFriends = async (friends: FriendDto[]) => {
 
     for (const friend of friends) {
         if (
-            friend.lol.gameStatus !== "outOfGame" &&
+            !["outOfGame", "hosting_RANKED_SOLO_5x5"].includes(friend.lol.gameStatus) &&
             friend.lol.gameQueueType === "RANKED_SOLO_5x5"
         ) {
             currentInGame.push({
