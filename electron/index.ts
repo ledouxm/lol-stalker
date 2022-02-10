@@ -37,7 +37,9 @@ export function makeWindow() {
         },
     });
     const port = process.env.PORT || 3001;
-    const url = isDev ? `https://localhost:${port}` : path.join(__dirname, "../src/out/index.html");
+    const url = isDev
+        ? `https://localhost:${port}`
+        : path.join(__dirname, "../../src/out/index.html");
     // window.webContents.openDevTools();
     isDev ? window?.loadURL(url) : window?.loadFile(url);
     console.log(__dirname);
