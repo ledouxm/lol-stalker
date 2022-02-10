@@ -9,13 +9,12 @@ import { useNotificationsQueries } from "./useNotificationsQueries";
 export const Notifications = () => {
     const { notificationsQuery, nbNewNotifications } = useNotificationsQueries();
     if (notificationsQuery.isError) return <Box>An error has occured</Box>;
-
     const notificationPages = notificationsQuery.data?.pages;
     const hasData = notificationPages?.some((arr) => !!arr.nextCursor);
 
     return (
         <Flex h="100%">
-            <Stack minW="150px" px="10px" h="100%" my="10px" pt="5px">
+            <Stack minW="150px" pl="10px" h="100%" my="10px" pt="5px">
                 <Box fontSize="20px" px="10px" fontWeight="bold" mb="10px">
                     Filters
                 </Box>
@@ -27,27 +26,27 @@ export const Notifications = () => {
                     <Spinner />
                 </Center>
             ) : (
-                <Stack
-                    ml="10px"
+                <Flex
+                    direction="column"
                     overflowY="auto"
                     height="100%"
                     w="100%"
                     overflowX="hidden"
-                    pl="20px"
+                    shouldWrapChildren
                 >
-                    <Box fontSize="20px" pt="5px" my="10px" fontWeight="bold">
+                    <Box fontSize="20px" pt="5px" my="10px" mb="8px" fontWeight="bold">
                         Recent notifications
                     </Box>
-                    <Divider w="70%" mx="0" />
+                    <Divider w="70%" mx="0" mb="0" mt="10px" />
 
-                    {nbNewNotifications && nbNewNotifications > 0 && (
+                    {!!nbNewNotifications && nbNewNotifications > 0 && (
                         <Box
                             onClick={() => notificationsQuery.refetch()}
                             w="100%"
                             textAlign="center"
                             bgColor="blue.500"
                             py="10px"
-                            borderRadius="10px 10px 0 0"
+                            m="0"
                             fontWeight="medium"
                             cursor="pointer"
                         >
@@ -59,7 +58,7 @@ export const Notifications = () => {
                         notificationPages={notificationPages!}
                         fetchNextPage={notificationsQuery.fetchNextPage}
                     />
-                </Stack>
+                </Flex>
             )}
             <Divider h="70%" alignSelf="center" mr="20px" orientation="vertical" />
             <Stack>
