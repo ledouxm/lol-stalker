@@ -1,75 +1,78 @@
-import { client as WebSocketClient, connection } from "websocket";
 import DiscordOauth2 from "discord-oauth2";
-import { DiscordAuth, editStoreEntry, store } from "../store";
-import { wsUrl } from "../../utils";
+import WebSocket from "ws";
 import { focusWindow } from "../..";
+import { wsUrl } from "../../utils";
+import { DiscordAuth, editStoreEntry, store } from "../store";
 export const makeSocketClient = async () => {
-    const client = new WebSocketClient();
-
-    client.on("connectFailed", async function (error: any) {
-        console.log("Connect Error: " + error.toString());
-        console.log(Object.entries(error));
-        await editStoreEntry(
-            "socketStatus",
-            error.code === "ECONNREFUSED" ? "can't reach server" : "error"
-        );
-        console.log("socket closed, retrying in 3s...");
-        setTimeout(() => connect(), 3000);
-    });
-
-    await editStoreEntry("socketStatus", "connecting");
-
-    client.on("connect", async function (connection) {
-        console.log("WebSocket Client Connected");
-        store.backendSocket = connection;
-
-        await editStoreEntry("socketStatus", "connected");
-
-        const interval = setInterval(() => sendWs("ping"), 5000);
-
-        if (store.discordAuth?.access_token) {
-            sendWs("guilds", { accessToken: store.discordAuth.access_token });
+    try {
+        if (store.backendSocket?.readyState === WebSocket.OPEN) {
+            return console.log("A ws connection alreay exists");
         }
 
-        connection.on("error", async function (error) {
-            console.log("Connection Error: " + error.toString());
+        const params = {
+            ...(store.config?.socketId ? { id: store.config?.socketId } : {}),
+            ...(store.discordAuth ? store.discordAuth : {}),
+        };
+        const search = new URLSearchParams(
+            Object.entries(params).reduce(
+                (acc, [key, value]) => ({ ...acc, ...(!!value ? { [key]: value } : {}) }),
+                {}
+            )
+        );
+
+        const socket = new WebSocket(wsUrl + "?" + search.toString(), {});
+        await editStoreEntry("socketStatus", "connecting");
+        await editStoreEntry("backendSocket", socket);
+
+        socket.onopen = async () => {
+            console.log("Connection opened");
+            await editStoreEntry("socketStatus", "connected");
+        };
+        socket.onerror = async (error) => {
+            console.error("WebSocket error");
             await editStoreEntry("socketStatus", "error");
-            console.log("socket closed, retrying in 3s...");
-            setTimeout(() => connect(), 3000);
-        });
+        };
 
-        connection.on("close", async function () {
-            store.backendSocket = null as any as connection;
-            clearInterval(interval);
-            console.log("echo-protocol Connection Closed");
+        //@ts-ignore
+        socket.onmessage = (event) => onMessage({ event });
+        socket.onclose = async () => {
+            console.log("WebSocket close");
             await editStoreEntry("socketStatus", "closed");
-            console.log("socket closed, retrying in 3s...");
-            setTimeout(() => connect(), 3000);
-        });
+            console.log("Retrying in 3s...");
+            setTimeout(() => makeSocketClient(), 3000);
+        };
+    } catch (error) {
+        console.error(error);
+    }
+};
 
-        connection.on("message", function (message) {
-            if (message.type === "utf8") {
-                const { event, data } = JSON.parse(message.utf8Data);
-                console.log("received", event);
-                makeCallback[event]?.(data);
-            }
-        });
-    });
+async function onMessage({ event: msgEvent }: { event: MessageEvent<ArrayBuffer | string> }) {
+    const length =
+        msgEvent.data instanceof ArrayBuffer ? msgEvent.data.byteLength : msgEvent.data.length;
+    // Most likely a "pong" response from our "ping" message
+    if (!length) return;
 
-    const params = {
-        ...(store.config.socketId ? { id: store.config.socketId } : {}),
-        ...(store.discordAuth ? store.discordAuth : {}),
-    };
-    const search = new URLSearchParams(
-        Object.entries(params).reduce(
-            (acc, [key, value]) => ({ ...acc, ...(!!value ? { [key]: value } : {}) }),
-            {}
-        )
-    );
+    const message = await decode(msgEvent.data);
+    // Invalid message
+    if (!message) return;
 
-    const connect = () => client.connect(wsUrl + "?" + search.toString(), "echo-protocol");
-    connect();
-    return client;
+    // console.log(message, typeof message);
+    const { event, data } = message;
+    console.log(event, data);
+    try {
+        makeCallback[event]?.(data);
+    } catch (e) {
+        console.log(e);
+    }
+}
+const decoder = new TextDecoder();
+export const decode = async <Payload = any>(payload: ArrayBuffer | string): Promise<Payload> => {
+    try {
+        const data = payload instanceof ArrayBuffer ? decoder.decode(payload) : payload;
+        return JSON.parse(data);
+    } catch (err) {
+        return null as any;
+    }
 };
 
 export const oauth = new DiscordOauth2();

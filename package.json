@@ -2,7 +2,7 @@
     "name": "lol-stalker",
     "version": "0.0.2",
     "license": "MIT",
-    "main": "main/index.js",
+    "main": "main/electron/index.js",
     "author": {
         "name": "Ledoux Martin"
     },
@@ -60,8 +60,9 @@
         "sqlite3": "^5.0.2",
         "typeorm": "^0.2.41",
         "websocket": "^1.0.34",
-        "ws": "^8.4.2",
+        "ws": "^8.5.0",
         "ws-client-js": "^1.0.5",
+        "xstate": "^4.29.0",
         "yenv": "^3.0.1"
     },
     "devDependencies": {
@@ -93,6 +94,10 @@
             "oneClick": true,
             "installerIcon": "public/icon.ico",
             "installerHeaderIcon": "public/icon.ico"
+        },
+        "win": {
+            "target": "nsis",
+            "icon": "public/icon.ico"
         },
         "files": [
             "main",

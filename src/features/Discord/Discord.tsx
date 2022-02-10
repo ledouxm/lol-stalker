@@ -26,7 +26,14 @@ import {
 import { useSelection } from "@pastable/core";
 import { useAtomValue } from "jotai/utils";
 import { useEffect } from "react";
-import { BiFolder, BiLogOut, BiPlusCircle, BiRefresh, BiTrash } from "react-icons/bi";
+import {
+    BiFolder,
+    BiLogOut,
+    BiMinusCircle,
+    BiPlusCircle,
+    BiRefresh,
+    BiTrash,
+} from "react-icons/bi";
 import { FaDiscord } from "react-icons/fa";
 import { useQuery } from "react-query";
 import {
@@ -74,7 +81,6 @@ const BotInfos = (props: BoxProps) => {
     const guilds = useAtomValue(discordGuildsAtom);
     const me = useAtomValue(meAtom);
 
-    if (!guilds) return null;
     return (
         <Center
             flexDir="column"
@@ -104,7 +110,7 @@ const BotInfos = (props: BoxProps) => {
                 )}
                 <Divider mt="15px" mb="20px" />
                 <Box textAlign="center">
-                    The bot is active on <b>{guilds?.length}</b> of your servers
+                    The bot is active on <b>{guilds?.length || 0}</b> of your servers
                 </Box>
                 <Divider my="20px" />
                 <UnorderedList spacing="10px">
@@ -168,34 +174,18 @@ const DiscordGuildList = (props: BoxProps) => {
                     guilds.map((guild) => (
                         <AccordionItem key={guild.guildId}>
                             <AccordionButton>
-                                <Flex justifyContent="space-between" w="100%" alignItems="center">
-                                    <Flex direction="column" textAlign="left">
-                                        <Box fontSize="20px" pb="3px">
-                                            {guild.name} - {guild.channelName}{" "}
-                                            <chakra.span fontWeight="600">
-                                                ({guild.summoners.length})
-                                            </chakra.span>
-                                            <AccordionIcon ml="10px" />
-                                        </Box>
-                                        <Box fontSize="sm" color="gray.400" mt="-6px">
-                                            {guild.nbStalkers} active stalker
-                                            {guild.nbStalkers > 1 ? "s" : ""}
-                                        </Box>
-                                    </Flex>
-                                    <BiTrash
-                                        size="20px"
-                                        cursor="pointer"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            window.Main.sendMessage("discord/remove-friends", {
-                                                channelId: guild.channelId,
-                                                guildId: guild.guildId,
-                                                summoners: guild.summoners.map(
-                                                    (summoner) => summoner.puuid
-                                                ),
-                                            });
-                                        }}
-                                    />
+                                <Flex direction="column" textAlign="left">
+                                    <Box fontSize="20px" pb="3px">
+                                        {guild.name} - {guild.channelName}{" "}
+                                        <chakra.span fontWeight="600">
+                                            ({guild.summoners.length})
+                                        </chakra.span>
+                                        <AccordionIcon ml="10px" />
+                                    </Box>
+                                    <Box fontSize="sm" color="gray.400" mt="-6px">
+                                        {guild.nbStalkers} active stalker
+                                        {guild.nbStalkers > 1 ? "s" : ""}
+                                    </Box>
                                 </Flex>
                             </AccordionButton>
                             <AccordionPanel>
@@ -261,6 +251,23 @@ const AddSummonerButton = ({
                     <BiPlusCircle size="30px" />
                     <chakra.span ml="10px">Add summoner</chakra.span>
                 </Center>
+                {summoners?.length !== 0 && (
+                    <Center
+                        ml="20px"
+                        cursor="pointer"
+                        onClick={() => {
+                            window.Main.sendMessage("discord/remove-friends", {
+                                channelId: channelId,
+                                guildId: guildId,
+                                summoners: summoners.map((summoner) => summoner.puuid),
+                            });
+                        }}
+                        userSelect="none"
+                    >
+                        <BiMinusCircle size="30px" />
+                        <chakra.span ml="10px">Remove all</chakra.span>
+                    </Center>
+                )}
             </Center>
             <Modal {...disclosure}>
                 <AddSummonerModal

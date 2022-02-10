@@ -1,12 +1,12 @@
 import fs from "fs/promises";
 import { AxiosInstance } from "axios";
-import { connection } from "websocket";
 import { sendToClient } from "../utils";
 import path from "path";
 import electronIsDev from "electron-is-dev";
 import { CurrentSummoner } from "./lcu/types";
 import { app } from "electron";
 import AutoLaunch from "auto-launch";
+import { WebSocket } from "ws";
 
 export const initialConfig = {
     windowsNotifications: true,
@@ -46,7 +46,7 @@ export interface Store {
     connectorStatus: null | ConnectorStatus;
     lcu: null | AxiosInstance;
     inGameFriends: null | any[];
-    backendSocket: null | connection;
+    backendSocket: null | WebSocket;
     userGuilds: null | string[];
     discordAuth: null | DiscordAuth;
     friends: null | any[];
@@ -169,7 +169,6 @@ export const loadStore = async () => {
             }
         } catch (e) {
             console.log("Couldn't load ", entryName + ".json");
-            store[entryName] = undefined;
             console.error(e);
         }
     }
@@ -190,7 +189,8 @@ export const emptyCache = async () => {
 };
 
 const jsonFolderPath = path.join(app.getPath("userData"), "jsons");
-const getJsonPath = (name: string) => path.join(jsonFolderPath, name + ".json");
+const getJsonPath = (name: string) =>
+    path.join(jsonFolderPath, (electronIsDev ? "dev." : "") + name + ".json");
 
 export const sendStore = () => {
     const notified = Object.entries(storeConfig)
