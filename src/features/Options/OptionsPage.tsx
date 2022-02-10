@@ -1,7 +1,6 @@
+import { CopyIcon } from "@chakra-ui/icons";
 import {
-    Box,
     Button,
-    ButtonProps,
     Center,
     CenterProps,
     Checkbox,
@@ -11,18 +10,13 @@ import {
     Spinner,
     Stack,
 } from "@chakra-ui/react";
-// import { shell } from "electron";
-import { useMutation, useQuery } from "react-query";
-import { electronRequest } from "../../utils";
-import { AiFillGithub, AiFillTwitterCircle } from "react-icons/ai";
-import { CopyIcon } from "@chakra-ui/icons";
-import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import { api } from "../../../electron/preload";
 import { useAtomValue } from "jotai/utils";
-import { configAtom, discordUrlsAtom } from "../../components/LCUConnector";
-import { useEffect } from "react";
-import { FaDiscord } from "react-icons/fa";
+import { useForm } from "react-hook-form";
+import { AiFillGithub, AiFillTwitterCircle } from "react-icons/ai";
+// import { shell } from "electron";
+import { useMutation } from "react-query";
+import { configAtom } from "../../components/LCUConnector";
+import { electronMutation, electronRequest } from "../../utils";
 export const OptionsPage = () => {
     const dlDbMutation = useMutation(() => electronRequest("config/dl-db"));
     const openExternalBrowserMutation = useMutation((url: string) =>
@@ -39,6 +33,7 @@ export const OptionsPage = () => {
                     <Button
                         colorScheme="red"
                         onClick={() => {
+                            electronMutation("config/empty-cache");
                             localStorage.clear();
                             window.location.reload();
                         }}
@@ -99,6 +94,12 @@ export const ConfigPanel = () => {
                 }
             >
                 Windows notifications
+            </Checkbox>
+            <Checkbox
+                isChecked={config.autoLaunch}
+                onChange={(e) => editConfigMutation.mutate({ autoLaunch: e.target.checked })}
+            >
+                Auto start on boot
             </Checkbox>
             <Button
                 leftIcon={<CopyIcon />}

@@ -12,14 +12,27 @@ import {
     sendSelectAllFriends,
 } from ".";
 import { sendToClient, getDbPath } from "../../utils";
+import { disableAutoLauch, enableAutoLaunch } from "../autoLaunch";
 import { getCurrentSummoner, sendConnectorStatus } from "../lcu/lcu";
-import { DiscordUrls, editStoreEntry, sendStore, sendStoreEntry, Store, store } from "../store";
+import {
+    DiscordUrls,
+    editStoreEntry,
+    emptyCache,
+    sendStore,
+    sendStoreEntry,
+    Store,
+    store,
+} from "../store";
 import { makeSocketClient, sendWs } from "../ws/discord";
 
 const getMe = async () => sendToClient("me", await getCurrentSummoner());
 const setConfig: InternalCallback = async (_, data) => {
     const newConfig = { ...store.config };
     Object.entries(data).forEach(([key, val]) => (newConfig[key] = val));
+    if (data["autoLaunch"] !== undefined) {
+        if (data["autoLaunch"]) await enableAutoLaunch();
+        else await disableAutoLauch();
+    }
 
     await editStoreEntry("config", newConfig);
 };

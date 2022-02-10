@@ -1,10 +1,7 @@
 import { client as WebSocketClient, connection } from "websocket";
 import DiscordOauth2 from "discord-oauth2";
-import { pick } from "@pastable/core";
-import fs from "fs/promises";
-import electronIsDev from "electron-is-dev";
 import { DiscordAuth, editStoreEntry, store } from "../store";
-import { sendToClient, wsUrl } from "../../utils";
+import { wsUrl } from "../../utils";
 import { focusWindow } from "../..";
 export const makeSocketClient = async () => {
     const client = new WebSocketClient();
@@ -16,6 +13,8 @@ export const makeSocketClient = async () => {
             "socketStatus",
             error.code === "ECONNREFUSED" ? "can't reach server" : "error"
         );
+        console.log("socket closed, retrying in 3s...");
+        setTimeout(() => connect(), 3000);
     });
 
     await editStoreEntry("socketStatus", "connecting");
@@ -35,6 +34,8 @@ export const makeSocketClient = async () => {
         connection.on("error", async function (error) {
             console.log("Connection Error: " + error.toString());
             await editStoreEntry("socketStatus", "error");
+            console.log("socket closed, retrying in 3s...");
+            setTimeout(() => connect(), 3000);
         });
 
         connection.on("close", async function () {
@@ -42,6 +43,8 @@ export const makeSocketClient = async () => {
             clearInterval(interval);
             console.log("echo-protocol Connection Closed");
             await editStoreEntry("socketStatus", "closed");
+            console.log("socket closed, retrying in 3s...");
+            setTimeout(() => connect(), 3000);
         });
 
         connection.on("message", function (message) {
@@ -64,8 +67,8 @@ export const makeSocketClient = async () => {
         )
     );
 
-    client.connect(wsUrl + "?" + search.toString(), "echo-protocol");
-
+    const connect = () => client.connect(wsUrl + "?" + search.toString(), "echo-protocol");
+    connect();
     return client;
 };
 

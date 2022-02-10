@@ -6,6 +6,7 @@ import path from "path";
 import electronIsDev from "electron-is-dev";
 import { CurrentSummoner } from "./lcu/types";
 import { app } from "electron";
+import AutoLaunch from "auto-launch";
 
 export const initialConfig = {
     windowsNotifications: true,
@@ -53,6 +54,7 @@ export interface Store {
     discordUrls: null | DiscordUrls;
     leagueSummoner: null | CurrentSummoner;
     me: any | null;
+    autoLaunch: AutoLaunch | null;
 }
 
 interface StoreConfig {
@@ -61,8 +63,7 @@ interface StoreConfig {
     formatter?: (data: any) => any;
     onLoad?: (data: any) => any;
 }
-
-export const store: Store = {
+const initialStore: Store = {
     config: initialConfig,
     selectedFriends: null,
     connectorStatus: null,
@@ -76,7 +77,11 @@ export const store: Store = {
     discordUrls: null,
     leagueSummoner: null,
     me: null,
+    autoLaunch: null,
 };
+const resetStore = () =>
+    Object.entries(initialStore).forEach(([key, value]) => (store[key as keyof Store] = value));
+export const store: Store = { ...initialStore };
 
 const storeConfig: Partial<Record<keyof Store, StoreConfig>> = {
     config: {
@@ -144,6 +149,7 @@ export const getValue = (entryName: keyof Store) =>
     storeConfig[entryName]?.formatter?.(store[entryName]) || store[entryName];
 
 export const loadStore = async () => {
+    resetStore();
     try {
         await fs.stat(jsonFolderPath);
         await fs.readdir(jsonFolderPath);
@@ -163,9 +169,24 @@ export const loadStore = async () => {
             }
         } catch (e) {
             console.log("Couldn't load ", entryName + ".json");
+            store[entryName] = undefined;
             console.error(e);
         }
     }
+};
+
+export const emptyCache = async () => {
+    const files = await fs.readdir(jsonFolderPath);
+    for (const file of files) {
+        try {
+            await fs.rm(file);
+            console.log("deleted", file);
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    await loadStore();
 };
 
 const jsonFolderPath = path.join(app.getPath("userData"), "jsons");

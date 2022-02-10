@@ -11,6 +11,7 @@ import { registerInternalRoutes } from "./features/routes/internal";
 import { makeSocketClient } from "./features/ws/discord";
 import { loadStore } from "./features/store";
 import { startUpdateApex } from "./jobs/updateApex";
+import { initAutoLauch } from "./features/autoLaunch";
 
 const height = 600;
 const width = 1200;
@@ -26,6 +27,7 @@ export function makeWindow() {
         show: true,
         resizable: true,
         autoHideMenuBar: true,
+        icon: path.join(__dirname, "../public/icon.ico"),
         fullscreenable: true,
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
@@ -37,9 +39,8 @@ export function makeWindow() {
     const port = process.env.PORT || 3001;
     const url = isDev ? `https://localhost:${port}` : path.join(__dirname, "../src/out/index.html");
     // window.webContents.openDevTools();
-
     isDev ? window?.loadURL(url) : window?.loadFile(url);
-
+    console.log(__dirname);
     return window;
 }
 const gotTheLock = app.requestSingleInstanceLock();
@@ -62,8 +63,9 @@ if (!gotTheLock && !isDev) {
         });
     // Create window, load the rest of the app, etc...
     app.whenReady().then(async () => {
-        await makeDb();
         await loadStore();
+        await initAutoLauch();
+        await makeDb();
         connector.start();
         registerInternalRoutes();
         await makeSocketClient();
