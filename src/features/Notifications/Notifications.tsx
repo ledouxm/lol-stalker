@@ -26,14 +26,7 @@ export const Notifications = () => {
                     <Spinner />
                 </Center>
             ) : (
-                <Flex
-                    direction="column"
-                    overflowY="auto"
-                    height="100%"
-                    w="100%"
-                    overflowX="hidden"
-                    shouldWrapChildren
-                >
+                <Flex direction="column" overflowY="auto" height="100%" w="100%" overflowX="hidden">
                     <Box fontSize="20px" pt="5px" my="10px" mb="8px" fontWeight="bold">
                         Recent notifications
                     </Box>
