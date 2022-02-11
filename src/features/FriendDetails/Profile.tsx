@@ -5,7 +5,6 @@ import { ProfileIcon } from "../DataDragon/Profileicon";
 import { formatRank } from "./FriendDetails";
 
 export const Profile = ({ friend }: { friend: FriendDto }) => {
-    console.log(friend);
     if (!friend?.rankings) return null;
     const lastRanking = last(friend?.rankings);
     return (

@@ -11,6 +11,7 @@ import { DevTools } from "./features/DevTools/DevTools";
 import { Discord } from "./features/Discord/Discord";
 import { lcuStatusAtom, Store } from "./components/LCUConnector";
 import { SocketStatus } from "./components/SocketStatus";
+import { CurrentSummoner } from "./features/CurrentSummoner/CurrentSummoner";
 
 export const Home = () => {
     const lcuStatus = useAtomValue(lcuStatusAtom);
@@ -65,6 +66,7 @@ const AppRoutes = () => {
             <Route path="/friendlist" element={<FriendList />} />
             <Route path="/friend/:puuid" element={<FriendDetails />} />
             <Route path="/options" element={<OptionsPage />} />
+            <Route path="/currentSummoner" element={<CurrentSummoner />} />
             {process.env.NODE_ENV === "development" && <Route path="/dev" element={<DevTools />} />}
             <Route path="/discord" element={<Discord />} />
         </Routes>

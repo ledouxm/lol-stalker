@@ -8,12 +8,8 @@ export const AddSummonerButton = ({
     channelId,
     summoners,
     name,
-}: {
-    name: string;
-    guildId: string;
-    channelId: string;
-    summoners: DiscordGuild["summoners"];
-}) => {
+    isRestricted,
+}: DiscordGuild) => {
     const disclosure = useDisclosure();
 
     return (
@@ -48,6 +44,7 @@ export const AddSummonerButton = ({
                     guildName={name}
                     guildId={guildId}
                     channelId={channelId}
+                    isRestricted={isRestricted}
                 />
             </Modal>
         </>

@@ -27,12 +27,14 @@ export const AddSummonerModal = ({
     guildId,
     channelId,
     onClose,
+    isRestricted,
 }: {
     summoners: DiscordGuild["summoners"];
     guildName: string;
     guildId: string;
     channelId: string;
     onClose: () => void;
+    isRestricted?: boolean;
 }) => {
     const { friendGroups } = useFriendList();
     const [selection, api] = useSelection<SummonerSelection>({
@@ -50,15 +52,16 @@ export const AddSummonerModal = ({
 
     const summonersIds = summoners.map((summoner) => summoner.puuid);
     const selectionIds = selection.map((selected) => selected.puuid);
+    const { toAdd, toRemove } = selection.reduce(
+        (acc, current) =>
+            summoners.find((summoner) => summoner.puuid === current.puuid)
+                ? { ...acc, toRemove: [...acc.toAdd, current] }
+                : { ...acc, toAdd: [...acc.toAdd, current] },
+        { toAdd: [] as SummonerSelection[], toRemove: [] as SummonerSelection[] }
+    );
+    const currentNbSelected = summoners.length + toAdd.length - toRemove.length;
 
     const onClick = () => {
-        const { toAdd, toRemove } = selection.reduce(
-            (acc, current) =>
-                summoners.find((summoner) => summoner.puuid === current.puuid)
-                    ? { ...acc, toRemove: [...acc.toAdd, current] }
-                    : { ...acc, toAdd: [...acc.toAdd, current] },
-            { toAdd: [] as SummonerSelection[], toRemove: [] as SummonerSelection[] }
-        );
         if (toAdd.length) {
             window.Main.sendMessage("discord/add-friends", {
                 channelId,
@@ -81,7 +84,11 @@ export const AddSummonerModal = ({
             <ModalCloseButton />
             {selection.length !== 0 && (
                 <Center position="fixed" bottom="0" left="50%" transform="translateX(-50%)">
-                    <Button colorScheme="blue" onClick={onClick}>
+                    <Button
+                        colorScheme="blue"
+                        onClick={onClick}
+                        isDisabled={isRestricted && currentNbSelected > 10}
+                    >
                         Apply ({selection.length})
                     </Button>
                 </Center>
@@ -89,6 +96,20 @@ export const AddSummonerModal = ({
             <Box pb="20px" pr="50px" color="gray.400" textAlign="center">
                 Add or remove summoners to <b>{guildName}</b> stalking list
             </Box>
+            {isRestricted && (
+                <Box
+                    textAlign="center"
+                    color={
+                        !toRemove.length && !toAdd.length
+                            ? "white"
+                            : currentNbSelected <= 10
+                            ? "green"
+                            : "red"
+                    }
+                >
+                    Stalker summoners: {currentNbSelected}/10
+                </Box>
+            )}
             {meQuery.isSuccess && (
                 <Box
                     userSelect="none"

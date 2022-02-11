@@ -1,7 +1,7 @@
 import DiscordOauth2 from "discord-oauth2";
 import WebSocket from "ws";
 import { focusWindow } from "../..";
-import { wsUrl } from "../../utils";
+import { sendToClient, wsUrl } from "../../utils";
 import { DiscordAuth, editStoreEntry, store } from "../store";
 export const makeSocketClient = async () => {
     try {
@@ -97,6 +97,7 @@ const makeCallback: Record<string, (data?: any) => void> = {
         sendWs("guilds", { accessToken: store.discordAuth?.access_token }),
     discordUrls: async (data) => editStoreEntry("discordUrls", data),
     invalidToken: () => editStoreEntry("discordAuth", null),
+    error: async (data) => sendToClient("error", data),
 };
 
 export const sendWs = (event: string, data?: any) =>

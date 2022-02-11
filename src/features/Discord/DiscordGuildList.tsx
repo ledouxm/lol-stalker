@@ -18,6 +18,7 @@ import { discordGuildsAtom } from "../../components/LCUConnector";
 import { refreshGuilds } from "./Discord";
 import { SummonerPanel } from "./SummonerPanel";
 import { AddSummonerButton } from "./AddSummonerButton";
+import { LockIcon } from "@chakra-ui/icons";
 
 export const DiscordGuildList = (props: BoxProps) => {
     const guilds = useAtomValue(discordGuildsAtom);
@@ -25,6 +26,8 @@ export const DiscordGuildList = (props: BoxProps) => {
     useEffect(() => {
         if (!guilds) refreshGuilds();
     }, [guilds]);
+
+    console.log(guilds);
 
     return (
         <Stack {...props} p="10px" h="100%" overflowY="auto">
@@ -50,7 +53,8 @@ export const DiscordGuildList = (props: BoxProps) => {
                                     <Box fontSize="20px" pb="3px">
                                         {guild.name} - {guild.channelName}{" "}
                                         <chakra.span fontWeight="600">
-                                            ({guild.summoners.length})
+                                            ({guild.summoners.length}/
+                                            {guild.isRestricted ? 10 : "*"})
                                         </chakra.span>
                                         <AccordionIcon ml="10px" />
                                     </Box>
@@ -65,22 +69,15 @@ export const DiscordGuildList = (props: BoxProps) => {
                                     <SummonerPanel
                                         key={summoner.id}
                                         summoner={summoner}
-                                        channelId={guild.channelId}
-                                        guildId={guild.guildId}
+                                        {...guild}
                                     />
                                 ))}
-                                <AddSummonerButton
-                                    guildId={guild.guildId}
-                                    name={guild.name}
-                                    channelId={guild.channelId}
-                                    summoners={guild.summoners}
-                                />
+                                <AddSummonerButton {...guild} />
                             </AccordionPanel>
                         </AccordionItem>
                     ))
                 )}
             </Accordion>
-            <Stack></Stack>
         </Stack>
     );
 };

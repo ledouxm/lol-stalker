@@ -56,7 +56,7 @@ if (!gotTheLock && !isDev) {
     app.quit();
 } else {
     if (!isDev)
-        app.on("second-instance", (event, commandLine, workingDirectory) => {
+        app.on("second-instance", () => {
             // Someone tried to run a second instance, we should focus our window.
             if (window) {
                 if (window.isMinimized()) window.restore();
@@ -86,13 +86,13 @@ if (!gotTheLock && !isDev) {
             app.quit();
             process.exit(0);
         });
-        app.on("open-url", (event, url) => {
+        app.on("open-url", (_, url) => {
             dialog.showErrorBox("Welcome Back", `You arrived from: ${url}`);
         });
     });
 
     // Handle the protocol. In this case, we choose to show an Error Box.
-    app.on("open-url", (event, url) => {
+    app.on("open-url", (_, url) => {
         dialog.showErrorBox("Welcome Back", `You arrived from: ${url}`);
     });
 

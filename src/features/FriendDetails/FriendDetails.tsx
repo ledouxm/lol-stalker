@@ -24,7 +24,7 @@ export const formatRank = (ranking: Pick<RankDto, "division" | "tier" | "leagueP
         ranking.leaguePoints
     } LP`;
 
-const getFriendRanks = (puuid: FriendDto["puuid"]) =>
+export const getFriendRanks = (puuid: FriendDto["puuid"]) =>
     electronRequest<FriendAllRanksDto>("friendList/friend", puuid);
 
 type FriendDetailsState = "notifications" | "match-history" | "graph" | "old-names";

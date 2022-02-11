@@ -10,6 +10,7 @@ import { useSummonerSpellsList } from "../features/DataDragon/useSummonerSpellsL
 import { friendsAtom } from "../features/FriendList/useFriendList";
 import { AuthData, CurrentSummoner, FriendDto, FriendLastRankDto } from "../types";
 import { electronRequest, sendMessage } from "../utils";
+import { errorToast } from "./toasts";
 
 export interface DiscordGuild {
     channelId: string;
@@ -18,6 +19,7 @@ export interface DiscordGuild {
     channelName: string;
     nbStalkers: number;
     summoners: { id: number; puuid: string; channelId: string; name: string }[];
+    isRestricted: boolean;
 }
 export interface ConnectorStatus {
     address: string;
@@ -99,6 +101,9 @@ export const LCUConnector = () => {
             setStore((store) => (store ? { ...store, ...data } : null))
         );
         window.Main.on("friendList/lastRank", (data: FriendLastRankDto[]) => setFriends([...data]));
+        window.Main.on("error", (data: string) =>
+            errorToast({ title: "An error has occured", description: data })
+        );
         sendMessage("friendList/lastRank");
 
         return () =>
