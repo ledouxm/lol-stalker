@@ -10,7 +10,7 @@ import { WebSocket } from "ws";
 
 export const initialConfig = {
     windowsNotifications: true,
-    dirname: __dirname,
+    dirname: path.join(__dirname, ".."),
     defaultLossMessage:
         "\u{1F602}\u{1F602}\u{1F602}\u{1F602}\u{1F602}\u{1F602}\u{1F602}\u{1F602}\u{1F602}\u{1F602}\u{1F602}\u{1F602}\u{1F602}",
 };

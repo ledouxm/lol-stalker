@@ -114,11 +114,8 @@ export const getRankDifference = (oldRank: Rank, newRank: Rank) => {
 
 export const getDbPath = () =>
     path.join(
-        __dirname,
-        path.join(
-            process.env.APPDATA!,
-            "LoL Stalker",
-            "database",
-            electronIsDev ? "lol-stalker.db" : "lol-stalker.dev.db"
-        )
+        process.env.APPDATA!,
+        "LoL Stalker",
+        "database",
+        electronIsDev ? "lol-stalker.dev.db" : "lol-stalker.db"
     );
