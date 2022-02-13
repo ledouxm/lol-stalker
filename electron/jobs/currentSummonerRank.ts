@@ -3,7 +3,7 @@ import { getManager } from "typeorm";
 import { Friend } from "../entities/Friend";
 import { Ranking } from "../entities/Ranking";
 import { getCurrentSummoner, getSoloQRankedStats } from "../features/lcu/lcu";
-import { editStoreEntry } from "../features/store";
+import { editStoreEntry, store } from "../features/store";
 import { sendWs } from "../features/ws/discord";
 import { getRankDifference } from "../utils";
 

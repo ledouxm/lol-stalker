@@ -17,6 +17,8 @@ export const CurrentSummoner = () => {
     if (friendQuery.isLoading) return <Spinner />;
     if (!friendQuery.data) return null;
 
+    if (!currentSummoner) return <Spinner />;
+
     return (
         <Stack h="100%">
             {currentSummoner && (

@@ -20,6 +20,7 @@ export const makeSocketClient = async () => {
             )
         );
 
+        let timeout = null as any as NodeJS.Timer;
         const socket = new WebSocket(wsUrl + "?" + search.toString(), {});
         await editStoreEntry("socketStatus", "connecting");
         await editStoreEntry("backendSocket", socket);
@@ -27,6 +28,10 @@ export const makeSocketClient = async () => {
         socket.onopen = async () => {
             console.log("Connection opened");
             await editStoreEntry("socketStatus", "connected");
+
+            timeout = setInterval(() => {
+                socket.send(JSON.stringify({ event: "ping", data: null }));
+            }, 10000);
         };
         socket.onerror = async (error) => {
             console.error("WebSocket error");
@@ -39,6 +44,7 @@ export const makeSocketClient = async () => {
             console.log("WebSocket close");
             await editStoreEntry("socketStatus", "closed");
             console.log("Retrying in 3s...");
+            clearTimeout(timeout);
             setTimeout(() => makeSocketClient(), 3000);
         };
     } catch (error) {

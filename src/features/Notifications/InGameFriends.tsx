@@ -63,7 +63,7 @@ const InGameFriendRow = ({ friend }: { friend: InGameFriend }) => {
     const champion = useChampionDataById(friend.championId);
     const navigate = useNavigate();
     return (
-        <Flex alignItems="center" justifyContent="space-between" p="5px" px="15px">
+        <Flex alignItems="center" justifyContent="space-between" p="5px" pl="0px" pr="15px">
             <Flex direction="column" w="100%" key={friend.puuid}>
                 <Box
                     fontWeight="bold"
