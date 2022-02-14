@@ -44,7 +44,7 @@ export const NotificationItem = ({
                         <chakra.span color={isRed ? "red-loss" : "blue-win"}>
                             {formatNotificationContent(notification)}
                         </chakra.span>
-                        {["DEMOTION", "LOSS"].includes(notification.type) && (
+                        {hasMessageButton(notification) && (
                             <Tooltip label="Send recorded message to this friend">
                                 <IconButton
                                     aria-label="Send message"
@@ -71,6 +71,16 @@ export const NotificationItem = ({
                 </Box>
             </Flex>
         </Flex>
+    );
+};
+
+const hasMessageButton = (notification: NotificationDto) => {
+    return (
+        ["DEMOTION", "LOSS"].includes(notification.type) ||
+        (notification.to.includes(" 99 LPs") &&
+            ["MASTER", "GRANDMASTER", "CHALLENGER"].every(
+                (tier) => !notification.to.includes(tier)
+            ))
     );
 };
 
