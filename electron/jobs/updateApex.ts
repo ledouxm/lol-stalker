@@ -8,7 +8,7 @@ export const startUpdateApex = async () => {
         sendWs("apex", apex);
 
         console.log("sent apex to ws backed");
-        setTimeout(() => startUpdateApex(), 1000 * 60);
+        setTimeout(() => startUpdateApex(), 1000 * 60 * 15);
     } catch (e) {
         console.log("couldn't find apex, retrying in 5s");
         setTimeout(() => startUpdateApex(), 5000);
