@@ -14,10 +14,28 @@ export const sendToClient = (channel: string, ...args: any[]) =>
 export const makeDataDragonUrl = (buildVersion: string) =>
     `https://ddragon.leagueoflegends.com/cdn/dragontail-${buildVersion}.tgz`;
 
-export const formatRank = (ranking: Pick<Ranking, "division" | "tier" | "leaguePoints">) =>
-    `${ranking.tier}${ranking.division !== "NA" ? ` ${ranking.division}` : ""} - ${
+export const formatRank = (
+    ranking: Pick<Ranking, "division" | "tier" | "leaguePoints"> & { miniSeriesProgress?: string }
+) => {
+    const isPromo = !!ranking.miniSeriesProgress && ranking.miniSeriesProgress !== "NNNNN";
+
+    return `${ranking.tier}${ranking.division !== "NA" ? ` ${ranking.division}` : ""} - ${
         ranking.leaguePoints
-    } LPs`;
+    } LPs${isPromo ? " " + getPromosGames(ranking.miniSeriesProgress!) : ""}`;
+};
+
+const getPromosGames = (miniSeriesProgress: string) => {
+    const nbWin = Array.from(miniSeriesProgress).reduce(
+        (acc, current) => (current === "W" ? acc + 1 : acc),
+        0
+    );
+    const nbLoss = Array.from(miniSeriesProgress).reduce(
+        (acc, current) => (current === "L" ? acc + 1 : acc),
+        0
+    );
+
+    return `(${nbWin} - ${nbLoss})`;
+};
 
 export const ranks: Rank[] = [
     {
@@ -65,6 +83,7 @@ interface Rank {
     tier: string;
     division: string;
     leaguePoints: number;
+    miniSeriesProgress?: string;
 }
 const tiers = [
     "IRON",

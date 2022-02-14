@@ -51,7 +51,8 @@ export const compareFriends = async (oldFriends: FriendStats[], newFriends: Frie
         if (
             newFriend.division !== oldFriend.division ||
             newFriend.tier !== oldFriend.tier ||
-            newFriend.leaguePoints !== oldFriend.leaguePoints
+            newFriend.leaguePoints !== oldFriend.leaguePoints ||
+            newFriend.miniSeriesProgress !== oldFriend.miniSeriesProgress
         ) {
             changes.push({
                 ...newFriend,

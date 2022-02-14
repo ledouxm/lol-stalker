@@ -41,7 +41,8 @@ export const startCheckCurrentSummonerRank = async () => {
             !lastRanking ||
             lastRanking.division !== summonerRank.division ||
             lastRanking.tier !== summonerRank.tier ||
-            lastRanking.leaguePoints !== summonerRank.leaguePoints
+            lastRanking.leaguePoints !== summonerRank.leaguePoints ||
+            lastRanking.miniSeriesProgress !== summonerRank?.miniSeriesProgress
         ) {
             console.log("saving new ranking");
             const ranking = manager.create(Ranking, {
