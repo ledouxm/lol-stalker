@@ -40,13 +40,15 @@ export const startCheckFriendListJob = async () => {
                             apexFromLCU[change.tier as Tier];
 
                         const payload = {
-                            ...notification,
+                            // ...notification,
                             fromDivision: change.oldFriend.division,
                             fromTier: change.oldFriend.tier,
                             fromLeaguePoints: change.oldFriend.leaguePoints,
+                            fromMiniSeriesProgress: change.oldFriend.miniSeriesProgress,
                             toDivision: change.division,
                             toTier: change.tier,
                             toLeaguePoints: change.leaguePoints,
+                            toMiniSeriesProgress: change.miniSeriesProgress,
                             puuid: change.puuid,
                             name: change.name,
                             apex,
