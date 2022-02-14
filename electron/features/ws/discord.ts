@@ -86,9 +86,6 @@ const makeCallback: Record<string, (data?: any) => void> = {
     id: async (data: string) => {
         await editStoreEntry("config", { ...store.config, socketId: data });
     },
-    guilds: async (guilds: string[]) => {
-        await editStoreEntry("userGuilds", guilds);
-    },
     auth: async (data: DiscordAuth) => {
         sendWs("guilds", { accessToken: data.access_token });
         focusWindow();

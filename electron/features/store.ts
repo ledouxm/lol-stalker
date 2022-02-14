@@ -61,7 +61,7 @@ interface StoreConfig {
     persist?: boolean;
     notifyOnChange?: boolean;
     formatter?: (data: any) => any;
-    onLoad?: (data: any) => any;
+    formatOnLoad?: (data: any) => any;
 }
 const initialStore: Store = {
     config: initialConfig,
@@ -99,12 +99,9 @@ const storeConfig: Partial<Record<keyof Store, StoreConfig>> = {
         persist: true,
         notifyOnChange: true,
         formatter: (data: Set<string>) => data && Array.from(data),
-        onLoad: (data: string[]) => data && new Set(data),
+        formatOnLoad: (data: string[]) => data && new Set(data),
     },
     inGameFriends: {
-        notifyOnChange: true,
-    },
-    userGuilds: {
         notifyOnChange: true,
     },
     connectorStatus: {
@@ -165,7 +162,7 @@ export const loadStore = async () => {
         try {
             const stored = JSON.parse(await fs.readFile(getJsonPath(entryName), "utf-8"));
             if (stored) {
-                store[entryName] = storeConfig[entryName]?.onLoad?.(stored) || stored;
+                store[entryName] = storeConfig[entryName]?.formatOnLoad?.(stored) || stored;
             }
         } catch (e) {
             console.log("Couldn't load ", entryName + ".json");

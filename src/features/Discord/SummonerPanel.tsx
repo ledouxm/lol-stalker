@@ -2,6 +2,7 @@ import { CloseIcon } from "@chakra-ui/icons";
 import { Box, Flex } from "@chakra-ui/react";
 import { DiscordGuild } from "../../components/LCUConnector";
 import { electronMutation } from "../../utils";
+import { useRemoveSummonersMutation } from "./AddSummonerModal";
 
 export const SummonerPanel = ({
     summoner,
@@ -12,6 +13,7 @@ export const SummonerPanel = ({
     guildId: string;
     channelId: string;
 }) => {
+    const removeSummonersMutation = useRemoveSummonersMutation();
     return (
         <Flex justifyContent="space-between" alignItems="center">
             <Box key={summoner.id}>{summoner.name}</Box>
@@ -19,7 +21,7 @@ export const SummonerPanel = ({
                 boxSize="15px"
                 cursor="pointer"
                 onClick={() =>
-                    electronMutation("discord/remove-friends", {
+                    removeSummonersMutation.mutate({
                         guildId,
                         channelId,
                         summoners: [summoner.puuid],

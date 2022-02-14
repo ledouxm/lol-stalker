@@ -8,23 +8,40 @@ import {
     Icon,
     IconButton,
     ListItem,
+    Spinner,
     UnorderedList,
 } from "@chakra-ui/react";
 import { useAtomValue } from "jotai/utils";
 import { BiLogOut } from "react-icons/bi";
 import { FaDiscord } from "react-icons/fa";
-import { discordGuildsAtom, meAtom } from "../../components/LCUConnector";
+import { meAtom } from "../../components/LCUConnector";
 import { electronMutation } from "../../utils";
 import { BotInvitation } from "./BotInvitation";
+import { useGuildsQuery } from "./DiscordGuildList";
 
 export const BotInfos = (props: BoxProps) => {
-    const guilds = useAtomValue(discordGuildsAtom);
+    const guildsQuery = useGuildsQuery();
     const me = useAtomValue(meAtom);
+    if (guildsQuery.isLoading)
+        return (
+            <Center w="100%" h="100%">
+                <Spinner />
+            </Center>
+        );
+    if (guildsQuery.isError)
+        return (
+            <Center w="100%" h="100%">
+                An error has occured
+            </Center>
+        );
+
+    const guilds = guildsQuery.data;
 
     return (
         <Center
             flexDir="column"
             justifyContent="space-between"
+            w="100%"
             h="100%"
             padding="10px"
             px="20px"

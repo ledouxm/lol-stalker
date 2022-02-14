@@ -1,7 +1,7 @@
 import { Center, chakra, Modal, useDisclosure } from "@chakra-ui/react";
 import { BiMinusCircle, BiPlusCircle } from "react-icons/bi";
 import { DiscordGuild } from "../../components/LCUConnector";
-import { AddSummonerModal } from "./SummonerSelection";
+import { AddSummonerModal, useRemoveSummonersMutation } from "./AddSummonerModal";
 
 export const AddSummonerButton = ({
     guildId,
@@ -11,7 +11,7 @@ export const AddSummonerButton = ({
     isRestricted,
 }: DiscordGuild) => {
     const disclosure = useDisclosure();
-
+    const removeSummonersMutation = useRemoveSummonersMutation();
     return (
         <>
             <Center>
@@ -24,7 +24,7 @@ export const AddSummonerButton = ({
                         ml="20px"
                         cursor="pointer"
                         onClick={() => {
-                            window.Main.sendMessage("discord/remove-friends", {
+                            removeSummonersMutation.mutate({
                                 channelId: channelId,
                                 guildId: guildId,
                                 summoners: summoners.map((summoner) => summoner.puuid),

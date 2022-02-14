@@ -6,31 +6,48 @@ import {
     AccordionPanel,
     Box,
     BoxProps,
+    Center,
     chakra,
     Flex,
     IconButton,
+    Spinner,
     Stack,
 } from "@chakra-ui/react";
 import { useAtomValue } from "jotai/utils";
 import { useEffect } from "react";
 import { BiRefresh } from "react-icons/bi";
-import { discordGuildsAtom } from "../../components/LCUConnector";
+import { DiscordGuild } from "../../components/LCUConnector";
 import { refreshGuilds } from "./Discord";
 import { SummonerPanel } from "./SummonerPanel";
 import { AddSummonerButton } from "./AddSummonerButton";
 import { LockIcon } from "@chakra-ui/icons";
+import { useQuery } from "react-query";
+import { api } from "../../api";
 
+const getGuilds = async () => (await api.get<DiscordGuild[]>("/guilds")).data;
+export const useGuildsQuery = () =>
+    useQuery<DiscordGuild[]>("guilds", getGuilds, { staleTime: 1000 * 60 * 5 });
 export const DiscordGuildList = (props: BoxProps) => {
-    const guilds = useAtomValue(discordGuildsAtom);
+    const guildsQuery = useGuildsQuery();
 
-    useEffect(() => {
-        if (!guilds) refreshGuilds();
-    }, [guilds]);
+    if (guildsQuery.isLoading)
+        return (
+            <Center w="100%" h="100%">
+                <Spinner />
+            </Center>
+        );
+    if (guildsQuery.isError)
+        return (
+            <Center w="100%" h="100%">
+                An error has occured
+            </Center>
+        );
 
+    const guilds = guildsQuery.data!;
     console.log(guilds);
 
     return (
-        <Stack {...props} p="10px" h="100%" overflowY="auto">
+        <Stack {...props} p="10px" h="100%" overflowY="auto" w="100%">
             <Flex alignItems="center" pb="3px">
                 <Box fontSize="20px" my="12px" fontWeight="bold">
                     Stalked summoners

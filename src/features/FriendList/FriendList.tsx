@@ -1,3 +1,4 @@
+import { SearchIcon } from "@chakra-ui/icons";
 import {
     Accordion,
     Box,
@@ -6,20 +7,42 @@ import {
     chakra,
     Divider,
     Flex,
+    Input,
     ListItem,
-    Spinner,
     Stack,
     UnorderedList,
 } from "@chakra-ui/react";
 import { useAtomValue } from "jotai/utils";
-import { leagueSummonerAtom } from "../../components/LCUConnector";
+import { useState } from "react";
+import { leagueSummonerAtom, selectedFriendsAtom } from "../../components/LCUConnector";
+import { FriendGroup, FriendLastRankDto } from "../../types";
 import { ProfileIcon } from "../DataDragon/Profileicon";
-import { FriendGroupRow } from "./FriendGroup";
+import { FriendGroupRow, FriendRow } from "./FriendGroup";
+import { SearchFriendlist } from "./SearchFriendList";
 import { useFriendList } from "./useFriendList";
+
+export const useSearchFriendlist = (friendGroups: FriendGroup[], search?: string) => {
+    const matchingFriends: FriendGroup["friends"] = [];
+    if (!search) return matchingFriends;
+
+    friendGroups.forEach((group) =>
+        group.friends.forEach((friend) => {
+            if (friend.name.toLowerCase().includes(search.toLowerCase()))
+                matchingFriends.push(friend);
+        })
+    );
+
+    return matchingFriends;
+};
 
 export const FriendList = () => {
     const { friendGroups } = useFriendList();
     const leagueSummoner = useAtomValue(leagueSummonerAtom);
+    const [search, setSearch] = useState("");
+
+    const searchFriendlist = useSearchFriendlist(friendGroups, search);
+    const selectedFriends = useAtomValue(selectedFriendsAtom);
+
     if (!friendGroups?.length)
         return (
             <Center direction="column" h="100%">
@@ -64,33 +87,50 @@ export const FriendList = () => {
                     Friendlist
                 </Box>
                 <Divider w="calc(100% - 20px)" />
-                <Flex p="10px">
-                    <Button
-                        onClick={() => window.Main.sendMessage("friendList/select-all", true)}
-                        colorScheme="blue"
+                <SearchFriendlist setSearch={setSearch} search={search} />
+                {!search && (
+                    <Flex p="10px">
+                        <Button
+                            onClick={() => window.Main.sendMessage("friendList/select-all", true)}
+                            colorScheme="blue"
+                        >
+                            Select all
+                        </Button>
+                        <Button
+                            ml="10px"
+                            onClick={() => window.Main.sendMessage("friendList/select-all", false)}
+                            colorScheme="red"
+                        >
+                            Unselect all
+                        </Button>
+                    </Flex>
+                )}
+                {search && (
+                    <Flex direction="column" mt="10px">
+                        {searchFriendlist.map((friend) => (
+                            <FriendRow
+                                key={friend.puuid}
+                                friend={friend}
+                                isChecked={!!selectedFriends?.includes(friend.puuid)}
+                                marginBottom="10px"
+                            />
+                        ))}
+                    </Flex>
+                )}
+                {!search && (
+                    <Accordion
+                        whiteSpace="nowrap"
+                        overflowY="auto"
+                        w="100%"
+                        h="100%"
+                        pr="20px"
+                        allowMultiple
                     >
-                        Select all
-                    </Button>
-                    <Button
-                        ml="10px"
-                        onClick={() => window.Main.sendMessage("friendList/select-all", false)}
-                        colorScheme="red"
-                    >
-                        Unselect all
-                    </Button>
-                </Flex>
-                <Accordion
-                    whiteSpace="nowrap"
-                    overflowY="auto"
-                    w="100%"
-                    h="100%"
-                    pr="20px"
-                    allowMultiple
-                >
-                    {friendGroups?.map((group) => (
-                        <FriendGroupRow key={group.groupId} group={group} />
-                    ))}
-                </Accordion>
+                        {friendGroups?.map((group) => (
+                            <FriendGroupRow key={group.groupId} group={group} />
+                        ))}
+                    </Accordion>
+                )}
             </Flex>
         </Flex>
     );

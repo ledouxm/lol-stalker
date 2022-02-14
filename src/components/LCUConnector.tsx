@@ -1,14 +1,14 @@
-import { useInterval } from "@chakra-ui/react";
 import axios from "axios";
 import { atom } from "jotai";
-import { atomWithStorage, useUpdateAtom } from "jotai/utils";
+import { useUpdateAtom } from "jotai/utils";
 import { useEffect } from "react";
 import { useQuery, useQueryClient } from "react-query";
 import { useChampionsList } from "../features/DataDragon/useChampionsList";
 import { useItemsList } from "../features/DataDragon/useItemsList";
 import { useSummonerSpellsList } from "../features/DataDragon/useSummonerSpellsList";
 import { friendsAtom } from "../features/FriendList/useFriendList";
-import { AuthData, CurrentSummoner, FriendDto, FriendLastRankDto } from "../types";
+import { useApi } from "../features/hooks/useApi";
+import { CurrentSummoner, FriendLastRankDto } from "../types";
 import { electronRequest, sendMessage } from "../utils";
 import { errorToast } from "./toasts";
 
@@ -60,7 +60,6 @@ export interface Store {
     selectedFriends: Array<string> | null;
     connectorStatus: null | ConnectorStatus;
     inGameFriends: null | any[];
-    userGuilds: null | DiscordGuild[];
     discordAuth: null | DiscordAuth;
     socketStatus: SocketStatus;
     discordUrls: null | DiscordUrls;
@@ -69,8 +68,8 @@ export interface Store {
 }
 
 export const storeAtom = atom<Store | null>(null);
+
 export const lcuStatusAtom = atom((get) => get(storeAtom)?.connectorStatus);
-export const discordGuildsAtom = atom((get) => get(storeAtom)?.userGuilds);
 export const configAtom = atom((get) => get(storeAtom)?.config);
 export const socketStatusAtom = atom((get) => get(storeAtom)?.socketStatus);
 export const selectedFriendsAtom = atom((get) => get(storeAtom)?.selectedFriends);
@@ -92,6 +91,7 @@ export const LCUConnector = () => {
     useChampionsList();
     useItemsList();
     useSummonerSpellsList();
+    useApi();
 
     useEffect(() => {
         window.Main.on("invalidate", (queryName: string) =>
