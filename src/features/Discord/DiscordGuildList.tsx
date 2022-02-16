@@ -13,22 +13,20 @@ import {
     Spinner,
     Stack,
 } from "@chakra-ui/react";
-import { useAtomValue } from "jotai/utils";
-import { useEffect } from "react";
 import { BiRefresh } from "react-icons/bi";
-import { DiscordGuild } from "../../components/LCUConnector";
-import { refreshGuilds } from "./Discord";
-import { SummonerPanel } from "./SummonerPanel";
-import { AddSummonerButton } from "./AddSummonerButton";
-import { LockIcon } from "@chakra-ui/icons";
 import { useQuery } from "react-query";
 import { api } from "../../api";
+import { DiscordGuild } from "../../components/LCUConnector";
+import { useFriendList } from "../FriendList/useFriendList";
+import { AddSummonerButton } from "./AddSummonerButton";
+import { SummonerPanel } from "./SummonerPanel";
 
 const getGuilds = async () => (await api.get<DiscordGuild[]>("/guilds")).data;
 export const useGuildsQuery = () =>
     useQuery<DiscordGuild[]>("guilds", getGuilds, { staleTime: 1000 * 60 * 5 });
 export const DiscordGuildList = (props: BoxProps) => {
     const guildsQuery = useGuildsQuery();
+    const { friends } = useFriendList();
 
     if (guildsQuery.isLoading)
         return (
@@ -44,8 +42,6 @@ export const DiscordGuildList = (props: BoxProps) => {
         );
 
     const guilds = guildsQuery.data!;
-    console.log(guilds);
-
     return (
         <Stack {...props} p="10px" h="100%" overflowY="auto" w="100%">
             <Flex alignItems="center" pb="3px">
@@ -54,12 +50,24 @@ export const DiscordGuildList = (props: BoxProps) => {
                 </Box>
                 <IconButton
                     ml="10px"
-                    onClick={() => refreshGuilds()}
+                    onClick={() => guildsQuery.refetch()}
                     icon={<BiRefresh size="30px" />}
                     aria-label="Refresh guilds"
                 />
             </Flex>
-            <Accordion allowMultiple>
+            <Accordion allowMultiple pos="relative">
+                {/* {true && (
+                    <Center
+                        h="100%"
+                        pos="absolute"
+                        zIndex="1"
+                        bgColor="black"
+                        w="100%"
+                        opacity=".8"
+                    >
+                        <Spinner size="lg" />
+                    </Center>
+                )} */}
                 {!guilds?.length ? (
                     <Box>No guild</Box>
                 ) : (
@@ -68,7 +76,7 @@ export const DiscordGuildList = (props: BoxProps) => {
                             <AccordionButton>
                                 <Flex direction="column" textAlign="left">
                                     <Box fontSize="20px" pb="3px">
-                                        {guild.name} - {guild.channelName}{" "}
+                                        {guild.guildName} - {guild.channelName}{" "}
                                         <chakra.span fontWeight="600">
                                             ({guild.summoners.length}/
                                             {guild.isRestricted ? 10 : "*"})
@@ -86,6 +94,9 @@ export const DiscordGuildList = (props: BoxProps) => {
                                     <SummonerPanel
                                         key={summoner.id}
                                         summoner={summoner}
+                                        isInFriendList={friends.some(
+                                            (friend) => friend.puuid === summoner.puuid
+                                        )}
                                         {...guild}
                                     />
                                 ))}

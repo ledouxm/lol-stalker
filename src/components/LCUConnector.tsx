@@ -15,8 +15,8 @@ import { errorToast } from "./toasts";
 export interface DiscordGuild {
     channelId: string;
     guildId: string;
-    name: string;
     channelName: string;
+    guildName: string;
     nbStalkers: number;
     summoners: { id: number; puuid: string; channelId: string; name: string }[];
     isRestricted: boolean;
@@ -104,6 +104,7 @@ export const LCUConnector = () => {
         window.Main.on("error", (data: string) =>
             errorToast({ title: "An error has occured", description: data })
         );
+        window.Main.on("errorToast", (data: string) => errorToast({ title: data }));
         sendMessage("friendList/lastRank");
 
         return () =>

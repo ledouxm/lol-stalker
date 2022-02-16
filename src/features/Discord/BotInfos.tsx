@@ -22,16 +22,10 @@ import { useGuildsQuery } from "./DiscordGuildList";
 export const BotInfos = (props: BoxProps) => {
     const guildsQuery = useGuildsQuery();
     const me = useAtomValue(meAtom);
-    if (guildsQuery.isLoading)
+    if (!me)
         return (
             <Center w="100%" h="100%">
                 <Spinner />
-            </Center>
-        );
-    if (guildsQuery.isError)
-        return (
-            <Center w="100%" h="100%">
-                An error has occured
             </Center>
         );
 

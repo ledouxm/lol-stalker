@@ -2,6 +2,7 @@ import DiscordOauth2 from "discord-oauth2";
 import WebSocket from "ws";
 import { focusWindow } from "../..";
 import { sendToClient, wsUrl } from "../../utils";
+import { sendInvalidate } from "../routes";
 import { DiscordAuth, editStoreEntry, store } from "../store";
 export const makeSocketClient = async () => {
     try {
@@ -95,11 +96,10 @@ const makeCallback: Record<string, (data?: any) => void> = {
         await editStoreEntry("me", data);
     },
     summoners: async (data) => console.log(data),
-    "summoners/add": async () => sendWs("guilds", { accessToken: store.discordAuth?.access_token }),
-    "summoners/remove": async () =>
-        sendWs("guilds", { accessToken: store.discordAuth?.access_token }),
+    invalidateGuilds: () => sendInvalidate("guilds"),
     discordUrls: async (data) => editStoreEntry("discordUrls", data),
     invalidToken: () => editStoreEntry("discordAuth", null),
+    rateLimit: () => sendToClient("errorToast", "Rate limit error, try again later"),
     error: async (data) => sendToClient("error", data),
 };
 

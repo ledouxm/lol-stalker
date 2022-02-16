@@ -32,6 +32,7 @@ export const useRemoveSummonersMutation = () => {
         onSuccess: () => queryClient.invalidateQueries("guilds"),
     });
 };
+
 export const AddSummonerModal = ({
     summoners,
     guildName,
@@ -76,23 +77,25 @@ export const AddSummonerModal = ({
     const { toAdd, toRemove } = selection.reduce(
         (acc, current) =>
             summoners.find((summoner) => summoner.puuid === current.puuid)
-                ? { ...acc, toRemove: [...acc.toAdd, current] }
+                ? { ...acc, toRemove: [...acc.toRemove, current] }
                 : { ...acc, toAdd: [...acc.toAdd, current] },
         { toAdd: [] as SummonerSelection[], toRemove: [] as SummonerSelection[] }
     );
     const currentNbSelected = summoners.length + toAdd.length - toRemove.length;
 
     const onClick = () => {
-        if (toAdd.length) {
-            const payload = { channelId, guildId, summoners: toAdd };
-            addSummonersMutation.mutate(payload);
-        }
         if (toRemove.length) {
+            console.log(toRemove);
             removeSummonersMutation.mutate({
                 channelId,
                 guildId,
                 summoners: toRemove.map((summoner) => summoner.puuid),
             });
+        }
+        if (toAdd.length) {
+            console.log(toAdd);
+            const payload = { channelId, guildId, summoners: toAdd };
+            addSummonersMutation.mutate(payload);
         }
         onClose();
     };
