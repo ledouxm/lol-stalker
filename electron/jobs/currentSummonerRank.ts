@@ -60,15 +60,17 @@ export const startCheckCurrentSummonerRank = async () => {
             if (lastRanking) {
                 const diff = getRankDifference(lastRanking, ranking);
                 const payload = {
-                    ...diff,
+                    // ...diff,
                     puuid: currentSummonerFromLCU.puuid,
                     name: currentSummonerFromLCU.displayName,
                     fromTier: lastRanking.tier,
                     fromDivision: lastRanking.division,
                     fromLeaguePoints: lastRanking.leaguePoints,
+                    fromMiniSeriesProgress: lastRanking.miniSeriesProgress,
                     toTier: ranking.tier,
                     toDivision: ranking.division,
                     toLeaguePoints: ranking.leaguePoints,
+                    toMiniSeriesProgress: ranking.miniSeriesProgress,
                 };
                 sendWs("update", payload);
             }
