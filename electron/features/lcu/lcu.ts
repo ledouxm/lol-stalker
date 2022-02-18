@@ -5,7 +5,7 @@ import LCUConnector from "lcu-connector";
 import { Friend } from "../../entities/Friend";
 import { sendToClient, Tier } from "../../utils";
 import { CurrentSummoner, FriendDto, MatchDto, Queue, RankedStats } from "./types";
-import { editStoreEntry, store } from "../store";
+import { editStoreEntry, Locale, store } from "../store";
 import { addOrUpdateFriends } from "../routes/friends";
 
 const httpsAgent = new https.Agent({ rejectUnauthorized: false });
@@ -23,6 +23,13 @@ connector.on("connect", async (data) => {
         headers: { Authorization: `Basic ${data.password}` },
     });
     console.log("connected to riot client");
+
+    try {
+        const locale = await getRegionLocale();
+        await editStoreEntry("locale", locale);
+    } catch (e) {
+        console.log(e);
+    }
 });
 connector.on("disconnect", () => {
     editStoreEntry("connectorStatus", null);
@@ -98,6 +105,7 @@ export const getApexLeague = (tier: RankedStats["queues"][0]["tier"]) =>
 ///lol-ranked-stats/v1/stats/{summonerId}
 export const getHelp = () => request("/help?format=Console");
 export const getBuild = () => request("/system/v1/builds");
+export const getRegionLocale = () => request<Locale>("/riotclient/region-locale");
 export const getCurrentSummoner = () =>
     request<CurrentSummoner>("/lol-summoner/v1/current-summoner");
 export const getFriends = () => request<FriendDto[]>("/lol-chat/v1/friends");

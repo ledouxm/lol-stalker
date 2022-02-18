@@ -27,7 +27,6 @@ export const useGuildsQuery = () =>
 export const DiscordGuildList = (props: BoxProps) => {
     const guildsQuery = useGuildsQuery();
     const { friends } = useFriendList();
-
     if (guildsQuery.isLoading)
         return (
             <Center w="100%" h="100%">
@@ -42,6 +41,7 @@ export const DiscordGuildList = (props: BoxProps) => {
         );
 
     const guilds = guildsQuery.data!;
+    console.log(guilds);
     return (
         <Stack {...props} p="10px" h="100%" overflowY="auto" w="100%">
             <Flex alignItems="center" pb="3px">

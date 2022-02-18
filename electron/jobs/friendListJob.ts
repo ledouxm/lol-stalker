@@ -40,7 +40,7 @@ export const startCheckFriendListJob = async () => {
                             apexFromLCU[change.tier as Tier];
 
                         const payload = {
-                            // ...notification,
+                            region: store.locale?.region,
                             fromDivision: change.oldFriend.division,
                             fromTier: change.oldFriend.tier,
                             fromLeaguePoints: change.oldFriend.leaguePoints,

@@ -40,6 +40,28 @@ export interface DiscordUrls {
     inviteUrl: string;
     authUrl: string;
 }
+
+export interface Locale {
+    locale: string;
+    region: string;
+    webLanguage: string;
+    webRegion: string;
+}
+
+export interface Me {
+    id: string;
+    username: string;
+    avatar: string;
+    discriminator: string;
+    public_flags: number;
+    flags: number;
+    banner?: any;
+    banner_color?: any;
+    accent_color?: any;
+    locale: string;
+    mfa_enabled: boolean;
+    premium_type: number;
+}
 export interface Store {
     config: Record<string, any>;
     selectedFriends: Set<string> | null;
@@ -53,8 +75,9 @@ export interface Store {
     socketStatus: SocketStatus;
     discordUrls: null | DiscordUrls;
     leagueSummoner: null | CurrentSummoner;
-    me: any | null;
+    me: Me | null;
     autoLaunch: AutoLaunch | null;
+    locale: Locale | null;
 }
 
 interface StoreConfig {
@@ -78,6 +101,7 @@ const initialStore: Store = {
     leagueSummoner: null,
     me: null,
     autoLaunch: null,
+    locale: null,
 };
 const resetStore = () =>
     Object.entries(initialStore).forEach(([key, value]) => (store[key as keyof Store] = value));
@@ -116,6 +140,10 @@ const storeConfig: Partial<Record<keyof Store, StoreConfig>> = {
     },
     leagueSummoner: {
         notifyOnChange: true,
+    },
+    locale: {
+        notifyOnChange: true,
+        persist: true,
     },
 };
 

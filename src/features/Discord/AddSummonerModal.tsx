@@ -13,11 +13,12 @@ import {
     Stack,
 } from "@chakra-ui/react";
 import { useSelection } from "@pastable/core";
+import { useAtomValue } from "jotai/utils";
 import { useState } from "react";
 import { BiFolder } from "react-icons/bi";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { api } from "../../api";
-import { DiscordGuild } from "../../components/LCUConnector";
+import { DiscordGuild, regionAtom, storeAtom } from "../../components/LCUConnector";
 import { FriendLastRankDto } from "../../types";
 import { electronRequest } from "../../utils";
 import { useSearchFriendlist } from "../FriendList/FriendList";
@@ -60,7 +61,7 @@ export const AddSummonerModal = ({
         { onSuccess: () => queryClient.invalidateQueries("guilds") }
     );
     const removeSummonersMutation = useRemoveSummonersMutation();
-
+    const region = useAtomValue(regionAtom);
     const [search, setSearch] = useState("");
 
     const searchFriendlist = useSearchFriendlist(friendGroups, search);
@@ -85,16 +86,20 @@ export const AddSummonerModal = ({
 
     const onClick = () => {
         if (toRemove.length) {
-            console.log(toRemove);
+            console.log("toremove", toRemove);
             removeSummonersMutation.mutate({
                 channelId,
                 guildId,
-                summoners: toRemove.map((summoner) => summoner.puuid),
+                summoners: toRemove.map((summoner) => summoner.id),
             });
         }
         if (toAdd.length) {
             console.log(toAdd);
-            const payload = { channelId, guildId, summoners: toAdd };
+            const payload = {
+                channelId,
+                guildId,
+                summoners: toAdd.map((summoner) => ({ ...summoner, region })),
+            };
             addSummonersMutation.mutate(payload);
         }
         onClose();

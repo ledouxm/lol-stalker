@@ -7,7 +7,7 @@ export const AddSummonerButton = ({
     guildId,
     channelId,
     summoners,
-    name,
+    guildName,
     isRestricted,
 }: DiscordGuild) => {
     const disclosure = useDisclosure();
@@ -27,7 +27,7 @@ export const AddSummonerButton = ({
                             removeSummonersMutation.mutate({
                                 channelId: channelId,
                                 guildId: guildId,
-                                summoners: summoners.map((summoner) => summoner.puuid),
+                                summoners: summoners.map((summoner) => summoner.id),
                             });
                         }}
                         userSelect="none"
@@ -41,7 +41,7 @@ export const AddSummonerButton = ({
                 <AddSummonerModal
                     {...disclosure}
                     summoners={summoners}
-                    guildName={name}
+                    guildName={guildName}
                     guildId={guildId}
                     channelId={channelId}
                     isRestricted={isRestricted}

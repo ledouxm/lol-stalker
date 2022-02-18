@@ -18,7 +18,7 @@ export interface DiscordGuild {
     channelName: string;
     guildName: string;
     nbStalkers: number;
-    summoners: { id: number; puuid: string; channelId: string; name: string }[];
+    summoners: { id: number; puuid: string; channelId: string; name: string; region: string }[];
     isRestricted: boolean;
 }
 export interface ConnectorStatus {
@@ -55,6 +55,14 @@ export interface Me {
     mfa_enabled: boolean;
     premium_type: number;
 }
+
+export interface Locale {
+    locale: string;
+    region: string;
+    webLanguage: string;
+    webRegion: string;
+}
+
 export interface Store {
     config: Record<string, any>;
     selectedFriends: Array<string> | null;
@@ -65,6 +73,7 @@ export interface Store {
     discordUrls: null | DiscordUrls;
     leagueSummoner: null | CurrentSummoner;
     me: null | Me;
+    locale: null | Locale;
 }
 
 export const storeAtom = atom<Store | null>(null);
@@ -77,6 +86,7 @@ export const discordAuthAtom = atom((get) => get(storeAtom)?.discordAuth);
 export const discordUrlsAtom = atom((get) => get(storeAtom)?.discordUrls);
 export const meAtom = atom((get) => get(storeAtom)?.me);
 export const leagueSummonerAtom = atom((get) => get(storeAtom)?.leagueSummoner);
+export const regionAtom = atom((get) => get(storeAtom)?.locale?.region);
 
 export const LCUConnector = () => {
     const setFriends = useUpdateAtom(friendsAtom);
