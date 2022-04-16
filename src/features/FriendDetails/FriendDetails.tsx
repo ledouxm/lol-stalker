@@ -24,7 +24,7 @@ export const formatRank = (ranking: Pick<RankDto, "division" | "tier" | "leagueP
         ranking.leaguePoints
     } LP`;
 
-const getFriendRanks = (puuid: FriendDto["puuid"]) =>
+export const getFriendRanks = (puuid: FriendDto["puuid"]) =>
     electronRequest<FriendAllRanksDto>("friendList/friend", puuid);
 
 type FriendDetailsState = "notifications" | "match-history" | "graph" | "old-names";
@@ -72,7 +72,7 @@ export const FriendDetails = () => {
                 setState={setState as (state: string) => void}
                 state={state}
             />
-            <Flex whiteSpace="nowrap" w="100%" h="100%">
+            <Flex whiteSpace="nowrap" w="100%" h="100%" maxH="calc(100% - 140px)">
                 {renderComponentByState[state](friend)}
             </Flex>
         </Stack>

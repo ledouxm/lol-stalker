@@ -33,7 +33,7 @@ export default ({ command }: ConfigEnv): UserConfig => {
     else {
         return {
             base: `./`,
-            publicDir: `./public`,
+            publicDir: `${__dirname}/public`,
             plugins: [],
             alias: {
                 "/@": srcRoot,

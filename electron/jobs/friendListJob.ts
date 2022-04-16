@@ -1,29 +1,27 @@
 import { Notification } from "electron";
-import { config } from "../config";
 import { Friend } from "../entities/Friend";
-import { checkFriendList, compareFriends, connectorStatus } from "../LCU/lcu";
-import { addRanking, getFriendsAndLastRankingFromDb } from "../routes/friends";
-import { addNotification } from "../routes/notifications";
-import { getRankDifference, sendToClient } from "../utils";
-
-export const friendsRef = {
-    current: null as any,
-};
+import { checkFriendList, compareFriends, getAllApexLeague } from "../features/lcu/lcu";
+import { getRankDifference, sendToClient, Tier } from "../utils";
+import { getFriendsAndLastRankingFromDb, addRanking } from "../features/routes/friends";
+import { addNotification } from "../features/routes/notifications";
+import { sendWs } from "../features/ws/discord";
+import { editStoreEntry, store } from "../features/store";
+import { sendInvalidate } from "../features/routes";
 
 export const startCheckFriendListJob = async () => {
     try {
-        if (!connectorStatus.current) throw "not connected to LCU";
+        if (!store.connectorStatus) throw "not connected to LCU";
         console.log("start checking friendlist");
-        friendsRef.current = await getFriendsAndLastRankingFromDb();
-
-        if (!friendsRef.current?.length) {
+        await editStoreEntry("friends", await getFriendsAndLastRankingFromDb());
+        if (!store.friends?.length) {
             const friendListStats = await checkFriendList();
-            friendsRef.current = friendListStats;
+            await editStoreEntry("friends", friendListStats);
         }
 
         while (true) {
             const friendListStats = await checkFriendList();
-            const changes = await compareFriends(friendsRef.current, friendListStats);
+            const changes = await compareFriends(store.friends!, friendListStats);
+            const apexFromLCU = await getAllApexLeague();
             if (changes.length) {
                 console.log(
                     `${changes.length} change${changes.length > 1 ? "s" : ""} found in friendList`
@@ -36,10 +34,31 @@ export const startCheckFriendListJob = async () => {
                             change.oldFriend as any,
                             change as any
                         );
+
+                        const apex =
+                            apexFromLCU[change.oldFriend.tier as Tier] ||
+                            apexFromLCU[change.tier as Tier];
+
+                        const payload = {
+                            region: store.locale?.region,
+                            fromDivision: change.oldFriend.division,
+                            fromTier: change.oldFriend.tier,
+                            fromLeaguePoints: change.oldFriend.leaguePoints,
+                            fromMiniSeriesProgress: change.oldFriend.miniSeriesProgress,
+                            toDivision: change.division,
+                            toTier: change.tier,
+                            toLeaguePoints: change.leaguePoints,
+                            toMiniSeriesProgress: change.miniSeriesProgress,
+                            puuid: change.puuid,
+                            name: change.name,
+                            apex,
+                        };
+
+                        sendWs("update", payload);
+
                         const friend = new Friend();
                         friend.puuid = change.puuid;
-                        console.log(config.current);
-                        if (config.current?.windowsNotifications && change.windowsNotification)
+                        if (store.config?.windowsNotifications && change.windowsNotification)
                             new Notification({
                                 title: change.name,
                                 body: notification.content,
@@ -47,12 +66,11 @@ export const startCheckFriendListJob = async () => {
                         await addNotification({ ...notification, friend });
                     }
                 }
-                sendToClient("invalidate", "notifications/nb-new");
+                sendInvalidate("notifications/nb-new");
             } else {
                 console.log("no soloQ played by friends");
             }
-
-            friendsRef.current = friendListStats;
+            await editStoreEntry("friends", friendListStats);
 
             await new Promise((resolve) => setTimeout(resolve, 10000));
         }

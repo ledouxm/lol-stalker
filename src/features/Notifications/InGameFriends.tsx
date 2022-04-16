@@ -1,4 +1,14 @@
-import { Box, BoxProps, Center, chakra, Flex, Spinner, Stack, useInterval } from "@chakra-ui/react";
+import {
+    Box,
+    BoxProps,
+    Center,
+    chakra,
+    Divider,
+    Flex,
+    Spinner,
+    Stack,
+    useInterval,
+} from "@chakra-ui/react";
 import { useState } from "react";
 import { useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
@@ -24,30 +34,28 @@ export const InGameFriends = () => {
                 <Box>An error has occured</Box>
             </Center>
         );
-    if (!query.data)
-        return (
-            <Center w="200px">
-                <Box>No friend activity</Box>
-            </Center>
-        );
-
     const inGameFriends = query.data;
 
     return (
-        <Stack w="300px" overflowY="auto">
-            <Box fontSize="20px" textAlign="center" pt="5px">
+        <Stack w="300px" overflowY="auto" h="100%">
+            <Box fontSize="20px" pt="5px" my="10px" fontWeight="bold">
                 Friend activity
             </Box>
-            {inGameFriends
-                .sort((a, b) => a.timeStamp - b.timeStamp)
-                .sort(
-                    (a, b) =>
-                        gameStatusOrder.findIndex((item) => item === a.gameStatus) -
-                        gameStatusOrder.findIndex((item) => item === b.gameStatus)
-                )
-                .map((friend) => (
-                    <InGameFriendRow friend={friend} key={friend.puuid} />
-                ))}
+            <Divider w="70%" mx="0" />
+            {!inGameFriends ? (
+                <Center h="100%">
+                    <Box>No friend activity</Box>
+                </Center>
+            ) : (
+                inGameFriends
+                    .sort((a, b) => a.timeStamp - b.timeStamp)
+                    .sort(
+                        (a, b) =>
+                            gameStatusOrder.findIndex((item) => item === a.gameStatus) -
+                            gameStatusOrder.findIndex((item) => item === b.gameStatus)
+                    )
+                    .map((friend) => <InGameFriendRow friend={friend} key={friend.puuid} />)
+            )}
         </Stack>
     );
 };
@@ -55,14 +63,14 @@ const InGameFriendRow = ({ friend }: { friend: InGameFriend }) => {
     const champion = useChampionDataById(friend.championId);
     const navigate = useNavigate();
     return (
-        <Flex alignItems="center" justifyContent="space-between" p="5px" px="15px">
+        <Flex alignItems="center" justifyContent="space-between" p="5px" pl="0px" pr="15px">
             <Flex direction="column" w="100%" key={friend.puuid}>
                 <Box
                     fontWeight="bold"
                     onClick={() => navigate(`/friend/${friend.puuid}`)}
                     cursor="pointer"
                 >
-                    {friend.gameName}
+                    {friend.name}
                 </Box>
                 <Flex mt="-3px" justifyContent="space-between">
                     <chakra.span color="gray.500">
@@ -105,15 +113,9 @@ const CountDown = ({ timeStamp, ...props }: { timeStamp: number } & BoxProps) =>
         </Box>
     );
 };
-type GameStatus = "hosting_RANKED_SOLO_5x5" | "inQueue" | "inGame" | "championSelect";
-const gameStatusOrder: GameStatus[] = [
-    "inGame",
-    "championSelect",
-    "inQueue",
-    "hosting_RANKED_SOLO_5x5",
-];
+type GameStatus = "inQueue" | "inGame" | "championSelect";
+const gameStatusOrder: GameStatus[] = ["inGame", "championSelect", "inQueue"];
 const gameStatusLabelMap: Record<string, string> = {
-    hosting_RANKED_SOLO_5x5: "In Lobby",
     inQueue: "In queue",
     inGame: "In game",
     championSelect: "In champion select",

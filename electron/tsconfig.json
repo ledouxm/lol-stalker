@@ -22,5 +22,12 @@
         "outDir": "../main"
     },
     "exclude": ["node_modules"],
-    "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.prisma", "prismaClient/*"]
+    "include": [
+        "**/*.ts",
+        "**/*.tsx",
+        "**/*.js",
+        "**/*.prisma",
+        "prismaClient/*",
+        "../ormconfig.js"
+    ]
 }

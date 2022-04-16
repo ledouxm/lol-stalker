@@ -1,8 +1,8 @@
 {
     "name": "lol-stalker",
-    "version": "0.0.2",
+    "version": "0.1.0",
     "license": "MIT",
-    "main": "main/index.js",
+    "main": "main/electron/index.js",
     "author": {
         "name": "Ledoux Martin"
     },
@@ -18,19 +18,19 @@
     },
     "productName": "LoL Stalker",
     "scripts": {
-        "dev": "yarn migration:up && concurrently \"yarn dev:vite --port 3002\" \" yarn dev:electron\"",
+        "dev": "concurrently \"yarn dev:vite --port 3002\" \" yarn dev:electron\"",
         "dev:vite": "vite --https",
         "dev:electron": "yarn build:electron && electron .",
         "build": "yarn clean && yarn init:db &&  yarn build:vite && yarn build:electron && yarn migration:up",
         "build:vite": "vite build",
         "build:electron": "tsc -p electron",
-        "dist": "yarn build && electron-builder",
+        "dist": "set NODE_ENV=PRODUCTION && yarn build && electron-builder",
         "pack": "yarn build && electron-builder --dir",
         "clean": "rimraf dist main src/out database",
         "type-check": "tsc",
         "init:db": "copyfiles ./base.db ./database && move-cli ./database/base.db ./database/lol-stalker.db",
         "migrate": "yarn migration:create && yarn migration:up",
-        "migration:create": "yarn typeorm migration:generate -o -n dist",
+        "migration:create": "yarn build:electron && yarn typeorm migration:generate -o -n dist",
         "migration:up": "yarn typeorm migration:run"
     },
     "dependencies": {
@@ -38,11 +38,12 @@
         "@chakra-ui/react": "^1.6.7",
         "@emotion/react": "^11",
         "@emotion/styled": "^11",
-        "@pastable/core": "^0.1.14",
+        "@pastable/core": "^0.1.15",
+        "auto-launch": "^5.0.5",
         "axios": "^0.24.0",
-        "bull": "^4.2.1",
         "classnames": "^2.3.1",
         "debug": "^4.3.3",
+        "discord-oauth2": "^2.9.0",
         "dotenv": "^14.3.2",
         "electron-is-dev": "^2.0.0",
         "framer-motion": "^4",
@@ -52,20 +53,27 @@
         "react-dom": "^17.0.2",
         "react-hook-form": "^7.25.3",
         "react-icons": "^4.3.1",
+        "react-json-tree": "^0.16.1",
         "react-query": "^3.34.8",
         "react-router-dom": "6",
         "recharts": "^2.1.8",
         "sqlite3": "^5.0.2",
         "typeorm": "^0.2.41",
+        "websocket": "^1.0.34",
+        "ws": "^8.5.0",
+        "ws-client-js": "^1.0.5",
+        "xstate": "^4.29.0",
         "yenv": "^3.0.1"
     },
     "devDependencies": {
-        "@types/bull": "^3.15.7",
+        "@types/auto-launch": "^5.0.2",
         "@types/node": "^16.3.3",
         "@types/react": "^17.0.3",
         "@types/react-dom": "^17.0.3",
         "@types/react-icons": "^3.0.0",
         "@types/sqlite3": "^3.1.8",
+        "@types/websocket": "^1.0.5",
+        "@types/ws": "^8.2.2",
         "@vitejs/plugin-react": "^1.1.4",
         "@vitejs/plugin-react-refresh": "^1.3.1",
         "autoprefixer": "^10.3.1",
@@ -75,22 +83,29 @@
         "electron": "^13.1.7",
         "electron-builder": "^22.10.5",
         "move-cli": "^2.0.0",
+        "path-exists-cli": "^2.0.0",
         "postcss": "^8.3.5",
-        "sqlite3-cli": "^1.0.0",
         "typescript": "^4.2.3",
         "vite": "^2.1.2"
     },
     "build": {
         "asar": false,
+        "nsis": {
+            "oneClick": true,
+            "installerIcon": "public/icon.ico",
+            "installerHeaderIcon": "public/icon.ico"
+        },
+        "win": {
+            "target": "nsis",
+            "icon": "public/icon.ico"
+        },
         "files": [
             "main",
             "src/out",
+            "resources/**/*",
             {
-                "from": "./database/",
-                "to": "main/database/",
-                "filter": [
-                    "*.db"
-                ]
+                "from": "public",
+                "to": "public"
             }
         ],
         "directories": {

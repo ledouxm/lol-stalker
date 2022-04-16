@@ -13,7 +13,6 @@ export const Navbar = (props: StackProps) => {
     const hasSubMenu = testRegex(location.pathname);
 
     const puuid = hasSubMenu && location.pathname.replace("/friend/", "");
-
     return (
         <>
             <Stack
@@ -29,7 +28,10 @@ export const Navbar = (props: StackProps) => {
             >
                 <AppLink to="/">Notifications</AppLink>
                 <AppLink to="/friendlist">Friendlist</AppLink>
+                <AppLink to="/currentSummoner">My graph</AppLink>
+                <AppLink to="/discord">Discord</AppLink>
                 <AppLink to="/options">Options</AppLink>
+                {process.env.NODE_ENV === "development" && <AppLink to="/dev">Dev tools</AppLink>}
                 {hasSubMenu && (
                     <Center>
                         <Box fontSize="sm">

@@ -30,7 +30,6 @@ export interface RankDto {
     losses: number;
     leaguePoints: number;
     division: string;
-    puuid: string;
     createdAt: Date;
 }
 
@@ -76,6 +75,22 @@ export interface ParticipantIdentity {
     player: Player;
 }
 
+export interface CurrentSummoner {
+    accountId: number;
+    displayName: string;
+    internalName: string;
+    nameChangeFlag: boolean;
+    percentCompleteForNextLevel: number;
+    privacy: string;
+    profileIconId: number;
+    puuid: string;
+    rerollPoints: any;
+    summonerId: number;
+    summonerLevel: number;
+    unnamed: boolean;
+    xpSinceLastLevel: number;
+    xpUntilNextLevel: number;
+}
 export interface Stats {
     assists: number;
     causedEarlySurrender: boolean;

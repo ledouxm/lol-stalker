@@ -1,6 +1,12 @@
 import debug from "debug";
 import { BrowserWindow } from "electron";
+import electronIsDev from "electron-is-dev";
+import path from "path";
 import { Ranking } from "./entities/Ranking";
+
+const domain = electronIsDev ? "localhost:8080/" : "stalker.back.chainbreak.dev/";
+export const baseURL = (electronIsDev ? "http://" : "https://") + domain;
+export const wsUrl = "ws://" + domain + "ws";
 
 export const sendToClient = (channel: string, ...args: any[]) =>
     console.log(channel)! || BrowserWindow.getAllWindows()?.[0]?.webContents.send(channel, ...args);
@@ -8,10 +14,28 @@ export const sendToClient = (channel: string, ...args: any[]) =>
 export const makeDataDragonUrl = (buildVersion: string) =>
     `https://ddragon.leagueoflegends.com/cdn/dragontail-${buildVersion}.tgz`;
 
-export const formatRank = (ranking: Pick<Ranking, "division" | "tier" | "leaguePoints">) =>
-    `${ranking.tier}${ranking.division !== "NA" ? ` ${ranking.division}` : ""} - ${
+export const formatRank = (
+    ranking: Pick<Ranking, "division" | "tier" | "leaguePoints"> & { miniSeriesProgress?: string }
+) => {
+    const isPromo = !!ranking.miniSeriesProgress && ranking.miniSeriesProgress !== "NNNNN";
+
+    return `${ranking.tier}${ranking.division !== "NA" ? ` ${ranking.division}` : ""} - ${
         ranking.leaguePoints
-    } LPs`;
+    } LPs${isPromo ? " " + getPromosGames(ranking.miniSeriesProgress!) : ""}`;
+};
+
+const getPromosGames = (miniSeriesProgress: string) => {
+    const nbWin = Array.from(miniSeriesProgress).reduce(
+        (acc, current) => (current === "W" ? acc + 1 : acc),
+        0
+    );
+    const nbLoss = Array.from(miniSeriesProgress).reduce(
+        (acc, current) => (current === "L" ? acc + 1 : acc),
+        0
+    );
+
+    return `(${nbWin} - ${nbLoss})`;
+};
 
 export const ranks: Rank[] = [
     {
@@ -56,12 +80,14 @@ export type Tier =
     | "CHALLENGER";
 type Division = "I" | "II" | "III" | "IV";
 interface Rank {
-    tier: Tier;
-    division: Division;
+    tier: string;
+    division: string;
     leaguePoints: number;
+    miniSeriesProgress?: string;
 }
 const tiers = [
     "IRON",
+    "BRONZE",
     "SILVER",
     "GOLD",
     "PLATINUM",
@@ -104,3 +130,11 @@ export const getRankDifference = (oldRank: Rank, newRank: Rank) => {
         content: `${hasLost ? "LOST" : "GAINED"} ${Math.abs(lpDifference)} LP`,
     };
 };
+
+export const getDbPath = () =>
+    path.join(
+        process.env.APPDATA!,
+        "LoL Stalker",
+        "database",
+        electronIsDev ? "lol-stalker.dev.db" : "lol-stalker.db"
+    );

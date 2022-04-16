@@ -1,11 +1,11 @@
 import { pick } from "@pastable/core";
 import { atom } from "jotai";
 import { useAtomValue } from "jotai/utils";
+import { selectedFriendsAtom } from "../../components/LCUConnector";
 import { FriendDto, FriendGroup, FriendLastRankDto } from "../../types";
 
 export const friendsAtom = atom<FriendLastRankDto[]>([]);
 export const groupsAtom = atom((get) => getFriendListFilteredByGroups(get(friendsAtom)));
-export const selectedFriendsAtom = atom<FriendDto["puuid"][]>([]);
 export interface FriendUpdate extends Partial<FriendDto> {
     puuid: FriendDto["puuid"];
 }
@@ -19,7 +19,7 @@ export const useFriendList = () => {
 export const useIsFriendSelected = (puuid: FriendDto["puuid"]) => {
     const selectedFriends = useAtomValue(selectedFriendsAtom);
 
-    return selectedFriends.includes(puuid);
+    return selectedFriends?.includes(puuid);
 };
 
 export const getFriendListFilteredByGroups = (friends: FriendLastRankDto[]) => {

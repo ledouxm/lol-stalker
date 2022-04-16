@@ -1,35 +1,24 @@
 import dotenv from "dotenv";
+import { app, BrowserWindow, dialog } from "electron";
 dotenv.config();
-import { app, BrowserWindow, ipcMain, shell } from "electron";
 import isDev from "electron-is-dev";
-import path, { join } from "path";
-import { config, loadConfig, persistConfig } from "./config";
+import path from "path";
 import { makeDb } from "./db";
 import { startCheckCurrentSummonerRank } from "./jobs/currentSummonerRank";
 import { startCheckFriendListJob } from "./jobs/friendListJob";
-import { connector, sendConnectorStatus } from "./LCU/lcu";
-import {
-    receiveToggleSelectFriends,
-    sendApex,
-    sendCursoredNotifications,
-    sendFriendList,
-    sendFriendListWithRankings,
-    sendFriendRank,
-    sendInstantMessage,
-    sendMatches,
-    sendNbNewNotifications,
-    sendSelectAllFriends,
-    sendSelected,
-} from "./routes";
-import { inGameFriends } from "./routes/friends";
-import { loadSelectedFriends } from "./selection";
-import { sendToClient } from "./utils";
+import { connector } from "./features/lcu/lcu";
+import { registerInternalRoutes } from "./features/routes/internal";
+import { makeSocketClient } from "./features/ws/discord";
+import { loadStore } from "./features/store";
+import { startUpdateApex } from "./jobs/updateApex";
+import { initAutoLauch } from "./features/autoLaunch";
 
 const height = 600;
 const width = 1200;
 
 const baseBounds = { height, width };
 let window: BrowserWindow;
+
 export function makeWindow() {
     // Create the browser window.
     window = new BrowserWindow({
@@ -38,90 +27,81 @@ export function makeWindow() {
         show: true,
         resizable: true,
         autoHideMenuBar: true,
+        icon: path.join(__dirname, "../public/icon.ico"),
         fullscreenable: true,
         webPreferences: {
-            preload: join(__dirname, "preload.js"),
+            preload: path.join(__dirname, "preload.js"),
             webSecurity: false,
             allowRunningInsecureContent: true,
             nodeIntegration: true,
         },
     });
     const port = process.env.PORT || 3001;
-    const url = isDev ? `https://localhost:${port}` : join(__dirname, "../src/out/index.html");
+    const url = isDev
+        ? `https://localhost:${port}`
+        : path.join(__dirname, "../../src/out/index.html");
     // window.webContents.openDevTools();
-
     isDev ? window?.loadURL(url) : window?.loadFile(url);
-
+    console.log(__dirname);
     return window;
 }
-app.whenReady().then(async () => {
-    await makeDb();
-    connector.start();
-    await loadSelectedFriends();
-    await loadConfig();
-    makeWindow();
-    startCheckFriendListJob();
-    startCheckCurrentSummonerRank();
-    app.on("activate", function () {
-        // On macOS it's common to re-create a window in the app when the
-        // dock icon is clicked and there are no other windows open.
-        if (BrowserWindow.getAllWindows().length === 0) makeWindow();
+const gotTheLock = app.requestSingleInstanceLock();
+
+export const focusWindow = () => {
+    window?.show();
+    window?.focus();
+};
+
+if (!gotTheLock && !isDev) {
+    app.quit();
+} else {
+    if (!isDev)
+        app.on("second-instance", () => {
+            // Someone tried to run a second instance, we should focus our window.
+            if (window) {
+                if (window.isMinimized()) window.restore();
+                window.focus();
+            }
+        });
+    // Create window, load the rest of the app, etc...
+    app.whenReady().then(async () => {
+        await loadStore();
+        await initAutoLauch();
+        await makeDb();
+        connector.start();
+        registerInternalRoutes();
+        await makeSocketClient();
+        makeWindow();
+
+        startCheckFriendListJob();
+        startCheckCurrentSummonerRank();
+        startUpdateApex();
+
+        app.on("activate", function () {
+            // On macOS it's common to re-create a window in the app when the
+            // dock icon is clicked and there are no other windows open.
+            if (BrowserWindow.getAllWindows().length === 0) makeWindow();
+        });
+        app.on("window-all-closed", () => {
+            app.quit();
+            process.exit(0);
+        });
+        app.on("open-url", (_, url) => {
+            dialog.showErrorBox("Welcome Back", `You arrived from: ${url}`);
+        });
     });
-    app.on("window-all-closed", () => {
-        app.quit();
-        process.exit(0);
+
+    // Handle the protocol. In this case, we choose to show an Error Box.
+    app.on("open-url", (_, url) => {
+        dialog.showErrorBox("Welcome Back", `You arrived from: ${url}`);
     });
-});
-app.setAppUserModelId("LoL Stalker");
 
-ipcMain.on("lcu/connection", () => {
-    sendConnectorStatus();
-});
-ipcMain.on("friendList/lastRank", sendFriendList);
-ipcMain.on("friendList/friend", sendFriendRank);
-ipcMain.on("friendList/ranks", sendFriendListWithRankings);
-ipcMain.on("friendList/select", receiveToggleSelectFriends);
-ipcMain.on("friendList/select-all", sendSelectAllFriends);
-ipcMain.on("friendList/selected", () => sendSelected());
-ipcMain.on("friendList/in-game", () => sendToClient("friendList/in-game", inGameFriends.current));
-ipcMain.on("friendList/message", sendInstantMessage);
+    app.setAppUserModelId("LoL Stalker");
 
-ipcMain.on("notifications/all", sendCursoredNotifications);
-ipcMain.on("notifications/nb-new", sendNbNewNotifications);
-ipcMain.on("friend/matches", sendMatches);
+    app.on("window-all-closed", function () {
+        if (process.platform !== "darwin") app.quit();
+    });
 
-ipcMain.on("config/apex", sendApex);
-
-ipcMain.on("config", () => sendToClient("config", config.current));
-ipcMain.on("config/set", async (_, data) => {
-    Object.entries(data).forEach(([key, val]) => (config.current![key] = val));
-    sendToClient("config/set", "ok");
-    sendToClient("invalidate", "config");
-    await persistConfig();
-});
-
-ipcMain.on("config/dl-db", () => {
-    const url = path.join(
-        __dirname,
-        isDev ? "../database/lol-stalker.db" : "./database/lol-stalker.db"
-    );
-    shell.showItemInFolder(url);
-    sendToClient("config/dl-db", "ok");
-});
-
-ipcMain.on("config/open-external", (_, url: string) => {
-    shell.openExternal(url);
-    sendToClient("config/open-external", "ok");
-});
-
-ipcMain.on("close", () => {
-    window.close();
-    app.exit(0);
-});
-
-app.on("window-all-closed", function () {
-    if (process.platform !== "darwin") app.quit();
-});
-
-app.commandLine.appendSwitch("disable-site-isolation-trials");
-app.commandLine.appendSwitch("ignore-certificate-errors");
+    app.commandLine.appendSwitch("disable-site-isolation-trials");
+    app.commandLine.appendSwitch("ignore-certificate-errors");
+}
